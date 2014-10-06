@@ -443,11 +443,11 @@ def get_households_profile(geo_code, geo_level, session):
     db_model_age = get_model_from_fields(['age of household head'],
                                             geo_level)
     objects = get_objects_by_geo(db_model_age, geo_code, geo_level, session)
-    total_under_20 = 0.0
+    total_under_18 = 0.0
     for obj in objects:
         age = getattr(obj, 'age of household head')
-        if age in ['10 - 14', '15 - 17', '18 - 19']:
-            total_under_20 += obj.total
+        if age in ['00 - 04', '05 - 09', '10 - 14', '15 - 17']:
+            total_under_18 += obj.total
 
     # tenure
     tenure_data, _ = get_stat_data(
@@ -513,9 +513,9 @@ def get_households_profile(geo_code, geo_level, session):
                     'values': {'this': percent(female_heads, total_households)},
                     'numerators': {'this': female_heads},
                     },
-                'under_20': {
-                    'name': 'Households with heads under 20 years old',
-                    'values': {'this': total_under_20},
+                'under_18': {
+                    'name': 'Households with heads under 18 years old',
+                    'values': {'this': total_under_18},
                     }
                 },
            }
