@@ -472,7 +472,7 @@ function Comparison(options) {
         
 
         // create the legend
-        var quintileColors = ['#d9ece8', '#a1cfc6', '#68b3a3', '#428476', '#264b44'];
+        var quintileColors = ['#fcbba1', '#fc9272', '#fb6a4a', '#de2d26', '#a50f15'];
         var buildLegend = function(colors) {
             var scaleStops = (values.length >= 5) ? 5 : values.length;
 
