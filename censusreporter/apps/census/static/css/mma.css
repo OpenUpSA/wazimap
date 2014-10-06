@@ -64,6 +64,10 @@
     text-decoration: underline;
 }
 
+.tool-group a i {
+    margin-left: 4px;
+}
+
 header.section-contents.table-explorer h1 a {
     float: none;
 }
