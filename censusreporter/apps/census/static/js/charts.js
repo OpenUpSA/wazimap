@@ -1339,9 +1339,8 @@ function Chart(options) {
             var geoIDs = chart.geoIDs;
 
             chart.tableURL =        '/data/table/?table='+chart.tableID+'&primary_geo_id='+chart.primaryGeoID+'&geo_ids='+geoIDs.join(',');
-            chart.distributionURL = '/data/distribution/?table='+chart.tableID+'&primary_geo_id='+chart.primaryGeoID+'&geo_ids='+geoIDs.join(',');
 
-            // when showing maps, try to show relevant geos right from
+            // when showing distribution and maps, try to show relevant geos right from
             // the start.
             geoIDs = [];
             if (chart.thisGeo.parent_geoid) {
@@ -1358,6 +1357,7 @@ function Chart(options) {
             }
 
             chart.mapURL = '/data/map/?table='+chart.tableID+'&primary_geo_id='+chart.primaryGeoID+'&geo_ids='+geoIDs.join(',');
+            chart.distributionURL = '/data/distribution/?table='+chart.tableID+'&primary_geo_id='+chart.primaryGeoID+'&geo_ids='+geoIDs.join(',');
         }
     }
 
