@@ -734,15 +734,6 @@ function Chart(options) {
 
         chart.actionLinks.append("span").text("/");
 
-        if (chart.tableID) {
-            chart.showMap = chart.actionLinks
-                .append("a")
-                    .text("Map")
-                    .attr("href", chart.mapURL);
-
-            chart.actionLinks.append("span").text("/");
-        }
-
         chart.showEmbed = chart.actionLinks
             .append("a")
                 .classed("chart-show-embed", true)
@@ -938,6 +929,16 @@ function Chart(options) {
             
             chart.dataDrawer = row.append("div")
                     .attr("class", "data-drawer column-full");
+
+            chart.dataDrawer.append("div")
+                    .attr("class", "tool-group")
+                    .append("ul")
+                    .attr("class", "toggle-set")
+                    .html(function() {
+                        return " <li><a class='smaller' href='" + chart.tableURL + "'>Table</a></li>" +
+                               " <li><a class='smaller' href='" + chart.mapURL + "'>Map</a></li>" +
+                               " <li><a class='smaller' href='" + chart.distributionURL + "'>Distribution</a></li>";
+                    });
                     
             chart.dataDrawer.append("h3")
                     .attr("class", "chart-title")
@@ -948,9 +949,7 @@ function Chart(options) {
                         } else {
                             titleText = "Table " + tableID;
                         }
-                        return titleText + " <a class='smaller push-right' href='" + chart.tableURL + "'>View table</a>"
-                                         + " <a class='smaller push-right' href='" + chart.mapURL + "'>Map</a>"
-                                         + " <a class='smaller push-right' href='" + chart.distributionURL + "'>Distribution</a>";
+                        return titleText;
                     });
 
             chart.dataTable = chart.dataDrawer.append("table")
