@@ -144,7 +144,7 @@
                 {% include 'profile/_blocks/_stat_list.html' with stat=demographics.median_age stat_type='number' %}
             </div>
             <div class="column-half" id="chart-histogram-demographics-age_group_distribution" data-stat-type="scaled-percentage" data-chart-title="Population by age range"></div>
-            <div class="column-quarter" id="chart-pie-demographics-age_category_distribution" data-stat-type="percentage" data-chart-title="Population by age category"></div>
+            <div class="column-quarter" id="chart-pie-demographics-age_category_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Population by age category"></div>
         </section>
         <section class="clearfix stat-row">
             <h2 class="header-for-columns"><a class="permalink" href="#pop_count" id="pop_count">Population <i class="fa fa-link"></i></a></h2>
@@ -155,7 +155,7 @@
                 <div id="chart-column-demographics-population_group_distribution" data-stat-type="scaled-percentage" data-chart-title="Population group"></div>
             </div>
             <div class="column-quarter">
-                <div id="chart-pie-demographics-sex_ratio" data-stat-type="percentage" data-chart-title="Sex"></div>
+                <div id="chart-pie-demographics-sex_ratio" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Sex"></div>
             </div>
         </section>
         <section class="clearfix stat-row">
@@ -207,14 +207,14 @@
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=households.owned stat_type='percentage' %}
             </div>
-            <div class="column-third" id="chart-pie-households-tenure_distribution" data-stat-type="percentage" data-chart-title="Households by ownership"></div>
+            <div class="column-third" id="chart-pie-households-tenure_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Households by ownership"></div>
         </section>
         <section class="clearfix stat-row grouped-row">
             <h2><a class="permalink" href="#household-head" id="household-head">Head of household <i class="fa fa-link"></i></a></h2>
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=households.head_of_household.female stat_type='percentage' %}
             </div>
-            <div class="column-third" id="chart-pie-households-head_of_household-gender_distribution" data-stat-type="percentage" data-chart-title="Head of household by gender"></div>
+            <div class="column-third" id="chart-pie-households-head_of_household-gender_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Head of household by gender"></div>
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=households.head_of_household.under_20 stat_type='number' %}
             </div>
@@ -300,8 +300,8 @@
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=economics.employment_status.Employed stat_type='percentage' %}
             </div>
-            <div class="column-third" id="chart-pie-economics-employment_status" data-chart-title="Population by employment status" data-stat-type="percentage" data-qualifier="Universe: {{ economics.employment_status.metadata.universe }}"></div>
-            <div class="column-third" id="chart-pie-economics-sector_type_distribution" data-chart-title="Sector of employment" data-stat-type="percentage" data-qualifier="Universe: {{ economics.sector_type_distribution.metadata.universe }}"></div>
+            <div class="column-third" id="chart-pie-economics-employment_status" data-chart-title="Population by employment status" data-stat-type="percentage" data-initial-sort="-value" data-qualifier="Universe: {{ economics.employment_status.metadata.universe }}"></div>
+            <div class="column-third" id="chart-pie-economics-sector_type_distribution" data-chart-title="Sector of employment" data-stat-type="percentage" data-initial-sort="-value" data-qualifier="Universe: {{ economics.sector_type_distribution.metadata.universe }}"></div>
         </section>
         <section class="clearfix stat-row">
             <h2><a class="permalink" href="#income" id="income">Monthly income <i class="fa fa-link"></i></a></h2>
@@ -318,7 +318,7 @@
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=economics.internet_access stat_type='percentage' %}
             </div>
-            <div class="column-third" id="chart-pie-economics-internet_access_distribution" data-chart-title="Primary means of internet access" data-stat-type="scaled-percentage"></div>
+            <div class="column-third" id="chart-pie-economics-internet_access_distribution" data-chart-title="Primary means of internet access" data-stat-type="scaled-percentage" data-initial-sort="-value"></div>
         </section>
     </div>
 </article>
