@@ -51,6 +51,23 @@
     text-decoration: none;
 }
 
+.data-drawer .tool-group {
+    float: right;
+    margin-right: 0px;
+}
+
+.data-drawer h3.chart-title {
+    margin-top: 6px;
+}
+
+.chart .action-links a {
+    text-decoration: underline;
+}
+
+.tool-group a i {
+    margin-left: 4px;
+}
+
 header.section-contents.table-explorer h1 a {
     float: none;
 }
