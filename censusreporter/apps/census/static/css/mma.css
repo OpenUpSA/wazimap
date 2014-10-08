@@ -55,6 +55,14 @@ header.section-contents.table-explorer h1 a {
     float: none;
 }
 
+.hovercard .context,
+.grid .context {
+    display: none;
+}
+.grid .value {
+    padding-right: 0em;
+}
+
 @media only screen and (max-width: 768px) {
     #share-this-page {
         display: none;
