@@ -50,7 +50,7 @@ var sumlevMap = {
                 "ancestors": ['province', 'country']},
     "ward":  {"name": "ward", "plural": "wards", "sumlev": "ward",
                 "children": [],
-                "ancestors": ['municipality', 'province', 'country']},
+                "ancestors": ['municipality', 'province']},
 };
 
 var releaseNames = {
