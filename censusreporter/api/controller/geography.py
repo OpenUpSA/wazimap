@@ -35,7 +35,7 @@ def get_locations(search_term, levels=None, year='2011'):
             if not level in geo_levels:
                 raise ValueError('Invalid geolevel: %s' % level)
     else:
-        levels = ['country', 'province', 'municipality', 'subplace']
+        levels = ['country', 'province', 'municipality', 'ward', 'subplace']
 
     session = get_session()
     try:
@@ -58,7 +58,13 @@ def get_locations(search_term, levels=None, year='2011'):
                                 model.code == search_term))
                     .limit(10)
                 )
-
+            elif level == 'ward':
+                objects.update(session
+                    .query(model)
+                    .filter(model.year == year,
+                            model.code.like(search_term + '%'))
+                    .limit(10)
+                )
             else:
                 objects.update(session
                     .query(model)
