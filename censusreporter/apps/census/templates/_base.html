@@ -69,9 +69,12 @@
                     {% endif %}
                 </div>
                 {% endif %}
-                <a class="logo" href="http://www.mediamonitoringafrica.org/" target="_blank">
-                    <img src="{% static 'img/mma.png' %}">
-                </a>
+                <div class="header-buttons">
+                    <a href="https://twitter.com/@Wazimap" title="@Wazimap on Twitter"><i class="fa fa-2x fa-twitter"></i></a>
+                    <a class="logo" href="http://www.mediamonitoringafrica.org/" target="_blank">
+                        <img src="{% static 'img/mma.png' %}">
+                    </a>
+                </div>
             </div>
         </header>
         {% block header_content %}{% endblock header_content %}

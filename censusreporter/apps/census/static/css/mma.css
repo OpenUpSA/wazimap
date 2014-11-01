@@ -21,8 +21,10 @@
     vertical-align: bottom;
     height: 25px;
 }
-#page-header-title .logo {
+#page-header-title .header-buttons {
     float: right;
+}
+#page-header-title .logo {
     margin: 0.3em 8px 0;
 }
 #page-header-title .logo img {
