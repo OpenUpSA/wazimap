@@ -677,7 +677,7 @@ h1.article-header-right {
 }
 #homepage .big-action h1 {
     float: left;
-    width: 150px;
+    width: 200px;
 }
 .data-builder h1 {
     float: none;
@@ -720,10 +720,9 @@ h1.article-header-right {
 #homepage .input-wrapper,
 #homepage .input-wrapper {
     padding-top: .25em;
-    padding-left: 180px;
+    padding-left: 230px;
 }
 #geography-select-wrapper .geolocate-only {
-    clear: both;
     width: 100%;
     margin: 1em auto;
 }
