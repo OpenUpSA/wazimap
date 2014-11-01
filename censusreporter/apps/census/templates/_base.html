@@ -86,34 +86,55 @@
         <footer id="page-footer">
             <section class="wrapper footer-container clearfix">
                 {% block footer_content %}
-                <ul class="ul-icon-list">
-                    <li class="column-quarter">
-                        <i class="fa fa-github"></i> <a href="https://github.com/Code4SA/censusreporter" target="_blank">Wazimap on Github</a>
-                    </li>
-                    <li class="column-quarter">
-                        <i class="fa fa-th-list"></i> <a href="http://www.mediamonitoringafrica.org/" target="_blank">Media Monitoring Africa Home</a>
-                    </li>
-                    <li class="column-quarter">
-                        <i class="fa fa-twitter"></i> <a href="http://twitter.com/Wazimap" target="_blank">@Wazimap</a>
-                    </li>
-                    <li class="column-quarter">
-                        <i class="fa fa-envelope"></i> <a href="mailto:info@mma.org.za">Email us</a>
-                    </li>
-                </ul>
-                <ul class="ul-icon-list">
-                    <li class="column-quarter">
-                        <i class="fa fa-bar-chart-o"></i> <a href="http://www.statssa.gov.za/" target="_blank">Census 2011 data from Stats SA</a>
-                    </li>
-                    <li class="column-quarter">
-                        <i class="fa fa-check-square"></i> <a href="http://www.elections.org.za/" target="_blank">Elections data from the IEC</a>
-                    </li>
-                    <li class="column-quarter">
-                        <i class="fa fa-github"></i> Built on <a href="http://censusreporter.org" target="_blank">CensusReporter.org</a>
-                    </li>
-                    <li class="column-quarter">
-                        <a href="http://www.code4sa.org/"><img src="{% static 'img/code4sa-logo-small.png' %}"></a>
-                    </li>
-                </ul>
+                <div class="column-quarter">
+                    <ul class="ul-icon-list">
+                        <li>
+                            <i class="fa fa-info"></i> <a href="/about">About Wazimap</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-twitter"></i> <a href="http://twitter.com/Wazimap" target="_blank">@Wazimap</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-pencil"></i> <a href="http://www.newstools.co.za/" target="_blank">More Newstools</a>
+                        </li>
+                    </ul>
+
+                    <ul class="ul-icon-list">
+                        <li>
+                            <i class="fa fa-check-square"></i> <a href="http://www.elections.org.za/" target="_blank">Elections data from the IEC</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-bar-chart-o"></i> <a href="http://www.statssa.gov.za/" target="_blank">Census 2011 data from Stats SA</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="column-quarter">
+                    <ul class="ul-icon-list">
+                        <li>
+                            <i class="fa fa-th-list"></i> <a href="http://www.mediamonitoringafrica.org/" target="_blank">Media Monitoring Africa</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-envelope"></i> <a href="mailto:info@mma.org.za">Email us</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="column-quarter">
+                    <ul class="ul-icon-list">
+                        <li>
+                            <i class="fa fa-github"></i> <a href="https://github.com/Code4SA/censusreporter" target="_blank">Wazimap on Github</a>
+                        </li>
+                        <li>
+                            <i class="fa fa-github"></i> Built on <a href="http://censusreporter.org" target="_blank">CensusReporter.org</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="column-quarter">
+                    <ul class="ul-icon-list">
+                        <li>
+                            <a href="http://www.code4sa.org/"><img src="{% static 'img/code4sa-logo-small.png' %}"></a>
+                        </li>
+                    </ul>
+                </div>
                 {% endblock footer_content %}
             </section>
         </footer>
