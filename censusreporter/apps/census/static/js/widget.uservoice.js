@@ -11,6 +11,7 @@ if (browserWidth > 480) {
     UserVoice.push(['addTrigger', {
         mode: 'contact',
         trigger_style: 'tab',
-        trigger_position: 'right'
+        trigger_position: 'bottom-right',
+        tab_label: 'help & feedback'
     }]);
 }
