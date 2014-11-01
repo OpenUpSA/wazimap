@@ -11,7 +11,7 @@ from .views import (HomepageView, GeographySearchView,
     HealthcheckView, DataView, TopicView, ExampleView, Elasticsearch)
 
 from .wazi import (GeographyDetailView, GeographyJsonView, WardSearchProxy, PlaceSearchJson,
-        LocateView, DataAPIView, TableAPIView)
+        LocateView, DataAPIView, TableAPIView, AboutView)
 
 admin.autodiscover()
 
@@ -28,6 +28,13 @@ urlpatterns = patterns('',
         view    = cache_page(STANDARD_CACHE_TIME)(HomepageView.as_view()),
         kwargs  = {},
         name    = 'homepage',
+    ),
+
+    url(
+        regex   = '^about$',
+        view    = cache_page(STANDARD_CACHE_TIME)(AboutView.as_view()),
+        kwargs  = {},
+        name    = 'about',
     ),
 
     # e.g. /profiles/province-GT/

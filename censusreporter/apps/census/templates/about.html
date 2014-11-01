@@ -1,0 +1,49 @@
+{% extends '_base.html' %}{% load partition staticfiles %}
+
+{% block head_title %}About - {{ block.super }}{% endblock %}
+
+{% block content %}
+<article id="about">
+    <header>
+        <h1 class="article-header">Why Wazimap? A brief history.</h1>
+    </header>
+    <section>
+
+      <p>Since our first democratic elections in South Africa, <a href="http://mediamonitoringafrica.org">Media Monitoring Africa (MMA)</a> has monitored the media’s coverage in the run up to the elections. While our media are overwhelmingly fair we have found a general tendency across all the media monitored (on average 50 different media titles for each period) to have their elections agenda set by  political leaders and political parties contesting. With some clear and often excellent exceptions that prove we have quality journalism, the news on offer tends to be event based, and fails to focus on the bigger issues we face. </p>
+
+      <a href="http://elections2014.mediamonitoringafrica.org/"><img class="pull-right" src="http://elections2014.mediamonitoringafrica.org/img/logo-top-left.png"></a>
+
+      <p>Despite issues of labour, unemployment, crime, health, education challenges, transformation, sustainability, land, racism, xenophobia, poverty, inequality, gender-based violence and child abuse being so prevalent, we see that each of these issues receive less than 2% of coverage. For a more comprehensive overview of the challenges in coverage and positive trends see our interactive elections analysis of the 2014 national elections at <a href="http://elections2014.mediamonitoringafrica.org/">elections2014.mediamonitoringafrica.org</a>.</p>
+
+      <h2 class="subhead">Journalism Tools</h2>
+
+      <p>We are also aware of the many challenges faced in our newsrooms with shrinking budgets, and fewer journalists being expected to produce more and more stories. The questions we sought to answer included how to disrupt elections coverage and promote stories that cover issues. How could we help journalists get reliable factual information to back up and give context to stories? How could we help media unpack the different political dynamics in different hot spots? And finally how could we help media see elements of how they cover elections?</p>
+
+      <a href="http://www.newstools.co.za/"><img class="pull-right" src="http://www.newstools.co.za//assets/img/logo_newstools.png" style="width: 200px; height: auto"></a>
+ 
+      <p>We had through our work on <a href="http://www.newstools.co.za/">NewsTools (Churnalism and NewsDiffs)</a> already started focusing on how to make better use of data and explore data journalism. We had an idea that we could try and mash data from the census carried out by Stats SA together with elections results and media coverage. What we were not sure about was how we could do this. </p>
+
+      <p>In a great moment of serendipity, during a break at a Hack Hackers event in Johannesburg, our Director William Bird met up with Adi Eyal from <a href="http://code4sa.org/">Code for South Africa</a>. A brief chat and sparkle in Adi’s eyes said he was sure we could do something. He showed us his data journalism work (at that point looking at municipal issues in Cape Town) and we showed him ours (our elections coverage and NewsTools) and agreed that we could take our engagement forward. </p>
+
+      <p>Our one challenge was to raise the funds necessary, not only to build a new tool but also to help us update and upgrade our online media monitoring capacity. We used the national general elections in 2014 as our focal point. Our application to the Open Society Foundation for South Africa was successful and which meant we were able to start to realise our new vision for MMA.</p>
+
+      <h2 class="subhead">Census Reporter</h2>
+
+      <a href="http://censusreporter.org/"><img class="pull-right" src="http://censusreporter.org/static/img/logo.png" style="width: 200px; height: auto"></a>
+
+      <p>A series of meetings and discussions between William, Wellington Radu (MMA head of programmes) Adi and then Greg Kempe (more about him shortly) resulted in the beginnings of a prototype. Through their networks and exposure, Adi and Greg identified an amazing tool that we could adapt, localise and replicate - <a href="http://censusreporter.org">Census Reporter</a>. Census Reporter was created in the USA as a Knight News Challenge project and was built by <a href="http://censusreporter.tumblr.com/people">Joe Germuska, John Keefe, Ryan Pitts, Ian Dees and Sara Schnadt</a>.</p>
+
+      <p>Thanks to Census Reporter we already had an incredible tool to base Wazimap on. A huge amount of work still had to take place with localising, bringing in our own data, adding our own additional elements, including using the map as the basic point of entry to the data. By mashing census, elections and media data we had taken an amazing idea and developed it even further.</p>
+
+      <h2 class="subhead">Wazimap</h2>
+
+      <a href="http://wazimap.co.za/"><img class="pull-right" src="{% static 'img/wazi-logo.png' %}"></a>
+
+      <p>The name Wazi is derived from the IsiXhosa word “ulwazi” for knowledge which we believed resonated with the aim of Wazimap. It was thanks largely to the coding brilliance of Greg  and Adi that that we were able to get a version of Wazimap up and running before our elections in May 2014. Each time we added on requests for new information Greg would work his magic and the results would appear.</p>
+
+      <p>At the same time Greg was also working on MMA’s other new creation, “Dexter” a tool to help automate and capture the monitoring data for MMA.  As a result of this tool, we were able to incorporate media coverage data into Wazimap. Our future plans will see further integration so that not only is Wazimap a means to gain facts and context to a place or issue, but it will also help journalists and other users see media trends, strengths and weaknesses in coverage.</p>
+
+      <p>Wazimap has already proven to be so successful that it is being adapted again for Kenya and Nigeria by Code for South Africa and we have more great things for Wazimap planned. <a href="http://wazimap.co.za">Play with Wazimap now</a>.</p>
+    </section>
+</article>
+{% endblock %}

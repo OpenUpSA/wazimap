@@ -9,7 +9,7 @@ from django.conf import settings
 from django.utils.safestring import SafeString
 from django.utils import simplejson
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
-from django.views.generic import View
+from django.views.generic import View, TemplateView
 
 from .views import GeographyDetailView as BaseGeographyDetailView, LocateView as BaseLocateView, render_json_to_response
 from .utils import LazyEncoder
@@ -256,3 +256,7 @@ class TableAPIView(View):
 
     def get(self, request, *args, **kwargs):
         return render_json_to_response([t.as_dict(columns=False) for t in DATA_TABLES.itervalues()])
+
+
+class AboutView(TemplateView):
+    template_name = 'about.html'
