@@ -37,6 +37,7 @@ def get_locations(search_term, levels=None, year='2011'):
     else:
         levels = ['country', 'province', 'municipality', 'ward', 'subplace']
 
+    search_term = search_term.strip()
     session = get_session()
     try:
         objects = set()
@@ -59,10 +60,18 @@ def get_locations(search_term, levels=None, year='2011'):
                     .limit(10)
                 )
             elif level == 'ward':
+                st = search_term.lower().strip('ward').strip()
+
+                filters = [model.code.like(st + '%')]
+                try:
+                    filters.append(model.ward_no == int(st))
+                except ValueError as e:
+                    pass
+
                 objects.update(session
                     .query(model)
-                    .filter(model.year == year,
-                            model.code.like(search_term + '%'))
+                    .filter(model.year == year)
+                    .filter(or_(*filters))
                     .limit(10)
                 )
             else:
