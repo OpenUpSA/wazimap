@@ -39,8 +39,8 @@ def create_api_database():
     create_db = "CREATE DATABASE %s WITH OWNER %s ENCODING 'UTF8' TEMPLATE template0" % (DB_NAME, DB_USER)
 
     if env.deploy_type == 'dev':
-        local('echo "%s" | psql' % create_user)
-        local('echo "%s" | psql' % create_db)
+        local('echo "%s" | sudo -u postgres psql' % create_user)
+        local('echo "%s" | sudo -u postgres psql' % create_db)
     else:
         sudo('echo "%s" | psql' % create_user, user='postgres')
         sudo('echo "%s" | psql' % create_db, user='postgres')
@@ -51,7 +51,7 @@ def drop_api_database():
     require('deploy_type')
 
     if env.deploy_type == 'dev':
-        local('echo "DROP DATABASE %s" | psql' % DB_NAME)
+        local('echo "DROP DATABASE %s" | sudo -u postgres psql' % DB_NAME)
     else:
         sudo('echo "DROP DATABASE %s" | psql' % DB_NAME, user='postgres')
 
@@ -78,10 +78,12 @@ def load_api_data():
 def reload_api_data():
     require('deploy_type')
 
-    sudo('initctl stop censusreporter')
+    if env.deploy_type == 'prod':
+        sudo('initctl stop censusreporter')
 
     execute(drop_api_database)
     execute(create_api_database)
     execute(load_api_data)
 
-    sudo('initctl start censusreporter')
+    if env.deploy_type == 'prod':
+        sudo('initctl start censusreporter')
