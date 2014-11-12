@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 
@@ -250,19 +251,36 @@ class SuperImporter(object):
             raise ValueError("Cannot recognize the geo level of %s" % geo_name)
 
 
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        raise ValueError("Requires 1 file path argument")
-    if len(sys.argv) == 3:
-        table_name = sys.argv[2]
-    else:
-        table_name = None
-    filepath = sys.argv[1]
+def create_arg_parser():
+    parser = argparse.ArgumentParser(
+        description='Imports data from a SuperWEB- or SuperCROSS-generated CSV file. '
+                    'The database table is automatically created from the fields in '
+                    'the file headers.'
+    )
+    parser.add_argument(
+        'filepath',
+        action='store',
+        help='the file path to a SuperCROSS or SuperWEB CSV export'
+    )
+    parser.add_argument(
+        '--tablename',
+        action='store',
+        dest='tablename',
+        default=None,
+        help='the name of the database table where the imported data will be stored. '
+             'If not provided, it is generated from the field names'
+    )
+    return parser
 
+
+if __name__ == '__main__':
+    args = create_arg_parser().parse_args()
+
+    filepath = args.filepath
     if not os.path.isabs(filepath):
         filepath = os.path.join(os.getcwd(), filepath)
 
     importer = SuperImporter(filepath)
-    importer.table_name = table_name
+    importer.table_name = args.tablename
     importer.run()
 
