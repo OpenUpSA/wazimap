@@ -500,6 +500,8 @@ FieldTable(['household goods'], universe='Households', denominator_key='total ho
 FieldTable(['tenure status'], universe='Households')
 FieldTable(['type of dwelling'], universe='Households')
 
+FieldTable(['age in completed years', 'present school attendance'], universe='Children over 4 and under 18')
+
 FieldTable(['party'], universe='Votes', id='party_votes_national_2014', description='2014 National Election results',
         dataset='2014 National Elections', year='2014')
 FieldTable(['party'], universe='Votes', id='party_votes_provincial_2014', description='2014 Provincial Election results',
