@@ -116,9 +116,6 @@ COLLAPSED_AGE_CATEGORIES = {
     '85+': '80+',
 }
 
-CHILD_ADULT_AGE_CATEGORIES = dict((str(n), '< 18' if n < 18 else '>= 18')
-                                  for n in range(0, 121))
-
 # Income categories
 
 COLLAPSED_INCOME_CATEGORIES = OrderedDict()
@@ -344,7 +341,10 @@ def get_demographics_profile(geo_code, geo_level, session):
         }}
 
     # median age/age category
-    db_model_age = get_model_from_fields(['age in completed years'], geo_level)
+    db_model_age = get_model_from_fields(
+        ['age in completed years'], geo_level,
+        table_name='ageincompletedyears_%s' % geo_level
+    )
     objects = sorted(
         get_objects_by_geo(db_model_age, geo_code, geo_level, session),
         key=lambda x: int(getattr(x, 'age in completed years'))
@@ -754,7 +754,7 @@ def get_children_profile(geo_code, geo_level, session):
     # demographics
     child_adult_dist, _ = get_stat_data(
             ['age in completed years'], geo_level, geo_code, session,
-            recode=CHILD_ADULT_AGE_CATEGORIES)
+            table_name='ageincompletedyearssimplified_%s' % geo_level)
     data = {
         'demographics': {
             'child_adult_distribution': child_adult_dist,
