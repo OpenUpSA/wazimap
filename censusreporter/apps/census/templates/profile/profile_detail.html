@@ -346,6 +346,35 @@
 
     </div>
 </article>
+
+<article id="children" class="clearfix">
+    <header class="section-contents">
+        <h1>Children</h1>
+    </header>
+    <div class="section-container">
+
+        <section class="clearfix stat-row">
+            <h2 class="header-for-columns"><a class="permalink" href="#child_pop_count" id="child_pop_count">Child population <i class="fa fa-link"></i></a></h2>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=children.demographics.total_children stat_type='number' %}
+            </div>
+            <div class="column-third">
+                <div id="chart-pie-children-demographics-child_adult_distribution" data-stat-type="percentage" data-chart-title="Population by age category"></div>
+            </div>
+        </section>
+        <section class="clearfix stat-row">
+            <h2 class="header-for-columns"><a class="permalink" href="#child_school" id="child_school">School <i class="fa fa-link"></i></a></h2>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=children.school.percent_school_attendance stat_type='percentage' %}
+            </div>
+            <div class="column-two-thirds">
+                <div id="chart-column-children-school-school_attendance_distribution" data-stat-type="scaled-percentage" data-chart-title="Percentage school attendance by age"></div>
+            </div>
+        </section>
+
+    </div>
+</article>
+
 {% endblock %}
 
 {% block body_javascript_extra %}{{ block.super }}

@@ -6,7 +6,8 @@ from api.models import get_model_from_fields
 from api.utils import get_session, LocationNotFound
 
 from .utils import (collapse_categories, calculate_median, calculate_median_stat, get_summary_geo_info,
-                    merge_dicts, group_remainder, add_metadata, get_stat_data, get_objects_by_geo, percent)
+                    merge_dicts, group_remainder, add_metadata, get_stat_data, get_objects_by_geo, percent,
+                    create_debug_dump)
 
 
 PROFILE_SECTIONS = (
@@ -15,6 +16,7 @@ PROFILE_SECTIONS = (
     'service_delivery',  # source of water, refuse disposal
     'education',  # highest educational level
     'households',  # household heads, etc.
+    'children',  # child-related stats
 )
 
 # Education categories
@@ -113,6 +115,9 @@ COLLAPSED_AGE_CATEGORIES = {
     '80 - 84': '80+',
     '85+': '80+',
 }
+
+CHILD_ADULT_AGE_CATEGORIES = dict((str(n), '< 18' if n < 18 else '>= 18')
+                                  for n in range(0, 121))
 
 # Income categories
 
@@ -743,3 +748,41 @@ def get_education_profile(geo_code, geo_level, session):
 
     return {'educational_attainment_distribution': edu_dist_data,
             'educational_attainment': edu_split_data}
+
+
+def get_children_profile(geo_code, geo_level, session):
+    # demographics
+    child_adult_dist, _ = get_stat_data(
+            ['age in completed years'], geo_level, geo_code, session,
+            recode=CHILD_ADULT_AGE_CATEGORIES)
+    data = {
+        'demographics': {
+            'child_adult_distribution': child_adult_dist,
+            'total_children': {
+                "name": "Children",
+                "values": {"this": child_adult_dist['< 18']['numerators']['this']}
+            },
+        }
+    }
+
+    # school
+    school_attendance_dist, total_school_aged = get_stat_data(
+        ['present school attendance', 'age in completed years'],
+        geo_level, geo_code, session,
+    )
+    school_attendance_dist['Yes']['metadata'] = \
+            school_attendance_dist['metadata']
+    school_attendance_dist = school_attendance_dist['Yes']
+    total_attendance = sum(d['numerators']['this'] for d in
+                           school_attendance_dist.values()
+                           if 'numerators' in d)
+    data['school'] = {
+        'school_attendance_distribution': school_attendance_dist,
+        'percent_school_attendance': {
+            "name": "School-aged children are in school",
+            "numerators": {"this": total_school_aged},
+            "values": {"this": percent(total_attendance, total_school_aged)}
+        }
+    }
+
+    return data

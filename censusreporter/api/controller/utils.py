@@ -414,3 +414,13 @@ def percent(num, denom, places=2):
       return 0
     else:
       return round(num / denom * 100, places)
+
+
+def create_debug_dump(data, geo_level, name):
+    import os
+    import json
+    debug_dir = os.path.join(os.path.dirname(__file__), 'debug')
+    if not os.path.exists(debug_dir):
+        os.mkdir(debug_dir)
+    with open(os.path.join(debug_dir, '%s_%s.json' % (name, geo_level)), 'w') as f:
+        f.write(json.dumps(data, indent=4))
