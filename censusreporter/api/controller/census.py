@@ -766,18 +766,30 @@ def get_children_profile(geo_code, geo_level, session):
     }
 
     # school
-    school_attendance_dist, total_school_aged = get_stat_data(
-        ['present school attendance', 'age in completed years'],
-        geo_level, geo_code, session,
-    )
-    school_attendance_dist['Yes']['metadata'] = \
-            school_attendance_dist['metadata']
-    school_attendance_dist = school_attendance_dist['Yes']
-    total_attendance = sum(d['numerators']['this'] for d in
-                           school_attendance_dist.values()
-                           if 'numerators' in d)
+
+    # NOTE: this data is incompatible with some views (check out
+    # https://github.com/censusreporter/censusreporter/issues/78)
+    #
+    # school_attendance_dist, total_school_aged = get_stat_data(
+    #     ['present school attendance', 'age in completed years'],
+    #     geo_level, geo_code, session,
+    # )
+    # school_attendance_dist['Yes']['metadata'] = \
+    #         school_attendance_dist['metadata']
+    # school_attendance_dist = school_attendance_dist['Yes']
+    # total_attendance = sum(d['numerators']['this'] for d in
+    #                        school_attendance_dist.values()
+    #                        if 'numerators' in d)
+
+    db_model = get_model_from_fields(['age in completed years',
+                                      'present school attendance'],
+                                     geo_level)
+    objects = get_objects_by_geo(db_model, geo_code, geo_level, session,
+                                 fields=['present school attendance'])
+    total_school_aged = float(sum(o[0] for o in objects))
+    total_attendance = float(sum(o[0] for o in objects if o[1] == 'Yes'))
     data['school'] = {
-        'school_attendance_distribution': school_attendance_dist,
+        #'school_attendance_distribution': school_attendance_dist,
         'percent_school_attendance': {
             "name": "School-aged children are in school",
             "numerators": {"this": total_school_aged},
