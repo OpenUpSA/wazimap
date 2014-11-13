@@ -754,7 +754,8 @@ def get_children_profile(geo_code, geo_level, session):
     # demographics
     child_adult_dist, _ = get_stat_data(
             ['age in completed years'], geo_level, geo_code, session,
-            table_name='ageincompletedyearssimplified_%s' % geo_level)
+            table_name='ageincompletedyearssimplified_%s' % geo_level,
+            recode={'< 18': '< 18', '18 to 64': '>= 18', '>= 65': '>= 18'})
     data = {
         'demographics': {
             'child_adult_distribution': child_adult_dist,
