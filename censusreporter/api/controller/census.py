@@ -756,12 +756,20 @@ def get_children_profile(geo_code, geo_level, session):
             ['age in completed years'], geo_level, geo_code, session,
             table_name='ageincompletedyearssimplified_%s' % geo_level,
             recode={'< 18': '< 18', '18 to 64': '>= 18', '>= 65': '>= 18'})
+    parental_survival_dist, _ = get_stat_data(['parents alive'],
+                                              geo_level, geo_code, session)
     data = {
         'demographics': {
             'child_adult_distribution': child_adult_dist,
             'total_children': {
                 "name": "Children",
                 "values": {"this": child_adult_dist['< 18']['numerators']['this']}
+            },
+            'parental_survival_distribution': parental_survival_dist,
+            'percent_no_parent': {
+                "name": "Of children have no parents",
+                "values": parental_survival_dist["Neither parent (or uncertain)"]['values'],
+                "numerators": parental_survival_dist["Neither parent (or uncertain)"]['numerators'],
             },
         }
     }
