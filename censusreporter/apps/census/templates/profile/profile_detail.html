@@ -372,6 +372,15 @@
             </div>
         </section>
         <section class="clearfix stat-row">
+            <h2 class="header-for-columns"><a class="permalink" href="#child_employment" id="child_employment">Employment <i class="fa fa-link"></i></a></h2>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=children.employment.percent_in_labour_force stat_type='percentage' %}
+            </div>
+            <div class="column-third">
+                <div id="chart-pie-children-employment-employment_distribution" data-stat-type="percentage" data-chart-title="Population by employment status" data-qualifier="Universe: {{ children.employment.employment_distribution.metadata.universe }}"></div>
+            </div>
+        </section>
+        <section class="clearfix stat-row">
             <h2 class="header-for-columns"><a class="permalink" href="#child_school" id="child_school">School <i class="fa fa-link"></i></a></h2>
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=children.school.percent_school_attendance stat_type='percentage' %}

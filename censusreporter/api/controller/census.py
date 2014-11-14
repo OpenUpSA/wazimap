@@ -252,6 +252,17 @@ TYPE_OF_DWELLING_RECODE = {
     'Not applicable': 'N/A',
 }
 
+
+COLLAPSED_EMPLOYMENT_CATEGORIES = {
+    'Employed': 'In labour force',
+    'Unemployed': 'In labour force',
+    'Discouraged work-seeker': 'In labour force',
+    'Other not economically active': 'Not in labour force',
+    'Age less than 15 years': 'Not in labour force',
+    'Not applicable': 'Not in labour force'
+}
+
+
 def get_census_profile(geo_code, geo_level):
     session = get_session()
 
@@ -804,6 +815,26 @@ def get_children_profile(geo_code, geo_level, session):
             "name": "School-aged children are in school",
             "numerators": {"this": total_school_aged},
             "values": {"this": percent(total_attendance, total_school_aged)}
+        }
+    }
+
+    # employment
+    employment_dist, _ = get_stat_data(
+        ['official employment status'],
+        geo_level, geo_code, session,
+        table_name='officialemploymentstatus15to17_%s' % geo_level,
+        exclude=['Age less than 15 years', 'Not applicable']
+    )
+    total_in_labour_force = float(sum(v["numerators"]["this"] for k, v
+                                      in employment_dist.iteritems()
+                                      if COLLAPSED_EMPLOYMENT_CATEGORIES.get(k, None)
+                                      == 'In labour force'))
+    data['employment'] = {
+        'employment_distribution': employment_dist,
+        'percent_in_labour_force': {
+            "name": "Of children between 15 and 17 are in the labour force",
+            "numerators": {"this": total_in_labour_force},
+            "values": {"this": percent(total_in_labour_force, _)}
         }
     }
 
