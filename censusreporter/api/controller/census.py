@@ -541,7 +541,8 @@ def get_economics_profile(geo_code, geo_level, session):
     employ_status, total_workers = get_stat_data(
             ['official employment status'], geo_level, geo_code, session,
             exclude=['Age less than 15 years', 'Not applicable'],
-            order_by='official employment status')
+            order_by='official employment status',
+            table_name='officialemploymentstatus_%s' % geo_level)
 
     # sector
     sector_dist_data, _ = get_stat_data(
@@ -767,7 +768,7 @@ def get_children_profile(geo_code, geo_level, session):
             },
             'parental_survival_distribution': parental_survival_dist,
             'percent_no_parent': {
-                "name": "Of children 14 and under have no biological parents",
+                "name": "Of children under 15 have no biological parents",
                 "values": parental_survival_dist["Neither parent (or uncertain)"]['values'],
                 "numerators": parental_survival_dist["Neither parent (or uncertain)"]['numerators'],
             },
