@@ -818,7 +818,7 @@ def get_children_profile(geo_code, geo_level, session):
         ['official employment status'],
         geo_level, geo_code, session,
         table_name='officialemploymentstatus15to17_%s' % geo_level,
-        exclude=['Age less than 15 years', 'Not applicable']
+        exclude=['Not applicable']
     )
     total_in_labour_force = float(sum(v["numerators"]["this"] for k, v
                                       in employment_dist.iteritems()
