@@ -17,6 +17,7 @@ PROFILE_SECTIONS = (
     'education',  # highest educational level
     'households',  # household heads, etc.
     'children',  # child-related stats
+    'child_households',  # households headed by children
 )
 
 # Education categories
@@ -776,22 +777,6 @@ def get_children_profile(geo_code, geo_level, session):
     parental_survival_dist, _ = get_stat_data(['parents alive'],
                                               geo_level, geo_code, session)
 
-    data = {
-        'demographics': {
-            'child_adult_distribution': child_adult_dist,
-            'total_children': {
-                "name": "Children",
-                "values": {"this": child_adult_dist['< 18']['numerators']['this']}
-            },
-            'parental_survival_distribution': parental_survival_dist,
-            'percent_no_parent': {
-                "name": "Of children under 15 have no biological parents",
-                "values": parental_survival_dist["Neither parent (or uncertain)"]['values'],
-                "numerators": parental_survival_dist["Neither parent (or uncertain)"]['numerators'],
-            },
-        }
-    }
-
     # school
 
     # NOTE: this data is incompatible with some views (check out
@@ -826,16 +811,6 @@ def get_children_profile(geo_code, geo_level, session):
         key_order=EDUCATION_KEY_ORDER,
     )
 
-    data['school'] = {
-        #'school_attendance_distribution': school_attendance_dist,
-        'percent_school_attendance': {
-            "name": "School-aged children are in school",
-            "numerators": {"this": total_school_aged},
-            "values": {"this": percent(total_attendance, total_school_aged)}
-        },
-        'education17_distribution': education17_dist,
-    }
-
     # employment
     employment_dist, total_15to17 = get_stat_data(
         ['official employment status'],
@@ -859,17 +834,110 @@ def get_children_profile(geo_code, geo_level, session):
     median = calculate_median_stat(income_dist_data)
     median_income = ESTIMATED_INCOME_CATEGORIES[median]
 
-    data['employment'] = {
-        'percent_in_labour_force': {
-            "name": "Of children between 15 and 17 are in the labour force",
-            "numerators": {"this": total_in_labour_force},
-            "values": {"this": percent(total_in_labour_force, total_15to17)}
+    return {
+        'demographics': {
+            'child_adult_distribution': child_adult_dist,
+            'total_children': {
+                "name": "Children",
+                "values": {"this": child_adult_dist['< 18']['numerators']['this']}
+            },
+            'parental_survival_distribution': parental_survival_dist,
+            'percent_no_parent': {
+                "name": "Of children under 15 have no biological parents",
+                "values": parental_survival_dist["Neither parent (or uncertain)"]['values'],
+                "numerators": parental_survival_dist["Neither parent (or uncertain)"]['numerators'],
+            },
         },
-        'employment_distribution': employment_dist,
-        'median_income': {
-            'name': 'Average monthly income',
-            'values': {'this': median_income},
+        'school': {
+            #'school_attendance_distribution': school_attendance_dist,
+            'percent_school_attendance': {
+                "name": "School-aged children are in school",
+                "numerators": {"this": total_school_aged},
+                "values": {"this": percent(total_attendance, total_school_aged)}
+            },
+            'education17_distribution': education17_dist,
         },
+        'employment': {
+            'percent_in_labour_force': {
+                "name": "Of children between 15 and 17 are in the labour force",
+                "numerators": {"this": total_in_labour_force},
+                "values": {"this": percent(total_in_labour_force, total_15to17)}
+            },
+            'employment_distribution': employment_dist,
+            'median_income': {
+                'name': 'Average monthly income',
+                'values': {'this': median_income},
+            },
+        }
     }
 
-    return data
+
+def get_child_households_profile(geo_code, geo_level, session):
+    # head of household
+    # gender
+    head_gender_dist, total_households = get_stat_data(
+            ['gender of head of household'], geo_level, geo_code, session,
+            order_by='gender of head of household',
+            table_name='genderofheadofhouseholdunder18_%s' % geo_level)
+    female_heads = head_gender_dist['Female']['numerators']['this']
+
+    # tenure
+    '''tenure_data, _ = get_stat_data(
+            ['tenure status'], geo_level, geo_code, session,
+            order_by='tenure status')
+
+    # annual household income
+    income_dist_data, _ = get_stat_data(
+            ['annual household income'], geo_level, geo_code, session,
+            exclude=['Unspecified'],
+            recode=HOUSEHOLD_INCOME_RECODE,
+            key_order=HOUSEHOLD_INCOME_RECODE.values())
+
+    # median income
+    median = calculate_median_stat(income_dist_data)
+    median_income = HOUSEHOLD_INCOME_ESTIMATE[median]
+
+    # type of dwelling
+    type_of_dwelling_dist, _ = get_stat_data(
+            ['type of dwelling'], geo_level, geo_code, session,
+            recode=TYPE_OF_DWELLING_RECODE,
+            order_by='-total')
+    informal = type_of_dwelling_dist['Shack']['numerators']['this']
+
+    # household goods
+    household_goods, _ = get_stat_data(
+            ['household goods'], geo_level, geo_code, session,
+            total=total_households,
+            recode=HOUSEHOLD_GOODS_RECODE,
+            exclude=['total households'],
+            key_order=sorted(HOUSEHOLD_GOODS_RECODE.values()))'''
+
+    '''
+            'type_of_dwelling_distribution': type_of_dwelling_dist,
+            'informal': {
+                'name': 'Households that are informal dwellings (shacks)',
+                'values': {'this': percent(informal, total_households)},
+                'numerators': {'this': informal},
+                },
+            'tenure_distribution': tenure_data,
+            'household_goods': household_goods,
+            'annual_income_distribution': income_dist_data,
+            'median_annual_income': {
+                'name': 'Average annual household income',
+                'values': {'this': median_income},
+                },'''
+
+    return {
+        'total_households': {
+            'name': 'Households with heads under 18 years old',
+            'values': {'this': total_households},
+        },
+        'head_of_household': {
+            'gender_distribution': head_gender_dist,
+            'female': {
+                'name': 'Households with women as their head',
+                'values': {'this': percent(female_heads, total_households)},
+                'numerators': {'this': female_heads},
+                },
+        },
+    }

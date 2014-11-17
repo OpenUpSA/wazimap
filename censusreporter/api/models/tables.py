@@ -509,6 +509,8 @@ FieldTable(['highest educational level'], id="highesteducationallevel17", univer
 FieldTable(['level of education'], id="levelofeducation17labourforce", universe="17-year-old children in the labour force")
 FieldTable(['individual monthly income'], id="individualmonthlyincome15to17", universe="Children 15 to 17 who are employed")
 
+FieldTable(['gender of head of household'], id="genderofheadofhouseholdunder18", universe='Households headed by children under 18')
+
 FieldTable(['party'], universe='Votes', id='party_votes_national_2014', description='2014 National Election results',
         dataset='2014 National Elections', year='2014')
 FieldTable(['party'], universe='Votes', id='party_votes_provincial_2014', description='2014 Provincial Election results',
