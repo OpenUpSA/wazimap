@@ -382,6 +382,12 @@
         </section>
         <section class="clearfix stat-row">
             <h2 class="header-for-columns"><a class="permalink" href="#child_employment" id="child_employment">Employment <i class="fa fa-link"></i></a></h2>
+            <aside>
+                Average monthly income is a median estimate, be careful with this value.
+            </aside>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=children.employment.median_income stat_type='dollar' %}
+            </div>
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=children.employment.percent_in_labour_force stat_type='percentage' %}
             </div>

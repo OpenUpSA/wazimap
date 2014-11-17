@@ -766,13 +766,16 @@ def get_education_profile(geo_code, geo_level, session):
 
 
 def get_children_profile(geo_code, geo_level, session):
-    # demographics
+    # age
     child_adult_dist, _ = get_stat_data(
             ['age in completed years'], geo_level, geo_code, session,
             table_name='ageincompletedyearssimplified_%s' % geo_level,
             recode={'< 18': '< 18', '18 to 64': '>= 18', '>= 65': '>= 18'})
+
+    # parental survival
     parental_survival_dist, _ = get_stat_data(['parents alive'],
                                               geo_level, geo_code, session)
+
     data = {
         'demographics': {
             'child_adult_distribution': child_adult_dist,
@@ -805,6 +808,7 @@ def get_children_profile(geo_code, geo_level, session):
     #                        school_attendance_dist.values()
     #                        if 'numerators' in d)
 
+    # school attendance
     db_model = get_model_from_fields(['age in completed years',
                                       'present school attendance'],
                                      geo_level)
@@ -812,6 +816,8 @@ def get_children_profile(geo_code, geo_level, session):
                                  fields=['present school attendance'])
     total_school_aged = float(sum(o[0] for o in objects))
     total_attendance = float(sum(o[0] for o in objects if o[1] == 'Yes'))
+
+    # education level
     education17_dist, _ = get_stat_data(
         ['highest educational level'],
         geo_level, geo_code, session,
@@ -819,6 +825,7 @@ def get_children_profile(geo_code, geo_level, session):
         table_name='highesteducationallevel17_%s' % geo_level,
         key_order=EDUCATION_KEY_ORDER,
     )
+
     data['school'] = {
         #'school_attendance_distribution': school_attendance_dist,
         'percent_school_attendance': {
@@ -840,6 +847,18 @@ def get_children_profile(geo_code, geo_level, session):
                                       in employment_dist.iteritems()
                                       if COLLAPSED_EMPLOYMENT_CATEGORIES.get(k, None)
                                       == 'In labour force'))
+
+    # median income
+    income_dist_data, total_workers = get_stat_data(
+        ['individual monthly income'], geo_level, geo_code, session,
+        exclude=['Not applicable'],
+        recode=COLLAPSED_INCOME_CATEGORIES,
+        key_order=COLLAPSED_INCOME_CATEGORIES.values(),
+        table_name='individualmonthlyincome15to17_%s' % geo_level
+    )
+    median = calculate_median_stat(income_dist_data)
+    median_income = ESTIMATED_INCOME_CATEGORIES[median]
+
     data['employment'] = {
         'percent_in_labour_force': {
             "name": "Of children between 15 and 17 are in the labour force",
@@ -847,6 +866,10 @@ def get_children_profile(geo_code, geo_level, session):
             "values": {"this": percent(total_in_labour_force, total_15to17)}
         },
         'employment_distribution': employment_dist,
+        'median_income': {
+            'name': 'Average monthly income',
+            'values': {'this': median_income},
+        },
     }
 
     return data
