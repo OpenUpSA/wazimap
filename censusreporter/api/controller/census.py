@@ -845,7 +845,8 @@ def get_children_profile(geo_code, geo_level, session):
             "name": "Of children between 15 and 17 are in the labour force",
             "numerators": {"this": total_in_labour_force},
             "values": {"this": percent(total_in_labour_force, total_15to17)}
-        }
+        },
+        'employment_distribution': employment_dist,
     }
 
     return data
