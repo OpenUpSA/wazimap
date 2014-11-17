@@ -501,6 +501,7 @@ FieldTable(['annual household income', 'gender of household head'], universe='Ho
 FieldTable(['household goods'], universe='Households', denominator_key='total households')
 FieldTable(['tenure status'], universe='Households')
 FieldTable(['type of dwelling'], universe='Households')
+FieldTable(['household size', 'age of household head'], universe='Households')
 
 # child-specific tables
 FieldTable(['age in completed years'], id='ageincompletedyearssimplified')

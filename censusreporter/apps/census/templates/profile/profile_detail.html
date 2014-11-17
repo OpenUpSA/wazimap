@@ -406,7 +406,7 @@
     <div class="section-container">
 
         <section class="clearfix stat-row">
-            <h2><a class="permalink" href="#child-households" id="#child-households">Households <i class="fa fa-link"></i></a></h2>
+            <h2><a class="permalink" href="#child-households" id="child-households">Households <i class="fa fa-link"></i></a></h2>
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=child_households.total_households stat_type='number' %}
             </div>
@@ -431,6 +431,10 @@
                 {% include 'profile/_blocks/_stat_list.html' with stat=child_households.median_annual_income stat_type='dollar' %}
             </div>
             <div class="column-three-quarters" id="chart-column-child_households-annual_income_distribution" data-stat-type="scaled-percentage" data-chart-title="Annual household income"></div>
+        </section>
+        <section class="clearfix stat-row">
+            <h2><a class="permalink" href="#child-household-size" id="child-household-size">Household size <i class="fa fa-link"></i></a></h2>
+            <div class="column-full" id="chart-grouped_column-child_households-household_size_distribution" data-stat-type="scaled-percentage" data-chart-title="Size of household by age group"></div>
         </section>
     </div>
 </article>
