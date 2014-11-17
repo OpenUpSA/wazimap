@@ -299,6 +299,7 @@ def get_census_profile(geo_code, geo_level):
         group_remainder(data['demographics']['province_of_birth_distribution'], 7)
         group_remainder(data['demographics']['region_of_birth_distribution'], 5)
         group_remainder(data['households']['type_of_dwelling_distribution'], 5)
+        group_remainder(data['child_households']['type_of_dwelling_distribution'], 5)
         
         return data
 
@@ -900,17 +901,6 @@ def get_child_households_profile(geo_code, geo_level, session):
             recode=TYPE_OF_DWELLING_RECODE,
             order_by='-total')
     informal = type_of_dwelling_dist['Shack']['numerators']['this']
-
-    # household goods
-    '''household_goods, _ = get_stat_data(
-            ['household goods'], geo_level, geo_code, session,
-            total=total_households,
-            recode=HOUSEHOLD_GOODS_RECODE,
-            exclude=['total households'],
-            key_order=sorted(HOUSEHOLD_GOODS_RECODE.values()))'''
-
-    '''
-            'household_goods': household_goods,'''
 
     return {
         'total_households': {
