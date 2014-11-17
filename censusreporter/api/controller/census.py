@@ -853,7 +853,7 @@ def get_children_profile(geo_code, geo_level, session):
         'school': {
             'school_attendance_distribution': school_attendance_dist,
             'percent_school_attendance': {
-                "name": "School-aged children are in school",
+                "name": "School-aged children (5 to 17 years old) are in school",
                 "numerators": {"this": total_school_aged},
                 "values": {"this": percent(float(total_attendance),
                                            float(total_school_aged))}
@@ -868,7 +868,7 @@ def get_children_profile(geo_code, geo_level, session):
             },
             'employment_distribution': employment_dist,
             'median_income': {
-                'name': 'Average monthly income',
+                'name': 'Average monthly income of employed children between 15 and 17',
                 'values': {'this': median_income},
             },
         }

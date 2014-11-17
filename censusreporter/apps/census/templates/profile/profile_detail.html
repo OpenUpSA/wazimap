@@ -386,7 +386,7 @@
             </div>
         </section>
         <section class="clearfix stat-row">
-            <h2 class="header-for-columns"><a class="permalink" href="#child_employment" id="child_employment">Employment <i class="fa fa-link"></i></a></h2>
+            <h2 class="header-for-columns"><a class="permalink" href="#child_employment" id="child_employment">Employment of 15- to 17-year-olds <i class="fa fa-link"></i></a></h2>
             <aside>
                 Average monthly income is a median estimate, be careful with this value.
             </aside>
@@ -397,7 +397,7 @@
                 {% include 'profile/_blocks/_stat_list.html' with stat=children.employment.percent_in_labour_force stat_type='percentage' %}
             </div>
             <div class="column-third">
-                <div id="chart-pie-children-employment-employment_distribution" data-stat-type="percentage" data-chart-title="Population by employment status" data-qualifier="Universe: {{ children.employment.employment_distribution.metadata.universe }}"></div>
+                <div id="chart-pie-children-employment-employment_distribution" data-stat-type="percentage" data-chart-title="15- to 17-year olds by employment status" data-qualifier="Universe: {{ children.employment.employment_distribution.metadata.universe }}"></div>
             </div>
         </section>
 
