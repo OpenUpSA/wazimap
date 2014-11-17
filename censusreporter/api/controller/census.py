@@ -465,14 +465,12 @@ def get_households_profile(geo_code, geo_level, session):
     female_heads = head_gender_dist['Female']['numerators']['this']
 
     # age
-    db_model_age = get_model_from_fields(['age of household head'],
-                                            geo_level)
-    objects = get_objects_by_geo(db_model_age, geo_code, geo_level, session)
-    total_under_18 = 0.0
-    for obj in objects:
-        age = getattr(obj, 'age of household head')
-        if age in ['00 - 04', '05 - 09', '10 - 14', '15 - 17']:
-            total_under_18 += obj.total
+    db_model_u18 = get_model_from_fields(
+        ['gender of head of household'], geo_level,
+        table_name='genderofheadofhouseholdunder18_%s' % geo_level
+    )
+    objects = get_objects_by_geo(db_model_u18, geo_code, geo_level, session)
+    total_under_18 = float(sum(o[0] for o in objects))
 
     # tenure
     tenure_data, _ = get_stat_data(
