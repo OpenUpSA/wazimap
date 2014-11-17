@@ -368,7 +368,7 @@
                 {% include 'profile/_blocks/_stat_list.html' with stat=children.demographics.percent_no_parent stat_type='percentage' %}
             </div>
             <div class="column-third">
-                <div id="chart-pie-children-demographics-parental_survival_distribution" data-stat-type="percentage" data-chart-title="Population by biological parental survival" data-qualifier="Universe: {{ children.demographics.parental_survival_distribution.metadata.universe }}"></div>
+                <div id="chart-pie-children-demographics-parental_survival_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Population by biological parental survival" data-qualifier="Universe: {{ children.demographics.parental_survival_distribution.metadata.universe }}"></div>
             </div>
         </section>
         <section class="clearfix stat-row">
@@ -377,7 +377,7 @@
                 {% include 'profile/_blocks/_stat_list.html' with stat=children.school.percent_school_attendance stat_type='percentage' %}
             </div>
             <div class="column-third">
-                <div id="chart-pie-children-school-school_attendance_distribution" data-stat-type="percentage" data-chart-title="Population by school attendance" data-qualifier="Universe: {{ children.school.school_attendance_distribution.metadata.universe }}"></div>
+                <div id="chart-pie-children-school-school_attendance_distribution" data-stat-type="percentage" data-chart-title="Population by school attendance" data-initial-sort="-value" data-qualifier="Universe: {{ children.school.school_attendance_distribution.metadata.universe }}"></div>
             </div>
         </section>
         <section class="clearfix stat-row">
@@ -397,14 +397,14 @@
                 {% include 'profile/_blocks/_stat_list.html' with stat=children.employment.percent_in_labour_force stat_type='percentage' %}
             </div>
             <div class="column-third">
-                <div id="chart-pie-children-employment-employment_distribution" data-stat-type="percentage" data-chart-title="15- to 17-year olds by employment status" data-qualifier="Universe: {{ children.employment.employment_distribution.metadata.universe }}"></div>
+                <div id="chart-pie-children-employment-employment_distribution" data-stat-type="percentage" data-chart-title="15- to 17-year olds by employment status" data-initial-sort="-value" data-qualifier="Universe: {{ children.employment.employment_distribution.metadata.universe }}"></div>
             </div>
         </section>
 
     </div>
 </article>
 
-<article id="service_delivery" class="clearfix">
+<article id="child_headed_households" class="clearfix">
     <header class="section-contents">
         <h1>Child-headed households</h1>
     </header>
@@ -418,14 +418,14 @@
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=child_households.informal stat_type='percentage' %}
             </div>
-            <div class="column-third" id="chart-pie-child_households-type_of_dwelling_distribution" data-stat-type="percentage" data-chart-title="Child-headed households by type of dwelling" data-qualifier="Universe: {{ child_households.type_of_dwelling_distribution.metadata.universe }}"></div>
+            <div class="column-third" id="chart-pie-child_households-type_of_dwelling_distribution" data-stat-type="percentage" data-chart-title="Child-headed households by type of dwelling" data-initial-sort="-value" data-qualifier="Universe: {{ child_households.type_of_dwelling_distribution.metadata.universe }}"></div>
         </section>
         <section class="clearfix stat-row grouped-row">
             <h2><a class="permalink" href="#child-household-head" id="child-household-head">Head of household <i class="fa fa-link"></i></a></h2>
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=child_households.head_of_household.female stat_type='percentage' %}
             </div>
-            <div class="column-third" id="chart-pie-child_households-head_of_household-gender_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Head of child-headed household by gender" data-qualifier="Universe: {{ child_households.head_of_household.gender_distribution.metadata.universe }}"></div>
+            <div class="column-third" id="chart-pie-child_households-head_of_household-gender_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Head of child-headed household by gender" data-initial-sort="-value" data-qualifier="Universe: {{ child_households.head_of_household.gender_distribution.metadata.universe }}"></div>
         </section>
         <section class="clearfix stat-row">
             <h2><a class="permalink" href="#child-household-income" id="child-household-income">Annual household income <i class="fa fa-link"></i></a></h2>
