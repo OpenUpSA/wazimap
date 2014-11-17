@@ -376,7 +376,12 @@
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=children.school.percent_school_attendance stat_type='percentage' %}
             </div>
-            <div class="column-two-thirds">
+            <div class="column-third">
+                <div id="chart-pie-children-school-school_attendance_distribution" data-stat-type="percentage" data-chart-title="Population by school attendance" data-qualifier="Universe: {{ children.school.school_attendance_distribution.metadata.universe }}"></div>
+            </div>
+        </section>
+        <section class="clearfix stat-row">
+            <div class="column-full">
                 <div id="chart-column-children-school-education17_distribution" data-stat-type="scaled-percentage" data-chart-title="Level of education of 17-year-olds" data-qualifier="Universe: {{ children.school.education17_distribution.metadata.universe }}"></div>
             </div>
         </section>

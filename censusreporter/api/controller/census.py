@@ -798,13 +798,11 @@ def get_children_profile(geo_code, geo_level, session):
     #                        if 'numerators' in d)
 
     # school attendance
-    db_model = get_model_from_fields(['age in completed years',
-                                      'present school attendance'],
-                                     geo_level)
-    objects = get_objects_by_geo(db_model, geo_code, geo_level, session,
-                                 fields=['present school attendance'])
-    total_school_aged = float(sum(o[0] for o in objects))
-    total_attendance = float(sum(o[0] for o in objects if o[1] == 'Yes'))
+    school_attendance_dist, total_school_aged = get_stat_data(
+        ['present school attendance'],
+        geo_level, geo_code, session,
+    )
+    total_attendance = school_attendance_dist['Yes']['numerators']['this']
 
     # education level
     education17_dist, _ = get_stat_data(
@@ -853,11 +851,12 @@ def get_children_profile(geo_code, geo_level, session):
             },
         },
         'school': {
-            #'school_attendance_distribution': school_attendance_dist,
+            'school_attendance_distribution': school_attendance_dist,
             'percent_school_attendance': {
                 "name": "School-aged children are in school",
                 "numerators": {"this": total_school_aged},
-                "values": {"this": percent(total_attendance, total_school_aged)}
+                "values": {"this": percent(float(total_attendance),
+                                           float(total_school_aged))}
             },
             'education17_distribution': education17_dist,
         },
