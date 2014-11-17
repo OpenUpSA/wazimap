@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="177.16534"
+   height="177.16534"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="wazimap-sticker copy.svg">
+  <defs
+     id="defs4">
+    <clipPath
+       id="clipPath3857"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         id="path3859"
+         d="m 0,47.772 168.904,0 L 168.904,0 0,0 0,47.772 z" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#00413e"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="17.558856"
+     inkscape:cy="87.053415"
+     inkscape:document-units="px"
+     inkscape:current-layer="g3799"
+     showgrid="false"
+     units="mm"
+     inkscape:window-width="1117"
+     inkscape:window-height="791"
+     inkscape:window-x="237"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:showpageshadow="false"
+     showborder="true"
+     borderlayer="false">
+    <sodipodi:guide
+       orientation="1,0"
+       position="278.60006,159.80613"
+       id="guide3025" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="-62.225397,131.52186"
+       id="guide3027" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-875.19683)">
+    <rect
+       style="fill:#00413e;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;fill-opacity:0;opacity:1"
+       id="rect2985"
+       width="238"
+       height="233"
+       x="-26"
+       y="-21.834656"
+       transform="translate(0,875.19683)" />
+    <rect
+       style="fill:#00413e;fill-opacity:0;stroke:none"
+       id="rect3755"
+       width="198"
+       height="140"
+       x="-54"
+       y="-60.834656"
+       transform="translate(0,875.19683)" />
+    <rect
+       style="fill:#00413e;fill-opacity:0;stroke:none"
+       id="rect3757"
+       width="98"
+       height="99"
+       x="72"
+       y="23.165344"
+       transform="translate(0,875.19683)" />
+    <g
+       transform="matrix(1.25,0,0,-1.25,23.029791,946.99729)"
+       inkscape:label="Wazi logo vector"
+       id="g3799">
+      <rect
+         style="fill:#00413e;stroke:none;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;fill-opacity:1"
+         id="rect3059"
+         width="199.40411"
+         height="198.69701"
+         x="-10.606602"
+         y="-9.5108461"
+         transform="matrix(0.8,0,0,-0.8,-18.423833,57.440368)" />
+      <g
+         id="g3937"
+         transform="matrix(1.5761488,0,0,1.5761488,-9.998084,-37.60951)">
+        <g
+           id="g3801"
+           transform="translate(3.4683,14.8154)">
+          <path
+             inkscape:connector-curvature="0"
+             d="m 0,0 13.762,-12.17 51.53,0 0,3.498 L 10.96,0.963 0,0 z"
+             style="fill:#22201e;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path3803" />
+        </g>
+        <g
+           id="g3805"
+           transform="translate(21.0215,16.916)">
+          <path
+             inkscape:connector-curvature="0"
+             d="M 0,0 -2.394,-10.64 -12.5,12.233 0,11.434 0,0 z"
+             style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path3807" />
+        </g>
+        <path
+           inkscape:connector-curvature="0"
+           d="m 67.83,6.541 -47.872,0 0,38.565 47.872,0 0,-38.565 z"
+           style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           id="path3809" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 65.66,7.615 -44.721,0 0,35.125 44.721,0 0,-35.125 z m -47.821,3.883 -7.281,16.272 7.281,0 0,-16.272 z m 47.821,34.34 -44.721,0 -3.1,0 0,-3.098 0,-12.184 -11.578,0 0.068,-0.156 -2.861,-15.585 9.792,0 4.579,-10.298 3.1,0 44.721,0 3.1,0 0,3.098 0,35.125 0,3.098 -3.1,0 z"
+           style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           id="path3811" />
+        <g
+           id="g3813"
+           transform="translate(23.9971,12.2559)">
+          <path
+             inkscape:connector-curvature="0"
+             d="m 0,0 0,-1.707 4.707,0 0,4.408 L 0,0 z"
+             style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path3815" />
+        </g>
+        <g
+           id="g3817"
+           transform="translate(23.9971,36.3223)">
+          <path
+             inkscape:connector-curvature="0"
+             d="m 0,0 4.707,-2.856 0,6.012 L 0,3.156 0,0 z"
+             style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path3819" />
+        </g>
+        <g
+           id="g3821"
+           transform="translate(30.9443,26.7041)">
+          <path
+             inkscape:connector-curvature="0"
+             d="m 0,0 -2.24,1.389 -4.707,2.92 0,-13.494 4.707,2.702 2.24,1.287 4.309,2.472 0,0.051 L 0,0 z"
+             style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path3823" />
+        </g>
+        <g
+           id="g3825"
+           transform="translate(35.2534,29.4028)">
+          <path
+             inkscape:connector-curvature="0"
+             d="m 0,0 0,8.619 -4.309,0 0,-5.947 L 0,0 z"
+             style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path3827" />
+        </g>
+        <g
+           id="g3829"
+           transform="translate(30.9443,16.2441)">
+          <path
+             inkscape:connector-curvature="0"
+             d="m 0,0 0,-5.964 4.309,0 0,8.438 L 0,0 z"
+             style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path3831" />
+        </g>
+        <g
+           id="g3833"
+           transform="translate(39.0957,27.021)">
+          <path
+             inkscape:connector-curvature="0"
+             d="m 0,0 3.043,0 0,6.569 -4.308,0 0,-5.785 L 0,0 z"
+             style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path3835" />
+        </g>
+        <g
+           id="g3837"
+           transform="translate(39.7183,21.2783)">
+          <path
+             inkscape:connector-curvature="0"
+             d="m 0,0 -1.888,-1.082 0,-9.916 4.309,0 L 2.421,0 0,0 z"
+             style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="path3839" />
+        </g>
+        <path
+           inkscape:connector-curvature="0"
+           d="m 49.024,38.021 -4.309,0 0,-11 4.309,0 0,11 z"
+           style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           id="path3841" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 44.716,10.28 4.309,0 0,10.998 -4.309,0 0,-10.998 z"
+           style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           id="path3843" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 51.601,10.28 4.31,0 0,10.998 -4.31,0 0,-10.998 z"
+           style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           id="path3845" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 55.911,31.357 -4.31,0 0,-4.336 4.31,0 0,4.336 z"
+           style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           id="path3847" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 62.796,36.273 -4.31,0 0,-9.252 4.31,0 0,9.252 z"
+           style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           id="path3849" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 58.487,10.28 4.31,0 0,10.998 -4.31,0 0,-10.998 z"
+           style="fill:#eb603a;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           id="path3851" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-size:17.60000038px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Lato;-inkscape-font-specification:Lato Bold"
+         x="-3.8130698"
+         y="62.989967"
+         id="text3965"
+         sodipodi:linespacing="125%"
+         transform="scale(1,-1)"><tspan
+           sodipodi:role="line"
+           id="tspan3967"
+           x="-3.8130698"
+           y="62.989967"
+           style="font-size:17.60000038px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;font-family:Lato;-inkscape-font-specification:Lato Bold">wazimap.co.za</tspan></text>
+    </g>
+  </g>
+</svg>
