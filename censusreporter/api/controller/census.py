@@ -914,20 +914,20 @@ def get_child_households_profile(geo_code, geo_level, session):
         },
         'type_of_dwelling_distribution': type_of_dwelling_dist,
         'informal': {
-            'name': 'Households that are informal dwellings (shacks)',
+            'name': 'Child-headed households that are informal dwellings (shacks)',
             'values': {'this': percent(informal, total_households)},
             'numerators': {'this': informal},
         },
         'annual_income_distribution': income_dist_data,
         'median_annual_income': {
-            'name': 'Average annual household income',
+            'name': 'Average annual child-headed household income',
             'values': {'this': median_income},
         },
         'household_size_distribution': household_size_dist,
         'head_of_household': {
             'gender_distribution': head_gender_dist,
             'female': {
-                'name': 'Households with women as their head',
+                'name': 'Child-headed households with women as their head',
                 'values': {'this': percent(female_heads, total_households)},
                 'numerators': {'this': female_heads},
                 },

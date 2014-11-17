@@ -418,24 +418,24 @@
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=child_households.informal stat_type='percentage' %}
             </div>
-            <div class="column-third" id="chart-pie-child_households-type_of_dwelling_distribution" data-stat-type="percentage" data-chart-title="Households by type of dwelling"></div>
+            <div class="column-third" id="chart-pie-child_households-type_of_dwelling_distribution" data-stat-type="percentage" data-chart-title="Child-headed households by type of dwelling" data-qualifier="Universe: {{ child_households.type_of_dwelling_distribution.metadata.universe }}"></div>
         </section>
         <section class="clearfix stat-row grouped-row">
             <h2><a class="permalink" href="#child-household-head" id="child-household-head">Head of household <i class="fa fa-link"></i></a></h2>
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=child_households.head_of_household.female stat_type='percentage' %}
             </div>
-            <div class="column-third" id="chart-pie-child_households-head_of_household-gender_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Head of household by gender"></div>
+            <div class="column-third" id="chart-pie-child_households-head_of_household-gender_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Head of child-headed household by gender" data-qualifier="Universe: {{ child_households.head_of_household.gender_distribution.metadata.universe }}"></div>
         </section>
         <section class="clearfix stat-row">
-            <h2><a class="permalink" href="#child-household-income" id="child-household-income">Annual household income<i class="fa fa-link"></i></a></h2>
+            <h2><a class="permalink" href="#child-household-income" id="child-household-income">Annual household income <i class="fa fa-link"></i></a></h2>
             <aside>
                 Average annual household income is a median estimate, be careful with this value.
             </aside>
             <div class="column-quarter">
                 {% include 'profile/_blocks/_stat_list.html' with stat=child_households.median_annual_income stat_type='dollar' %}
             </div>
-            <div class="column-three-quarters" id="chart-column-child_households-annual_income_distribution" data-stat-type="scaled-percentage" data-chart-title="Annual household income"></div>
+            <div class="column-three-quarters" id="chart-column-child_households-annual_income_distribution" data-stat-type="scaled-percentage" data-chart-title="Annual child-headed household income" data-qualifier="Universe: {{ child_households.annual_income_distribution.metadata.universe }}"></div>
         </section>
         <section class="clearfix stat-row">
             <h2><a class="permalink" href="#child-household-size" id="child-household-size">Household size <i class="fa fa-link"></i></a></h2>
