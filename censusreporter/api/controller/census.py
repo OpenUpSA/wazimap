@@ -847,7 +847,7 @@ def get_children_profile(geo_code, geo_level, session):
             },
             'parental_survival_distribution': parental_survival_dist,
             'percent_no_parent': {
-                "name": "Of children under 15 have no biological parents",
+                "name": "Of children 14 and under have no living biological parents",
                 "values": parental_survival_dist["Neither parent (or uncertain)"]['values'],
                 "numerators": parental_survival_dist["Neither parent (or uncertain)"]['numerators'],
             },
