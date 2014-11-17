@@ -514,6 +514,7 @@ FieldTable(['individual monthly income'], id="individualmonthlyincome15to17", un
 # child-headed households
 FieldTable(['gender of head of household'], id="genderofheadofhouseholdunder18", universe='Households headed by children under 18')
 FieldTable(['annual household income'], id="annualhouseholdincomeunder18", universe='Households headed by children under 18')
+FieldTable(['type of main dwelling'], id='typeofmaindwellingunder18', universe='Households headed by children under 18')
 
 FieldTable(['party'], universe='Votes', id='party_votes_national_2014', description='2014 National Election results',
         dataset='2014 National Elections', year='2014')

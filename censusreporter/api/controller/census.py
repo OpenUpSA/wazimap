@@ -882,11 +882,6 @@ def get_child_households_profile(geo_code, geo_level, session):
             table_name='genderofheadofhouseholdunder18_%s' % geo_level)
     female_heads = head_gender_dist['Female']['numerators']['this']
 
-    # tenure
-    '''tenure_data, _ = get_stat_data(
-            ['tenure status'], geo_level, geo_code, session,
-            order_by='tenure status')'''
-
     # annual household income
     income_dist_data, _ = get_stat_data(
             ['annual household income'], geo_level, geo_code, session,
@@ -900,14 +895,14 @@ def get_child_households_profile(geo_code, geo_level, session):
     median_income = HOUSEHOLD_INCOME_ESTIMATE[median]
 
     # type of dwelling
-    '''type_of_dwelling_dist, _ = get_stat_data(
-            ['type of dwelling'], geo_level, geo_code, session,
+    type_of_dwelling_dist, _ = get_stat_data(
+            ['type of main dwelling'], geo_level, geo_code, session,
             recode=TYPE_OF_DWELLING_RECODE,
             order_by='-total')
     informal = type_of_dwelling_dist['Shack']['numerators']['this']
 
     # household goods
-    household_goods, _ = get_stat_data(
+    '''household_goods, _ = get_stat_data(
             ['household goods'], geo_level, geo_code, session,
             total=total_households,
             recode=HOUSEHOLD_GOODS_RECODE,
@@ -915,24 +910,18 @@ def get_child_households_profile(geo_code, geo_level, session):
             key_order=sorted(HOUSEHOLD_GOODS_RECODE.values()))'''
 
     '''
-            'type_of_dwelling_distribution': type_of_dwelling_dist,
-            'informal': {
-                'name': 'Households that are informal dwellings (shacks)',
-                'values': {'this': percent(informal, total_households)},
-                'numerators': {'this': informal},
-                },
-            'tenure_distribution': tenure_data,
-            'household_goods': household_goods,
-            'annual_income_distribution': income_dist_data,
-            'median_annual_income': {
-                'name': 'Average annual household income',
-                'values': {'this': median_income},
-                },'''
+            'household_goods': household_goods,'''
 
     return {
         'total_households': {
             'name': 'Households with heads under 18 years old',
             'values': {'this': total_households},
+        },
+        'type_of_dwelling_distribution': type_of_dwelling_dist,
+        'informal': {
+            'name': 'Households that are informal dwellings (shacks)',
+            'values': {'this': percent(informal, total_households)},
+            'numerators': {'this': informal},
         },
         'annual_income_distribution': income_dist_data,
         'median_annual_income': {
