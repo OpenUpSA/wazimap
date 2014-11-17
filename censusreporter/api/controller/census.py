@@ -39,8 +39,8 @@ COLLAPSED_EDUCATION_CATEGORIES = {
     'NTC I / N1/ NIC/ V Level 2': 'Some secondary',
     'NTC II / N2/ NIC/ V Level 3': 'Some secondary',
     'NTC III /N3/ NIC/ V Level 4': 'Grade 12 (Matric)',
-    'N4 / NTC 4': None,
-    'N5 /NTC 5': None,
+    'N4 / NTC 4': 'N/A',
+    'N5 /NTC 5': 'N/A',
     'N6 / NTC 6': 'Undergrad',
     'Certificate with less than Grade 12 / Std 10': 'Some secondary',
     'Diploma with less than Grade 12 / Std 10': 'Some secondary',
@@ -54,8 +54,8 @@ COLLAPSED_EDUCATION_CATEGORIES = {
     'Higher Degree Masters / PhD': 'Post-grad',
     'Other': 'Other',
     'No schooling': 'None',
-    'Unspecified': None,
-    'Not applicable': None,
+    'Unspecified': 'N/A',
+    'Not applicable': 'N/A',
 }
 EDUCATION_GET_OR_HIGHER = set([
     'Grade 9 / Std 7 / Form 2/ ABET 4',
