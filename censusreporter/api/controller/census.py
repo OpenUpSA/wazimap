@@ -487,7 +487,8 @@ def get_households_profile(geo_code, geo_level, session):
             ['annual household income'], geo_level, geo_code, session,
             exclude=['Unspecified'],
             recode=HOUSEHOLD_INCOME_RECODE,
-            key_order=HOUSEHOLD_INCOME_RECODE.values())
+            key_order=HOUSEHOLD_INCOME_RECODE.values(),
+            table_name='annualhouseholdincome_genderofhouseholdhead_%s' % geo_level)
 
     # median income
     median = calculate_median_stat(income_dist_data)
@@ -884,21 +885,22 @@ def get_child_households_profile(geo_code, geo_level, session):
     # tenure
     '''tenure_data, _ = get_stat_data(
             ['tenure status'], geo_level, geo_code, session,
-            order_by='tenure status')
+            order_by='tenure status')'''
 
     # annual household income
     income_dist_data, _ = get_stat_data(
             ['annual household income'], geo_level, geo_code, session,
             exclude=['Unspecified'],
             recode=HOUSEHOLD_INCOME_RECODE,
-            key_order=HOUSEHOLD_INCOME_RECODE.values())
+            key_order=HOUSEHOLD_INCOME_RECODE.values(),
+            table_name='annualhouseholdincomeunder18_%s' % geo_level)
 
     # median income
     median = calculate_median_stat(income_dist_data)
     median_income = HOUSEHOLD_INCOME_ESTIMATE[median]
 
     # type of dwelling
-    type_of_dwelling_dist, _ = get_stat_data(
+    '''type_of_dwelling_dist, _ = get_stat_data(
             ['type of dwelling'], geo_level, geo_code, session,
             recode=TYPE_OF_DWELLING_RECODE,
             order_by='-total')
@@ -931,6 +933,11 @@ def get_child_households_profile(geo_code, geo_level, session):
         'total_households': {
             'name': 'Households with heads under 18 years old',
             'values': {'this': total_households},
+        },
+        'annual_income_distribution': income_dist_data,
+        'median_annual_income': {
+            'name': 'Average annual household income',
+            'values': {'this': median_income},
         },
         'head_of_household': {
             'gender_distribution': head_gender_dist,

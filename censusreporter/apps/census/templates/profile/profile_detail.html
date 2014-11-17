@@ -429,17 +429,17 @@
             </div>
             <div class="column-third" id="chart-pie-child_households-head_of_household-gender_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Head of household by gender"></div>
         </section>
-        {% comment %}<section class="clearfix stat-row">
-            <h2><a class="permalink" href="#household-income" id="household-income">Annual household income<i class="fa fa-link"></i></a></h2>
+        <section class="clearfix stat-row">
+            <h2><a class="permalink" href="#child-household-income" id="child-household-income">Annual household income<i class="fa fa-link"></i></a></h2>
             <aside>
                 Average annual household income is a median estimate, be careful with this value.
             </aside>
             <div class="column-quarter">
-                {% include 'profile/_blocks/_stat_list.html' with stat=households.median_annual_income stat_type='dollar' %}
+                {% include 'profile/_blocks/_stat_list.html' with stat=child_households.median_annual_income stat_type='dollar' %}
             </div>
-            <div class="column-three-quarters" id="chart-column-households-annual_income_distribution" data-stat-type="scaled-percentage" data-chart-title="Annual household income"></div>
+            <div class="column-three-quarters" id="chart-column-child_households-annual_income_distribution" data-stat-type="scaled-percentage" data-chart-title="Annual household income"></div>
         </section>
-        <section class="clearfix stat-row">
+        {% comment %}<section class="clearfix stat-row">
             <h2><a class="permalink" href="#household_goods" id="household_goods">Household goods <i class="fa fa-link"></i></a></h2>
             <div class="column-full" id="chart-column-households-household_goods" data-stat-type="scaled-percentage" data-chart-title="Goods available by household"></div>
         </section>{% endcomment %}
