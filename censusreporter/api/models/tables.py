@@ -504,6 +504,7 @@ FieldTable(['age in completed years'], id='ageincompletedyearssimplified')
 FieldTable(['age in completed years', 'present school attendance'], universe='Children over 4 and under 18')
 FieldTable(['parents alive'], universe='Children 14 and under')
 FieldTable(['official employment status'], id="officialemploymentstatus15to17", universe="Children 15 to 17")
+FieldTable(['highest educational level'], id="highesteducationallevel17", universe="17-year-old children")
 
 FieldTable(['party'], universe='Votes', id='party_votes_national_2014', description='2014 National Election results',
         dataset='2014 National Elections', year='2014')

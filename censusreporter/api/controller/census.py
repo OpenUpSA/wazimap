@@ -92,6 +92,14 @@ EDUCATION_FET_OR_HIGHER = set([
     'Honours degree',
     'Higher Degree Masters / PhD',
 ])
+EDUCATION_KEY_ORDER = (
+    'None', 'Other',
+    'Some primary', 'Primary',
+    'Some secondary',
+    'Grade 12 (Matric)',
+    'Undergrad',
+    'Post-grad'
+)
 
 # Age categories
 
@@ -731,12 +739,7 @@ def get_education_profile(geo_code, geo_level, session):
         }
     edu_dist_data = collapse_categories(edu_dist_data,
                                         COLLAPSED_EDUCATION_CATEGORIES,
-                                        key_order=('None', 'Other',
-                                                   'Some primary', 'Primary',
-                                                   'Some secondary',
-                                                   'Grade 12 (Matric)',
-                                                   'Undergrad',
-                                                   'Post-grad'))
+                                        key_order=EDUCATION_KEY_ORDER)
     edu_split_data = {
         'percent_get_or_higher': {
             "name": "Completed Grade 9 or higher",
@@ -809,17 +812,25 @@ def get_children_profile(geo_code, geo_level, session):
                                  fields=['present school attendance'])
     total_school_aged = float(sum(o[0] for o in objects))
     total_attendance = float(sum(o[0] for o in objects if o[1] == 'Yes'))
+    education17_dist, _ = get_stat_data(
+        ['highest educational level'],
+        geo_level, geo_code, session,
+        recode=COLLAPSED_EDUCATION_CATEGORIES,
+        table_name='highesteducationallevel17_%s' % geo_level,
+        key_order=EDUCATION_KEY_ORDER,
+    )
     data['school'] = {
         #'school_attendance_distribution': school_attendance_dist,
         'percent_school_attendance': {
             "name": "School-aged children are in school",
             "numerators": {"this": total_school_aged},
             "values": {"this": percent(total_attendance, total_school_aged)}
-        }
+        },
+        'education17_distribution': education17_dist,
     }
 
     # employment
-    employment_dist, _ = get_stat_data(
+    employment_dist, total_15to17 = get_stat_data(
         ['official employment status'],
         geo_level, geo_code, session,
         table_name='officialemploymentstatus15to17_%s' % geo_level,
@@ -830,11 +841,10 @@ def get_children_profile(geo_code, geo_level, session):
                                       if COLLAPSED_EMPLOYMENT_CATEGORIES.get(k, None)
                                       == 'In labour force'))
     data['employment'] = {
-        'employment_distribution': employment_dist,
         'percent_in_labour_force': {
             "name": "Of children between 15 and 17 are in the labour force",
             "numerators": {"this": total_in_labour_force},
-            "values": {"this": percent(total_in_labour_force, _)}
+            "values": {"this": percent(total_in_labour_force, total_15to17)}
         }
     }
 
