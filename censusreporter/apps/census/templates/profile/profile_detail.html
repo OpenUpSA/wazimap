@@ -346,6 +346,104 @@
 
     </div>
 </article>
+
+<article id="children" class="clearfix">
+    <header class="section-contents">
+        <h1>Children</h1>
+    </header>
+    <div class="section-container">
+
+        <section class="clearfix stat-row">
+            <h2 class="header-for-columns"><a class="permalink" href="#child_pop_count" id="child_pop_count">Child population <i class="fa fa-link"></i></a></h2>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=children.demographics.total_children stat_type='number' %}
+            </div>
+            <div class="column-third">
+                <div id="chart-pie-children-demographics-child_adult_distribution" data-stat-type="percentage" data-chart-title="Population by age category"></div>
+            </div>
+        </section>
+        <section class="clearfix stat-row">
+            <h2 class="header-for-columns"><a class="permalink" href="#parents" id="parents">Parents <i class="fa fa-link"></i></a></h2>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=children.demographics.percent_no_parent stat_type='percentage' %}
+            </div>
+            <div class="column-third">
+                <div id="chart-pie-children-demographics-parental_survival_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Children 14 and under by biological parental survival" data-qualifier="Universe: {{ children.demographics.parental_survival_distribution.metadata.universe }}"></div>
+            </div>
+        </section>
+        <section class="clearfix stat-row">
+            <h2 class="header-for-columns"><a class="permalink" href="#child_school" id="child_school">School attendance <i class="fa fa-link"></i></a></h2>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=children.school.percent_school_attendance stat_type='percentage' %}
+            </div>
+            <div class="column-third">
+                <div id="chart-pie-children-school-school_attendance_distribution" data-stat-type="percentage" data-chart-title="Children 5 to 17 by school attendance" data-initial-sort="-value" data-qualifier="Universe: {{ children.school.school_attendance_distribution.metadata.universe }}"></div>
+            </div>
+        </section>
+        <section class="clearfix stat-row">
+            <div class="column-full">
+                <div id="chart-column-children-school-education17_distribution" data-stat-type="scaled-percentage" data-chart-title="17-year-olds by highest educational level" data-qualifier="Universe: {{ children.school.education17_distribution.metadata.universe }}"></div>
+            </div>
+        </section>
+        <section class="clearfix stat-row">
+            <h2 class="header-for-columns"><a class="permalink" href="#child_employment" id="child_employment">Employment of 15- to 17-year-olds <i class="fa fa-link"></i></a></h2>
+            <aside>
+                Average monthly income is a median estimate, be careful with this value.
+            </aside>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=children.employment.median_income stat_type='dollar' %}
+            </div>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=children.employment.percent_in_labour_force stat_type='percentage' %}
+            </div>
+            <div class="column-third">
+                <div id="chart-pie-children-employment-employment_distribution" data-stat-type="percentage" data-chart-title="15- to 17-year olds by employment status" data-initial-sort="-value" data-qualifier="Universe: {{ children.employment.employment_distribution.metadata.universe }}"></div>
+            </div>
+        </section>
+
+    </div>
+</article>
+
+<article id="child_headed_households" class="clearfix">
+    <header class="section-contents">
+        <h1>Child-headed households</h1>
+    </header>
+    <div class="section-container">
+
+        <section class="clearfix stat-row">
+            <h2><a class="permalink" href="#child-households" id="child-households">Households headed by children under 18 years old<i class="fa fa-link"></i></a></h2>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=child_households.total_households stat_type='number' %}
+            </div>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=child_households.informal stat_type='percentage' %}
+            </div>
+            <div class="column-third" id="chart-pie-child_households-type_of_dwelling_distribution" data-stat-type="percentage" data-chart-title="Child-headed households by type of dwelling" data-initial-sort="-value" data-qualifier="Universe: {{ child_households.type_of_dwelling_distribution.metadata.universe }}"></div>
+        </section>
+        <section class="clearfix stat-row grouped-row">
+            <h2><a class="permalink" href="#child-household-head" id="child-household-head">Head of household <i class="fa fa-link"></i></a></h2>
+            <div class="column-third">
+                {% include 'profile/_blocks/_stat_list.html' with stat=child_households.head_of_household.female stat_type='percentage' %}
+            </div>
+            <div class="column-third" id="chart-pie-child_households-head_of_household-gender_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Head of child-headed household by gender" data-initial-sort="-value" data-qualifier="Universe: {{ child_households.head_of_household.gender_distribution.metadata.universe }}"></div>
+        </section>
+        <section class="clearfix stat-row">
+            <h2><a class="permalink" href="#child-household-income" id="child-household-income">Annual household income <i class="fa fa-link"></i></a></h2>
+            <aside>
+                Average annual household income is a median estimate, be careful with this value.
+            </aside>
+            <div class="column-quarter">
+                {% include 'profile/_blocks/_stat_list.html' with stat=child_households.median_annual_income stat_type='dollar' %}
+            </div>
+            <div class="column-three-quarters" id="chart-column-child_households-annual_income_distribution" data-stat-type="scaled-percentage" data-chart-title="Annual child-headed household income" data-qualifier="Universe: {{ child_households.annual_income_distribution.metadata.universe }}"></div>
+        </section>
+        <section class="clearfix stat-row">
+            <h2><a class="permalink" href="#child-household-size" id="child-household-size">Household size <i class="fa fa-link"></i></a></h2>
+            <div class="column-full" id="chart-grouped_column-child_households-household_size_distribution" data-stat-type="scaled-percentage" data-chart-title="Size of household by age of household head"></div>
+        </section>
+    </div>
+</article>
+
 {% endblock %}
 
 {% block body_javascript_extra %}{{ block.super }}

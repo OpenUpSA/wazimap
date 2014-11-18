@@ -6,7 +6,8 @@ from api.models import get_model_from_fields
 from api.utils import get_session, LocationNotFound
 
 from .utils import (collapse_categories, calculate_median, calculate_median_stat, get_summary_geo_info,
-                    merge_dicts, group_remainder, add_metadata, get_stat_data, get_objects_by_geo, percent)
+                    merge_dicts, group_remainder, add_metadata, get_stat_data, get_objects_by_geo, percent,
+                    create_debug_dump)
 
 
 PROFILE_SECTIONS = (
@@ -15,6 +16,8 @@ PROFILE_SECTIONS = (
     'service_delivery',  # source of water, refuse disposal
     'education',  # highest educational level
     'households',  # household heads, etc.
+    'children',  # child-related stats
+    'child_households',  # households headed by children
 )
 
 # Education categories
@@ -36,8 +39,8 @@ COLLAPSED_EDUCATION_CATEGORIES = {
     'NTC I / N1/ NIC/ V Level 2': 'Some secondary',
     'NTC II / N2/ NIC/ V Level 3': 'Some secondary',
     'NTC III /N3/ NIC/ V Level 4': 'Grade 12 (Matric)',
-    'N4 / NTC 4': None,
-    'N5 /NTC 5': None,
+    'N4 / NTC 4': 'N/A',
+    'N5 /NTC 5': 'N/A',
     'N6 / NTC 6': 'Undergrad',
     'Certificate with less than Grade 12 / Std 10': 'Some secondary',
     'Diploma with less than Grade 12 / Std 10': 'Some secondary',
@@ -51,8 +54,8 @@ COLLAPSED_EDUCATION_CATEGORIES = {
     'Higher Degree Masters / PhD': 'Post-grad',
     'Other': 'Other',
     'No schooling': 'None',
-    'Unspecified': None,
-    'Not applicable': None,
+    'Unspecified': 'N/A',
+    'Not applicable': 'N/A',
 }
 EDUCATION_GET_OR_HIGHER = set([
     'Grade 9 / Std 7 / Form 2/ ABET 4',
@@ -90,6 +93,14 @@ EDUCATION_FET_OR_HIGHER = set([
     'Honours degree',
     'Higher Degree Masters / PhD',
 ])
+EDUCATION_KEY_ORDER = (
+    'None', 'Other',
+    'Some primary', 'Primary',
+    'Some secondary',
+    'Grade 12 (Matric)',
+    'Undergrad',
+    'Post-grad'
+)
 
 # Age categories
 
@@ -250,6 +261,17 @@ TYPE_OF_DWELLING_RECODE = {
     'Not applicable': 'N/A',
 }
 
+
+COLLAPSED_EMPLOYMENT_CATEGORIES = {
+    'Employed': 'In labour force',
+    'Unemployed': 'In labour force',
+    'Discouraged work-seeker': 'In labour force',
+    'Other not economically active': 'Not in labour force',
+    'Age less than 15 years': 'Not in labour force',
+    'Not applicable': 'Not in labour force'
+}
+
+
 def get_census_profile(geo_code, geo_level):
     session = get_session()
 
@@ -277,6 +299,7 @@ def get_census_profile(geo_code, geo_level):
         group_remainder(data['demographics']['province_of_birth_distribution'], 7)
         group_remainder(data['demographics']['region_of_birth_distribution'], 5)
         group_remainder(data['households']['type_of_dwelling_distribution'], 5)
+        group_remainder(data['child_households']['type_of_dwelling_distribution'], 5)
         
         return data
 
@@ -339,7 +362,10 @@ def get_demographics_profile(geo_code, geo_level, session):
         }}
 
     # median age/age category
-    db_model_age = get_model_from_fields(['age in completed years'], geo_level)
+    db_model_age = get_model_from_fields(
+        ['age in completed years'], geo_level,
+        table_name='ageincompletedyears_%s' % geo_level
+    )
     objects = sorted(
         get_objects_by_geo(db_model_age, geo_code, geo_level, session),
         key=lambda x: int(getattr(x, 'age in completed years'))
@@ -439,14 +465,12 @@ def get_households_profile(geo_code, geo_level, session):
     female_heads = head_gender_dist['Female']['numerators']['this']
 
     # age
-    db_model_age = get_model_from_fields(['age of household head'],
-                                            geo_level)
-    objects = get_objects_by_geo(db_model_age, geo_code, geo_level, session)
-    total_under_18 = 0.0
-    for obj in objects:
-        age = getattr(obj, 'age of household head')
-        if age in ['00 - 04', '05 - 09', '10 - 14', '15 - 17']:
-            total_under_18 += obj.total
+    db_model_u18 = get_model_from_fields(
+        ['gender of head of household'], geo_level,
+        table_name='genderofheadofhouseholdunder18_%s' % geo_level
+    )
+    objects = get_objects_by_geo(db_model_u18, geo_code, geo_level, session)
+    total_under_18 = float(sum(o[0] for o in objects))
 
     # tenure
     tenure_data, _ = get_stat_data(
@@ -462,7 +486,8 @@ def get_households_profile(geo_code, geo_level, session):
             ['annual household income'], geo_level, geo_code, session,
             exclude=['Unspecified'],
             recode=HOUSEHOLD_INCOME_RECODE,
-            key_order=HOUSEHOLD_INCOME_RECODE.values())
+            key_order=HOUSEHOLD_INCOME_RECODE.values(),
+            table_name='annualhouseholdincome_genderofhouseholdhead_%s' % geo_level)
 
     # median income
     median = calculate_median_stat(income_dist_data)
@@ -536,7 +561,8 @@ def get_economics_profile(geo_code, geo_level, session):
     employ_status, total_workers = get_stat_data(
             ['official employment status'], geo_level, geo_code, session,
             exclude=['Age less than 15 years', 'Not applicable'],
-            order_by='official employment status')
+            order_by='official employment status',
+            table_name='officialemploymentstatus_%s' % geo_level)
 
     # sector
     sector_dist_data, _ = get_stat_data(
@@ -714,12 +740,7 @@ def get_education_profile(geo_code, geo_level, session):
         }
     edu_dist_data = collapse_categories(edu_dist_data,
                                         COLLAPSED_EDUCATION_CATEGORIES,
-                                        key_order=('None', 'Other',
-                                                   'Some primary', 'Primary',
-                                                   'Some secondary',
-                                                   'Grade 12 (Matric)',
-                                                   'Undergrad',
-                                                   'Post-grad'))
+                                        key_order=EDUCATION_KEY_ORDER)
     edu_split_data = {
         'percent_get_or_higher': {
             "name": "Completed Grade 9 or higher",
@@ -743,3 +764,172 @@ def get_education_profile(geo_code, geo_level, session):
 
     return {'educational_attainment_distribution': edu_dist_data,
             'educational_attainment': edu_split_data}
+
+
+def get_children_profile(geo_code, geo_level, session):
+    # age
+    child_adult_dist, _ = get_stat_data(
+            ['age in completed years'], geo_level, geo_code, session,
+            table_name='ageincompletedyearssimplified_%s' % geo_level,
+            recode={'< 18': 'Children (< 18)',
+                    '18 to 64': 'Adults (>= 18)',
+                    '>= 65': 'Adults (>= 18)'})
+
+    # parental survival
+    parental_survival_dist, _ = get_stat_data(['parents alive'],
+                                              geo_level, geo_code, session)
+
+    # school
+
+    # NOTE: this data is incompatible with some views (check out
+    # https://github.com/censusreporter/censusreporter/issues/78)
+    #
+    # school_attendance_dist, total_school_aged = get_stat_data(
+    #     ['present school attendance', 'age in completed years'],
+    #     geo_level, geo_code, session,
+    # )
+    # school_attendance_dist['Yes']['metadata'] = \
+    #         school_attendance_dist['metadata']
+    # school_attendance_dist = school_attendance_dist['Yes']
+    # total_attendance = sum(d['numerators']['this'] for d in
+    #                        school_attendance_dist.values()
+    #                        if 'numerators' in d)
+
+    # school attendance
+    school_attendance_dist, total_school_aged = get_stat_data(
+        ['present school attendance'],
+        geo_level, geo_code, session,
+    )
+    total_attendance = school_attendance_dist['Yes']['numerators']['this']
+
+    # education level
+    education17_dist, _ = get_stat_data(
+        ['highest educational level'],
+        geo_level, geo_code, session,
+        recode=COLLAPSED_EDUCATION_CATEGORIES,
+        table_name='highesteducationallevel17_%s' % geo_level,
+        key_order=EDUCATION_KEY_ORDER,
+    )
+
+    # employment
+    employment_dist, total_15to17 = get_stat_data(
+        ['official employment status'],
+        geo_level, geo_code, session,
+        table_name='officialemploymentstatus15to17_%s' % geo_level,
+        exclude=['Not applicable']
+    )
+    total_in_labour_force = float(sum(v["numerators"]["this"] for k, v
+                                      in employment_dist.iteritems()
+                                      if COLLAPSED_EMPLOYMENT_CATEGORIES.get(k, None)
+                                      == 'In labour force'))
+
+    # median income
+    income_dist_data, total_workers = get_stat_data(
+        ['individual monthly income'], geo_level, geo_code, session,
+        exclude=['Not applicable'],
+        recode=COLLAPSED_INCOME_CATEGORIES,
+        key_order=COLLAPSED_INCOME_CATEGORIES.values(),
+        table_name='individualmonthlyincome15to17_%s' % geo_level
+    )
+    median = calculate_median_stat(income_dist_data)
+    median_income = ESTIMATED_INCOME_CATEGORIES[median]
+
+    return {
+        'demographics': {
+            'child_adult_distribution': child_adult_dist,
+            'total_children': {
+                "name": "Children",
+                "values": {"this": child_adult_dist['Children (< 18)']['numerators']['this']}
+            },
+            'parental_survival_distribution': parental_survival_dist,
+            'percent_no_parent': {
+                "name": "Of children 14 and under have no living biological parents",
+                "values": parental_survival_dist["Neither parent (or uncertain)"]['values'],
+                "numerators": parental_survival_dist["Neither parent (or uncertain)"]['numerators'],
+            },
+        },
+        'school': {
+            'school_attendance_distribution': school_attendance_dist,
+            'percent_school_attendance': {
+                "name": "School-aged children (5 to 17 years old) are in school",
+                "numerators": {"this": total_school_aged},
+                "values": {"this": percent(float(total_attendance),
+                                           float(total_school_aged))}
+            },
+            'education17_distribution': education17_dist,
+        },
+        'employment': {
+            'percent_in_labour_force': {
+                "name": "Of children between 15 and 17 are in the labour force",
+                "numerators": {"this": total_in_labour_force},
+                "values": {"this": percent(total_in_labour_force, total_15to17)}
+            },
+            'employment_distribution': employment_dist,
+            'median_income': {
+                'name': 'Average monthly income of employed children between 15 and 17',
+                'values': {'this': median_income},
+            },
+        }
+    }
+
+
+def get_child_households_profile(geo_code, geo_level, session):
+    # head of household
+    # gender
+    head_gender_dist, total_households = get_stat_data(
+            ['gender of head of household'], geo_level, geo_code, session,
+            order_by='gender of head of household',
+            table_name='genderofheadofhouseholdunder18_%s' % geo_level)
+    female_heads = head_gender_dist['Female']['numerators']['this']
+
+    # annual household income
+    income_dist_data, _ = get_stat_data(
+            ['annual household income'], geo_level, geo_code, session,
+            exclude=['Unspecified'],
+            recode=HOUSEHOLD_INCOME_RECODE,
+            key_order=HOUSEHOLD_INCOME_RECODE.values(),
+            table_name='annualhouseholdincomeunder18_%s' % geo_level)
+
+    # median income
+    median = calculate_median_stat(income_dist_data)
+    median_income = HOUSEHOLD_INCOME_ESTIMATE[median]
+
+    # type of dwelling
+    type_of_dwelling_dist, _ = get_stat_data(
+            ['type of main dwelling'], geo_level, geo_code, session,
+            recode=TYPE_OF_DWELLING_RECODE,
+            order_by='-total')
+    informal = type_of_dwelling_dist['Shack']['numerators']['this']
+
+    # size of household
+    household_size_dist, _ = get_stat_data(
+        ['household size', 'age of household head'],
+        geo_level, geo_code, session
+    )
+
+    return {
+        'total_households': {
+            'name': 'Households with heads under 18 years old',
+            'values': {'this': total_households},
+        },
+        'type_of_dwelling_distribution': type_of_dwelling_dist,
+        'informal': {
+            'name': 'Child-headed households that are informal dwellings (shacks)',
+            'values': {'this': percent(informal, total_households)},
+            'numerators': {'this': informal},
+        },
+        'annual_income_distribution': income_dist_data,
+        'median_annual_income': {
+            'name': 'Average annual child-headed household income',
+            'values': {'this': median_income},
+        },
+        'household_size_distribution': household_size_dist,
+        'head_of_household': {
+            'gender_distribution': head_gender_dist,
+            'female': {
+                'name': 'Child-headed households with women as their head',
+                'values': {'this': percent(female_heads, total_households)},
+                'numerators': {'this': female_heads},
+                },
+        },
+    }
