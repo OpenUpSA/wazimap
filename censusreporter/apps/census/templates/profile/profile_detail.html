@@ -368,16 +368,16 @@
                 {% include 'profile/_blocks/_stat_list.html' with stat=children.demographics.percent_no_parent stat_type='percentage' %}
             </div>
             <div class="column-third">
-                <div id="chart-pie-children-demographics-parental_survival_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Population by biological parental survival" data-qualifier="Universe: {{ children.demographics.parental_survival_distribution.metadata.universe }}"></div>
+                <div id="chart-pie-children-demographics-parental_survival_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Children 14 and under by biological parental survival" data-qualifier="Universe: {{ children.demographics.parental_survival_distribution.metadata.universe }}"></div>
             </div>
         </section>
         <section class="clearfix stat-row">
-            <h2 class="header-for-columns"><a class="permalink" href="#child_school" id="child_school">School <i class="fa fa-link"></i></a></h2>
+            <h2 class="header-for-columns"><a class="permalink" href="#child_school" id="child_school">School attendance <i class="fa fa-link"></i></a></h2>
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=children.school.percent_school_attendance stat_type='percentage' %}
             </div>
             <div class="column-third">
-                <div id="chart-pie-children-school-school_attendance_distribution" data-stat-type="percentage" data-chart-title="Population by school attendance" data-initial-sort="-value" data-qualifier="Universe: {{ children.school.school_attendance_distribution.metadata.universe }}"></div>
+                <div id="chart-pie-children-school-school_attendance_distribution" data-stat-type="percentage" data-chart-title="Children 5 to 17 by school attendance" data-initial-sort="-value" data-qualifier="Universe: {{ children.school.school_attendance_distribution.metadata.universe }}"></div>
             </div>
         </section>
         <section class="clearfix stat-row">
@@ -411,7 +411,7 @@
     <div class="section-container">
 
         <section class="clearfix stat-row">
-            <h2><a class="permalink" href="#child-households" id="child-households">Households <i class="fa fa-link"></i></a></h2>
+            <h2><a class="permalink" href="#child-households" id="child-households">Households headed by children under 18 years old<i class="fa fa-link"></i></a></h2>
             <div class="column-third">
                 {% include 'profile/_blocks/_stat_list.html' with stat=child_households.total_households stat_type='number' %}
             </div>
