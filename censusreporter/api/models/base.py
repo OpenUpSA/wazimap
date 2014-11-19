@@ -26,6 +26,8 @@ Geographic models
 '''
 
 class GeoMixin(object):
+    child_level = None
+
     def as_dict(self):
         return {
             'full_geoid': self.full_geoid,
@@ -261,12 +263,38 @@ class Subplace(Base):
     year = Column(String(4), index=True, nullable=False)
 
 
+class PoliceDistrict(Base, GeoMixin):
+    # a 5-character string where the first 2 characters is the
+    # province code and the last 3 are digits, e.g. MP322
+    # Note: a few municipalities exist for large city areas with
+    # 3-letter codes, e.g. CPT (same code used for district)
+    code = Column(String(256), primary_key=True)
+    name = Column(String(256), index=True, nullable=False)
+    year = Column(String(4), index=True, nullable=False)
+    province_code = Column(String(3), ForeignKey('province.code'))
+
+    # associations
+    province  = relationship('Province', lazy=False)
+
+    level = 'policedistrict'
+
+    @property
+    def context_name(self):
+        return '%s, %s' % (self.short_name, self.province.code)
+
+    def parents(self):
+        return [self.province, self.country]
+
+
+
+
 geo_models = {
     'subplace': Subplace,
     'ward': Ward,
     'municipality': Municipality,
     'province': Province,
     'country': Country,
+    'policedistrict': PoliceDistrict,
 }
 geo_levels = geo_models.keys()
 

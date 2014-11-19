@@ -266,7 +266,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     :param str table_name: override the table name, otherwise it's calculated from the fields and geo_level
     :param dict or list only: only include these field values. If +fields+ has many items, this must be a dict
                               mapping field names to a list of strings.
-    :param doct or list exclude: ignore these field values. If +fields+ has many items, this must be a dict
+    :param dict or list exclude: ignore these field values. If +fields+ has many items, this must be a dict
                                  mapping field names to a list of strings. Field names are checked
                                  before any recoding.
     :param bool exclude_zero: ignore fields that have a zero total
@@ -335,7 +335,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         for i, field in enumerate(fields):
             key = getattr(obj, field)
 
-            if only and key not in only.get(field, {}):
+            if only and field in only and key not in only.get(field, {}):
                 return key, None
 
             if exclude and key in exclude.get(field, {}):
@@ -362,7 +362,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             data = data[key]
 
             # default values for intermediate fields
-            if data and i < n_fields-1:
+            if data is not None and i < n_fields-1:
                 data['metadata'] = {'name': key}
 
         # data is now the dict where the end value is going to go

@@ -11,25 +11,25 @@ from api.utils import get_session, get_table_model, capitalize
 '''
 Models for handling census and other data tables.
 
-`SimpleTable` and `DataTable` instances describe an underlying Postgres table
+`SimpleTable` and `FieldTable` instances describe an underlying Postgres table
 and have extra metadata associated with them, such as the universe they cover.
 All tables have an `id` which identifies them internally to the user when
 exploring datasets.
 
 A `SimpleTable` is like a spreadsheet, with one row per geography. It has
-no concept of fields and the table is is set manually. Simple tables are
+no concept of fields and the table id is set manually. Simple tables are
 not split by geography, for no particular reason. Hence, simple table ids
 are the same as the underlying Postgres table name.
 
-A `DataTable` is for census data and may have multiple rows per geography.
+A `FieldTable` is for census data and may have multiple rows per geography.
 The id for a table is derived from the table's fields. The underlying
 database has one table (and hence model) per geography, and the name of those
 tables is derived from the id and the geography level. Each model is created
 dynamically and linked back to its data table.
 
-A `DataTable` can be looked up based on a required set of fields. This
+A `FieldTable` can be looked up based on a required set of fields. This
 means that the census controller doesn't care about table names, only
-about what fields it requires. If more than one DataTable could serve
+about what fields it requires. If more than one FieldTable could serve
 for a set of fields, the one with the fewest extraneous fields is chosen.
 '''
 
@@ -212,7 +212,16 @@ class FieldTable(SimpleTable):
         Build models that correspond to the tables underlying this data table.
         """
         self.models = {}
-        for level in geo_levels:
+
+        # XXX: HACK
+        if self.dataset_name == 'Police Crime Statistics':
+            levels = ['policedistrict', 'province', 'country']
+        else:
+            levels = list(geo_levels)
+            if 'policedistrict' in levels:
+                levels.remove('policedistrict')
+
+        for level in levels:
             model = build_model_from_fields(
                     self.fields, level,
                     table_name=get_table_name(id=self.id, geo_level=level))
@@ -433,7 +442,7 @@ def build_model_from_fields(fields, geo_level, table_name=None):
                      for field in fields]
 
     # foreign keys
-    field_columns.append(Column('%s_code' % geo_level, String(8),
+    field_columns.append(Column('%s_code' % geo_level, String(20),
                                 ForeignKey('%s.code' % geo_level),
                                 primary_key=True, index=True))
 
@@ -518,6 +527,10 @@ FieldTable(['gender of head of household'], id="genderofheadofhouseholdunder18",
 FieldTable(['annual household income'], id="annualhouseholdincomeunder18", universe='Households headed by children under 18')
 FieldTable(['type of main dwelling'], id='typeofmaindwellingunder18', universe='Households headed by children under 18')
 
+# Crime
+FieldTable(['crime', 'year'], universe='Crimes', dataset='Police Crime Statistics', year='2013')
+
+# Elections
 FieldTable(['party'], universe='Votes', id='party_votes_national_2014', description='2014 National Election results',
         dataset='2014 National Elections', year='2014')
 FieldTable(['party'], universe='Votes', id='party_votes_provincial_2014', description='2014 Provincial Election results',

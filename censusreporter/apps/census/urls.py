@@ -19,7 +19,7 @@ STANDARD_CACHE_TIME = 60*15 # 15-minute cache
 COMPARISON_FORMATS = 'map|table|distribution'
 BLOCK_ROBOTS = getattr(settings, 'BLOCK_ROBOTS', False)
 
-geo_levels = 'ward|municipality|province|country'
+geo_levels = 'ward|municipality|province|country|policedistrict'
 
 
 urlpatterns = patterns('',
