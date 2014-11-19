@@ -779,6 +779,11 @@ def get_children_profile(geo_code, geo_level, session):
     parental_survival_dist, _ = get_stat_data(['parents alive'],
                                               geo_level, geo_code, session)
 
+    # gender
+    gender_dist, _ = get_stat_data(
+            ['gender'], geo_level, geo_code, session,
+            table_name='genderunder18_%s' % geo_level)
+
     # school
 
     # NOTE: this data is incompatible with some views (check out
@@ -841,6 +846,7 @@ def get_children_profile(geo_code, geo_level, session):
                 "name": "Children",
                 "values": {"this": child_adult_dist['Children (< 18)']['numerators']['this']}
             },
+            'gender_distribution': gender_dist,
             'parental_survival_distribution': parental_survival_dist,
             'percent_no_parent': {
                 "name": "Of children 14 and under have no living biological parents",

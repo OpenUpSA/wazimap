@@ -359,6 +359,9 @@
                 {% include 'profile/_blocks/_stat_list.html' with stat=children.demographics.total_children stat_type='number' %}
             </div>
             <div class="column-third">
+                <div id="chart-pie-children-demographics-gender_distribution" data-stat-type="percentage" data-chart-title="Children under 18 by gender" data-qualifier="Universe: {{ children.demographics.gender_distribution.metadata.universe }}"></div>
+            </div>
+            <div class="column-third">
                 <div id="chart-pie-children-demographics-child_adult_distribution" data-stat-type="percentage" data-chart-title="Population by age category"></div>
             </div>
         </section>

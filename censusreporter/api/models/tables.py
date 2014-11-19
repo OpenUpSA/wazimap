@@ -511,6 +511,7 @@ FieldTable(['official employment status'], id="officialemploymentstatus15to17", 
 FieldTable(['highest educational level'], id="highesteducationallevel17", universe="17-year-old children")
 FieldTable(['level of education'], id="levelofeducation17labourforce", universe="17-year-old children in the labour force")
 FieldTable(['individual monthly income'], id="individualmonthlyincome15to17", universe="Children 15 to 17 who are employed")
+FieldTable(['gender'], id='genderunder18', universe='Children under 18')
 
 # child-headed households
 FieldTable(['gender of head of household'], id="genderofheadofhouseholdunder18", universe='Households headed by children under 18')
