@@ -16,7 +16,7 @@ from .utils import LazyEncoder
 from .profile import enhance_api_data
 
 from api.models.tables import get_datatable, DATA_TABLES
-from api.controller import get_census_profile, get_geography, get_locations, get_locations_from_coords, get_elections_profile, get_crime_profile
+from api.controller import get_census_profile, get_geography, get_locations, get_locations_from_coords, get_elections_profile
 from api.utils import LocationNotFound
 from api.download import generate_download_bundle, supported_formats
 
@@ -48,14 +48,9 @@ class GeographyDetailView(BaseGeographyDetailView):
         except (ValueError, LocationNotFound):
             raise Http404
 
-        if geo_level == 'policedistrict':
-            profile_data = get_crime_profile(geo_code, geo_level)
-            self.template_name = 'profile/profile_crime.html'
-        else:
-            profile_data = get_census_profile(geo_code, geo_level)
-            profile_data['elections'] = get_elections_profile(geo_code, geo_level)
-            profile_data['election_list'] = ["national_2014", "provincial_2014"]
-
+        profile_data = get_census_profile(geo_code, geo_level)
+        profile_data['elections'] = get_elections_profile(geo_code, geo_level)
+        profile_data['election_list'] = ["national_2014", "provincial_2014"]
         profile_data['geography'] = geo.as_dict_deep()
 
         profile_data = enhance_api_data(profile_data)
