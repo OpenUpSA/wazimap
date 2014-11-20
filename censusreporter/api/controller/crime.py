@@ -68,7 +68,7 @@ CRIME_CLASSES = {
         'Culpable homicide',
         'Public violence',
         'Crimen injuria',
-        'Neglect and ill-treatment of children ',
+        'Neglect and ill-treatment of children',
         'Kidnapping',
     ]
 }

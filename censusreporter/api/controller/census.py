@@ -279,7 +279,11 @@ def get_census_profile(geo_code, geo_level):
         geo_summary_levels = get_summary_geo_info(geo_code, geo_level, session)
         data = {}
 
-        for section in PROFILE_SECTIONS:
+        sections = list(PROFILE_SECTIONS)
+        if geo_level in ['country', 'province']:
+            sections.append('crime')
+
+        for section in sections:
             function_name = 'get_%s_profile' % section
             if function_name in globals():
                 func = globals()[function_name]
@@ -937,5 +941,20 @@ def get_child_households_profile(geo_code, geo_level, session):
                 'values': {'this': percent(female_heads, total_households)},
                 'numerators': {'this': female_heads},
                 },
+        },
+    }
+
+
+def get_crime_profile(geo_code, geo_level, session):
+    child_crime, total = get_stat_data(
+        ['crime'], geo_level, geo_code, session,
+        only=['Neglect and ill-treatment of children'],
+        percent=False)
+
+    return {
+        'crime_against_children': {
+            'name': 'Crimes of neglect and ill-treatment of children in 2014',
+            'values': {'this': total},
+            'metadata': {'universe': 'Crimes in 2014'},
         },
     }

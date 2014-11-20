@@ -374,6 +374,17 @@
                 <div id="chart-pie-children-demographics-parental_survival_distribution" data-stat-type="percentage" data-initial-sort="-value" data-chart-title="Children 14 and under by biological parental survival" data-qualifier="Universe: {{ children.demographics.parental_survival_distribution.metadata.universe }}"></div>
             </div>
         </section>
+        {% if crime %}
+        <section class="clearfix stat-row">
+            <aside>
+                Crime information is only currently available at national and provincial levels.
+            </aside>
+            <h2 class="header-for-columns"><a class="permalink" href="#crimes_children" id="crimes_children">Crimes against children <i class="fa fa-link"></i></a></h2>
+            <div class="column-full">
+                {% include 'profile/_blocks/_stat_list.html' with stat=crime.crime_against_children stat_type='number' %}
+            </div>
+        </section>
+        {% endif %}
         <section class="clearfix stat-row">
             <h2 class="header-for-columns"><a class="permalink" href="#child_school" id="child_school">School attendance <i class="fa fa-link"></i></a></h2>
             <div class="column-third">

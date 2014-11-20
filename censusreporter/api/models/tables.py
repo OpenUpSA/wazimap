@@ -442,7 +442,7 @@ def build_model_from_fields(fields, geo_level, table_name=None):
                      for field in fields]
 
     # foreign keys
-    field_columns.append(Column('%s_code' % geo_level, String(20),
+    field_columns.append(Column('%s_code' % geo_level, String(5),
                                 ForeignKey('%s.code' % geo_level),
                                 primary_key=True, index=True))
 
