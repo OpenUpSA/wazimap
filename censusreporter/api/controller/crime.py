@@ -29,12 +29,39 @@ def get_crime_profile(geo_code, geo_level):
         session.close()
 
 
+CRIME_CLASSES = {
+    'contact': [
+        'Murder',
+        'Total Sexual Offences',
+        'Attempted murder',
+        'Assault with the intent to inflict grievous bodily harm',
+        'Common assault',
+        'Robbery with aggravating circumstances',
+        'Common robbery',
+        'Arson',
+        'Malicious damage to property',
+    ],
+    'property': [
+        'Burglary at non-residential premises',
+        'Burglary at residential premises',
+        'Theft of motor vehicle and motorcycle',
+        'Theft out of or from motor vehicle',
+        'Stock-theft',
+    ],
+}
+
+
 def get_crime_breakdown_profile(geo_code, geo_level, session):
     crime_distribution, _ = get_stat_data(
-            ['crime', 'year'], geo_level, geo_code, session,
-            exclude_zero=True, only={'year': ['2014']},
-            order_by='-total')
+            ['crime'], geo_level, geo_code, session,
+            exclude_zero=True, order_by='-total')
 
-    return {
-        'crime_distribution': crime_distribution,
-    }
+    classes = {}
+    for name, crimes in CRIME_CLASSES.iteritems():
+        classes[name], _ = get_stat_data(
+            ['crime'], geo_level, geo_code, session,
+            only=crimes, exclude_zero=True, order_by='-total')
+
+    classes['crime_distribution'] = crime_distribution
+
+    return classes

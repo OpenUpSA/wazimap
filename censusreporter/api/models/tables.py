@@ -528,7 +528,7 @@ FieldTable(['annual household income'], id="annualhouseholdincomeunder18", unive
 FieldTable(['type of main dwelling'], id='typeofmaindwellingunder18', universe='Households headed by children under 18')
 
 # Crime
-FieldTable(['crime', 'year'], universe='Crimes', dataset='Police Crime Statistics', year='2013')
+FieldTable(['crime'], universe='Crimes', dataset='Police Crime Statistics', year='2014')
 
 # Elections
 FieldTable(['party'], universe='Votes', id='party_votes_national_2014', description='2014 National Election results',

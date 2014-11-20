@@ -51,6 +51,9 @@ var sumlevMap = {
     "ward":  {"name": "ward", "plural": "wards", "sumlev": "ward",
                 "children": [],
                 "ancestors": ['municipality', 'province']},
+    "policedistrict":  {"name": "police district", "plural": "police districts", "sumlev": "policedistrict",
+                "children": [],
+                "ancestors": ['province']},
 };
 
 var releaseNames = {

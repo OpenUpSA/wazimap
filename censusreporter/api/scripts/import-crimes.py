@@ -22,9 +22,6 @@ class CrimeImporter(object):
         self.includes_total = False
         self.table_name = None
 
-    def district_name_to_code(self, name):
-        return bad_chars.sub('', name.lower())
-
 
     def import_crimes(self):
         session = get_session()
@@ -37,14 +34,16 @@ class CrimeImporter(object):
             reader = csv.DictReader(f, delimiter=",")
 
             for row in reader:
-                name = row['Police Station']
-                code = self.district_name_to_code(name)
-                args = {
-                        'crime': row['Crime'],
-                        'year': row['Year'],
-                        'total': int(row['Incidents']),
-                        }
-                args[geo_code_attr] = code
+                args = {}
+                for key, val in row.iteritems():
+                    key = key.lower()
+                    if key == 'geo_code':
+                        args[geo_code_attr] = val
+                    elif key == 'total':
+                        args['total'] = int(val)
+                    else:
+                        args[key] = val
+
                 item = model(**args)
                 session.add(item)
 
@@ -82,9 +81,8 @@ class CrimeImporter(object):
 
 def create_arg_parser():
     parser = argparse.ArgumentParser(
-        description='Imports data from a SuperWEB- or SuperCROSS-generated CSV file. '
-                    'The database table is automatically created from the fields in '
-                    'the file headers.'
+            description='Imports crime data from CSV. The first column must be a geo_code, there must ' +
+                    'be a total column and the remaining columns are considered fields.'
     )
     parser.add_argument(
         '--districts',
@@ -95,7 +93,7 @@ def create_arg_parser():
     parser.add_argument(
         'filepath',
         action='store',
-        help='the file path to a SuperCROSS or SuperWEB CSV export'
+        help='the file path to a CSV file'
     )
     parser.add_argument(
         '--geolevel',
