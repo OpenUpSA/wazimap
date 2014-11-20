@@ -98,45 +98,59 @@
 
 <p class="explain">Interact with charts and statistics for additional information.</p>
 
-<article id="contact" class="clearfix">
+<article id="property" class="clearfix">
     <header class="section-contents">
-        <h1>Contact and related crimes</h1>
+        <h1>Contact and Property</h1>
     </header>
     <div class="section-container">
-
         <section class="clearfix stat-row">
-            <h2><a class="permalink" href="#contact" id="contact">Contact crimes <i class="fa fa-link"></i></a></h2>
-            <div class="column-full" id="chart-column-crime-contact" data-stat-type="number"></div>
+            <div class="column-half">
+                <h2><a class="permalink" href="#contact" id="contact">Contact crimes in 2014<i class="fa fa-link"></i></a></h2>
+                <div class="column-full" id="chart-bar-crime-contact" data-stat-type="number"></div>
+            </div>
+            <div class="column-half">
+                <h2><a class="permalink" href="#property" id="property">Property crimes in 2014<i class="fa fa-link"></i></a></h2>
+                <div id="chart-bar-crime-property" data-stat-type="number"></div>
+            </div>
         </section>
     </div>
 </article>
 
 <article id="property" class="clearfix">
     <header class="section-contents">
-        <h1>Property crimes</h1>
+        <h1>Other</h1>
     </header>
     <div class="section-container">
-
         <section class="clearfix stat-row">
-            <h2><a class="permalink" href="#property" id="property">Property crimes <i class="fa fa-link"></i></a></h2>
-            <div class="column-full" id="chart-column-crime-property" data-stat-type="number"></div>
+            <div class="column-half">
+                <h2><a class="permalink" href="#contact" id="contact">Crimes detected as a result of police action in 2014<i class="fa fa-link"></i></a></h2>
+                <div class="column-full" id="chart-column-crime-policeaction" data-stat-type="number"></div>
+            </div>
+            <div class="column-half">
+                <h2><a class="permalink" href="#property" id="property">Other serious crimes in 2014<i class="fa fa-link"></i></a></h2>
+                <div id="chart-bar-crime-otherserious" data-stat-type="number"></div>
+            </div>
         </section>
     </div>
 </article>
 
-<article id="crime" class="clearfix">
+<article id="property" class="clearfix">
     <header class="section-contents">
-        <h1>Crime</h1>
+        <h1>Robbery and other</h1>
     </header>
     <div class="section-container">
-
         <section class="clearfix stat-row">
-            <h2><a class="permalink" href="#crimes" id="crimes">Crimes <i class="fa fa-link"></i></a></h2>
-            <div class="column-full" id="chart-bar-crime-crime_distribution" data-stat-type="scaled-percentage" data-chart-title="Crimes committed"></div>
+            <div class="column-half">
+                <h2><a class="permalink" href="#contact" id="contact">Aggravated robberies in 2014<i class="fa fa-link"></i></a></h2>
+                <div class="column-full" id="chart-column-crime-aggravatedrobbery" data-stat-type="number"></div>
+            </div>
+            <div class="column-half">
+                <h2><a class="permalink" href="#property" id="property">Other crimes in 2014<i class="fa fa-link"></i></a></h2>
+                <div id="chart-bar-crime-other" data-stat-type="number"></div>
+            </div>
         </section>
     </div>
 </article>
-
 {% endblock %}
 
 {% block body_javascript_extra %}{{ block.super }}

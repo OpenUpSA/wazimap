@@ -48,19 +48,43 @@ CRIME_CLASSES = {
         'Theft out of or from motor vehicle',
         'Stock-theft',
     ],
+    'policeaction': [
+        'Unlawful possession of firearms and ammunition',
+        'Drug-related crime',
+        'Driving under the influence of alcohol or drugs',
+    ],
+    'otherserious': [
+        'All theft not mentioned elsewhere',
+        'Commercial crime',
+        'Shoplifting',
+    ],
+    'aggravatedrobbery': [
+        'Carjacking',
+        'Truck hijacking',
+        'Robbery at residential premises',
+        'Robbery at non-residential premises',
+    ],
+    'other': [
+        'Culpable homicide',
+        'Public violence',
+        'Crimen injuria',
+        'Neglect and ill-treatment of children ',
+        'Kidnapping',
+    ]
 }
 
 
 def get_crime_breakdown_profile(geo_code, geo_level, session):
     crime_distribution, _ = get_stat_data(
             ['crime'], geo_level, geo_code, session,
-            exclude_zero=True, order_by='-total')
+            percent=False, exclude_zero=True, order_by='-total')
 
     classes = {}
     for name, crimes in CRIME_CLASSES.iteritems():
         classes[name], _ = get_stat_data(
             ['crime'], geo_level, geo_code, session,
-            only=crimes, exclude_zero=True, order_by='-total')
+            only=crimes,
+            percent=False, exclude_zero=True, order_by='-total')
 
     classes['crime_distribution'] = crime_distribution
 
