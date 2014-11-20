@@ -392,18 +392,21 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         grand_total = sum(our_total.values())
 
     # add in percentages
-    if percent:
-        def calc_percent(data):
-            for key, data in data.iteritems():
-                if not key == 'metadata':
-                    if 'numerators' in data:
+    def calc_percent(data):
+        for key, data in data.iteritems():
+            if not key == 'metadata':
+                if 'numerators' in data:
+                    if percent:
                         tot = our_total[key] if many_fields else grand_total
                         perc = 0 if tot == 0 else (data['numerators']['this'] / tot * 100)
                         data['values'] = {'this': round(perc, 2)}
                     else:
-                        calc_percent(data)
+                        data['values'] = dict(data['numerators'])
+                        data['numerators']['this'] = None
+                else:
+                    calc_percent(data)
 
-        calc_percent(root_data)
+    calc_percent(root_data)
 
     add_metadata(root_data, model)
 
