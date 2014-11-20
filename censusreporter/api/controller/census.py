@@ -3,6 +3,7 @@ from collections import OrderedDict
 from sqlalchemy import func
 
 from api.models import get_model_from_fields
+from api.models.tables import get_datatable, get_table_id
 from api.utils import get_session, LocationNotFound
 
 from .utils import (collapse_categories, calculate_median, calculate_median_stat, get_summary_geo_info,
@@ -279,7 +280,11 @@ def get_census_profile(geo_code, geo_level):
         geo_summary_levels = get_summary_geo_info(geo_code, geo_level, session)
         data = {}
 
-        for section in PROFILE_SECTIONS:
+        sections = list(PROFILE_SECTIONS)
+        if geo_level in ['country', 'province']:
+            sections.append('crime')
+
+        for section in sections:
             function_name = 'get_%s_profile' % section
             if function_name in globals():
                 func = globals()[function_name]
@@ -937,5 +942,23 @@ def get_child_households_profile(geo_code, geo_level, session):
                 'values': {'this': percent(female_heads, total_households)},
                 'numerators': {'this': female_heads},
                 },
+        },
+    }
+
+
+def get_crime_profile(geo_code, geo_level, session):
+    child_crime, total = get_stat_data(
+        ['crime'], geo_level, geo_code, session,
+        only=['Neglect and ill-treatment of children'],
+        percent=False)
+
+    table = get_datatable(get_table_id(['crime']))
+
+    return {
+        'dataset': table.dataset_name,
+        'crime_against_children': {
+            'name': 'Crimes of neglect and ill-treatment of children in 2014',
+            'values': {'this': total},
+            'metadata': {'universe': 'Crimes in 2014'},
         },
     }
