@@ -67,7 +67,13 @@
             {% endif %}
             
             <div class="column-full">
-                <p class="caption"><strong>Census data:</strong> 2011</p>
+                <p class="caption">
+                    <strong>Census data:</strong> 2011
+                    {% if crime %}
+                    <br>
+                    <strong>Crime data:</strong> {{ crime.dataset }}</p>
+                    {% endif %}
+                </p>
             </div>
         </article>
     </div>

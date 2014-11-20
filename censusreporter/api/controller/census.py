@@ -3,6 +3,7 @@ from collections import OrderedDict
 from sqlalchemy import func
 
 from api.models import get_model_from_fields
+from api.models.tables import get_datatable, get_table_id
 from api.utils import get_session, LocationNotFound
 
 from .utils import (collapse_categories, calculate_median, calculate_median_stat, get_summary_geo_info,
@@ -951,7 +952,10 @@ def get_crime_profile(geo_code, geo_level, session):
         only=['Neglect and ill-treatment of children'],
         percent=False)
 
+    table = get_datatable(get_table_id(['crime']))
+
     return {
+        'dataset': table.dataset_name,
         'crime_against_children': {
             'name': 'Crimes of neglect and ill-treatment of children in 2014',
             'values': {'this': total},

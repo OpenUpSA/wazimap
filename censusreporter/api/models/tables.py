@@ -213,15 +213,7 @@ class FieldTable(SimpleTable):
         """
         self.models = {}
 
-        # XXX: HACK
-        if self.dataset_name == 'Police Crime Statistics':
-            levels = ['policedistrict', 'province', 'country']
-        else:
-            levels = list(geo_levels)
-            if 'policedistrict' in levels:
-                levels.remove('policedistrict')
-
-        for level in levels:
+        for level in DATASET_GEO_LEVELS[self.dataset_name]:
             model = build_model_from_fields(
                     self.fields, level,
                     table_name=get_table_name(id=self.id, geo_level=level))
@@ -479,6 +471,15 @@ def get_table_name(fields=None, geo_level=None, id=None):
     return '%s_%s' % (id, geo_level)
 
 
+# the geo levels applicable to different datasets
+DATASET_GEO_LEVELS = {
+    'Census 2011'               : ['country', 'province', 'municipality', 'ward'],
+    '2014 National Elections'   : ['country', 'province', 'municipality', 'ward'],
+    '2014 Provincial Elections' : ['country', 'province', 'municipality', 'ward'],
+    'Police Crime Statistics 2014'   : ['country', 'province'],
+}
+
+
 # Define our tables so the data API can discover them.
 FieldTable(['access to internet'])
 FieldTable(['age groups in 5 years'])
@@ -528,7 +529,7 @@ FieldTable(['annual household income'], id="annualhouseholdincomeunder18", unive
 FieldTable(['type of main dwelling'], id='typeofmaindwellingunder18', universe='Households headed by children under 18')
 
 # Crime
-FieldTable(['crime'], universe='Crimes', dataset='Police Crime Statistics', year='2014')
+FieldTable(['crime'], universe='Crimes', dataset='Police Crime Statistics 2014', year='2014')
 
 # Elections
 FieldTable(['party'], universe='Votes', id='party_votes_national_2014', description='2014 National Election results',
