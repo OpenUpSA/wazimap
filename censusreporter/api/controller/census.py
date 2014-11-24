@@ -333,7 +333,7 @@ def get_demographics_profile(geo_code, geo_level, session):
                        '80+'))
 
     # sex
-    db_model_sex = get_model_from_fields(['gender'], geo_level)
+    db_model_sex = get_model_from_fields(['gender'], geo_level, table_name='gender_%s' % geo_level)
     query = session.query(func.sum(db_model_sex.total)) \
                    .filter(db_model_sex.gender == 'Male')
     geo_attr = '%s_code' % geo_level
