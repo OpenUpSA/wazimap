@@ -90,9 +90,7 @@ header.section-contents.table-explorer h1 a {
     #share-this-page {
         display: none;
     }
-}
 
-@media only screen and (max-width: 480px) {
     #how-to h1.article-header {
         font-size: 2.5em;
     }
@@ -108,6 +106,18 @@ header.section-contents.table-explorer h1 a {
     #landing-slippy-map {
         display: none;
         visibility: hidden;
+    }
+
+    #cover-map {
+        margin: 0px;
+    }
+
+    #profile .content-container {
+        margin: 0px;
+    }
+
+    #profile .explain {
+        padding: 0 1.5em;
     }
 }
 
