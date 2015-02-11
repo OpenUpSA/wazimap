@@ -62,11 +62,8 @@ def load_api_data():
 
     data_dir_abs = os.path.join(env.repo_dir, DATA_DIR)
     commands = (
-        '%s -f %s/demarcation_2011.sql' % (PSQL_STRING, data_dir_abs),
-        'for fp in `ls %s/*.tar.gz | xargs`; do tar -xvzf ${fp} -C %s/; done'
-        % (data_dir_abs, data_dir_abs),
-        'for fp in `ls %s/*.sql | grep -v demarcation_2011.sql | xargs`; '
-        'do %s -f ${fp}; done' % (data_dir_abs, PSQL_STRING),
+        'for fp in `ls %s/*.tar.gz`; do tar -xvzf ${fp} -C %s/; done' % (data_dir_abs, data_dir_abs),
+        'for fp in `ls %s/*.sql`; do echo loading $fp; %s -f ${fp}; done' % (data_dir_abs, PSQL_STRING),
     )
 
     if env.deploy_type == 'dev':
