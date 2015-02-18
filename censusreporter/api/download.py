@@ -134,7 +134,7 @@ def load_geometries(geo_ids):
         layer = source.GetLayer(0)
         for i in xrange(layer.GetFeatureCount()):
             feat = layer.GetFeature(i)
-            featid = 'country-ZA' if level == 'country' else feat['id']
+            featid = 'ZA' if level == 'country' else feat['id']
             geometries[level + '-' + featid] = feat
 
     return geometries
