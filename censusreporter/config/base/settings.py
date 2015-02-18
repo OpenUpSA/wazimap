@@ -101,11 +101,9 @@ LOGGING = {
             'level': 'ERROR',
         },
         'censusreporter': {
-            'handlers': ['console'],
             'level': 'INFO',
         },
         'django': {
-            'handlers': ['console'],
             'level': 'INFO',
         },
     }
