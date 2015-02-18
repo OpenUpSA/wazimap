@@ -92,41 +92,32 @@ LOGGING = {
         'verbose': {
             'format': '%(asctime)s %(levelname)s %(module)s %(process)d %(thread)d %(message)s'
         },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
     },
     'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler',
-            'formatter': 'verbose'
-        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'verbose'
         },
     },
     'loggers': {
-        'censusreporter':{
+        '': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
+        'censusreporter': {
             'handlers': ['console'],
             'level': 'INFO',
-            'propagate': True,
         },
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
         },
     }
 }
 
 ADMINS = (
-    ('Greg Kempe', 'greg@kempe.net'),
-    ('Rizmari Versfeld', 'rizziepit@gmail.com'),
-    ('Petrus Janse van Rensburg', 'petrus.jvrensburg@gmail.com'),
+    ('Greg Kempe', 'greg@code4sa.org'),
 )
 MANAGERS = ADMINS
 
