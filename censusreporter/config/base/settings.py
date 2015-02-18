@@ -82,12 +82,7 @@ WSGI_APPLICATION = 'censusreporter.wsgi.application'
 # more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
+    'disable_existing_loggers': True,
     'formatters': {
         'verbose': {
             'format': '%(asctime)s %(levelname)s %(module)s %(process)d %(thread)d %(message)s'
