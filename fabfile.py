@@ -22,7 +22,7 @@ PACKAGES = (
 # Nginx & Upstart constants
 SERVER_NAMES = 'wazimap.co.za'
 EMBED_URL = 'embed.wazimap.co.za'
-SERVER_ALIASES = 'wazimap.com wazimap.org wazimap.net wazimap.info mma-dashboard.code4sa.org'
+SERVER_ALIASES = 'wazimap.com wazimap.org wazimap.net wazimap.info'
 PROXY_PORT = 5001
 PROXY_HOST = '127.0.0.1'
 LOG_DIR = 'censusreporter_logs'
@@ -44,7 +44,7 @@ def prod():
     env.deploy_dir = '/var/www-data/'
     env.branch = 'master'
     env.hosts = PROD_HOSTS
-    env.user = 'mma'
+    env.user = 'ubuntu'
     env.repo_dir = os.path.join(env.deploy_dir, CODE_DIR)
     env.embed_dir = os.path.join(env.deploy_dir, 'embed_data/profiles/')
 
@@ -61,11 +61,11 @@ def provision():
     if env.deploy_type == 'prod':
         sudo('mkdir -p %s' % env.deploy_dir)
         sudo('chown -R %s:%s %s' % (env.deploy_user, env.deploy_user, env.deploy_dir))
-        sudo('rm /etc/nginx/sites-enabled/default')
+        sudo('rm /etc/nginx/sites-enabled/default', warn_only=True)
 
     provision_api()
-
     git_checkout()
+    load_api_data()
 
 
 @task

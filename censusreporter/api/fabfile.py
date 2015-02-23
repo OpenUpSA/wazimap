@@ -8,7 +8,7 @@ DATA_DIR = 'censusreporter/api/data'
 PSQL_STRING = 'PGPASSWORD=%s psql -d %s -U %s -h localhost' \
               % (DB_PASSWORD, DB_NAME, DB_USER)
 PACKAGES = (
-    'postgresql-9.1',
+    'postgresql-9.3',
     'memcached',
     'python-software-properties',
 )
@@ -19,7 +19,7 @@ def provision_api():
     require('deploy_type')
 
     sudo('apt-get install --yes --no-upgrade %s' % ' '.join(PACKAGES))
-    sudo('sed -i "s/local   all             all                                     peer/local   all             all                                     trust/" /etc/postgresql/9.1/main/pg_hba.conf')
+    sudo('sed -i "s/local   all             all                                     peer/local   all             all                                     trust/" /etc/postgresql/9.3/main/pg_hba.conf')
     sudo('/etc/init.d/postgresql restart')
 
     # install libgdal
@@ -28,8 +28,6 @@ def provision_api():
     sudo('apt-get -q -y install libgdal1-dev')
 
     create_api_database()
-    load_api_data()
-
 
 @task
 def create_api_database():
