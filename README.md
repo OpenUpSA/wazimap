@@ -27,7 +27,7 @@ Here's what you need to know to get a local version of Census Reporter up and ru
 
 First, clone this repository to your machine and move into your new project directory:
 
-    >> git clone git@github.com:censusreporter/censusreporter.git
+    >> git clone git@github.com:Code4SA/censusreporter.git
     >> cd <your cloned repo dir>
 
 Create the virtual environment for your local project, activate it and install the required libraries:
