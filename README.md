@@ -25,6 +25,12 @@ Census Reporter is an open-source project, so not only is the data free to use, 
 
 Here's what you need to know to get a local version of Census Reporter up and running. These instructions assume you're using <a href="http://virtualenv.readthedocs.org/en/latest/">virtualenv</a> and <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">virtualenvwrapper</a> to manage your development environments.
 
+You'll need [GDAL](http://www.gdal.org/) installed. On Mac OS X, use `brew install gdal` or on Ubuntu use:
+
+    >> sudo apt-add-repository -y ppa:ubuntugis/ubuntugis-unstable
+    >> sudo apt-get update
+    >> sudo apt-get install libgdal1-dev
+
 First, clone this repository to your machine and move into your new project directory:
 
     >> git clone git@github.com:Code4SA/censusreporter.git
