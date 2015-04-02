@@ -15,6 +15,35 @@ Some example geoids are:
 * `ward-19100057`: ward 19100057 in Cape Town, South Africa
 * `county-1`: the Mombasa county in Kenya
 
+Geographies are defined in [models/base.py](models/base.py), one for each level of the heirarchy. For example, suppose we have this heirarchy:
+
+    Country > Province > Municipality
+
+Then we will need geography models for `Country`, `Province` and `Municipality`. Each model must define the following attributes:
+
+* `code`: the official code for this geograpyhy, when combined with `level` forms the `geoid`. (String)
+* `level`: the level of this geograpyhy, when combined with `code` forms the `geoid`. (String)
+* `name`: the name of this geograpyhy. (String)
+
+If the geography can be broken into further geographies (such as a Country can be broken into Provinces), then it must also have:
+
+* `child_level`: the geography level that this geography can be broken into. (String)
+
+Every geography except the top-level Country should also provide a `parents` method that returns an array of the geographies
+that contain this one, smallest to biggest.
+
+```python
+class Municipality(Base, GeoMixin):
+    ...  # code, name etc.
+    level = 'municipality'
+
+    def parents(self):
+        return [self.province, self.country]
+```
+
+You will also need to correctly setup the defaults on the `Country` class.
+
+
 Data Tables
 -----------
 
