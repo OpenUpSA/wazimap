@@ -161,3 +161,12 @@ var numberWithCommas = function(n) {
     var parts = roundNumber(n).toString().split(".");
     return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (parts[1] ? "." + parts[1] : "");
 }
+
+// mapit code mappings
+var MAPIT_LEVEL_TYPES = {
+    'country': 'CY',
+    'district': 'DC',
+    'province': 'PR',
+    'municipality': 'MN',
+    'ward': 'WD',
+};
