@@ -150,11 +150,11 @@ if (allowMapDrag) {
     }).addTo(map);
 
     // add province boundaries
-    d3.json("http://maps.code4sa.org/political/2011/province?quantization=1000", function(error, topo) {
-        if (!topo)
+    d3.json("http://mapit.code4sa.org/areas/PR.geojson?generation=1&simplify_tolerance=0.01", function(error, geojson) {
+        if (!geojson)
             return;
 
-        var featureLayer = L.geoJson(topojson.feature(topo, topo.objects.demarcation), {
+        var featureLayer = L.geoJson(geojson, {
             style: {
                 "clickable": true,
                 "color": "#00d",
@@ -164,8 +164,8 @@ if (allowMapDrag) {
                 "fillOpacity": 0.3,
             },
             onEachFeature: function(feature, layer) {
-                var name = feature.properties['province_name'];
-                var code = feature.properties['province'];
+                var name = feature.properties.name;
+                var code = feature.properties.codes.MDB;
 
                 layer.bindLabel(name, {direction: 'auto'});
                 layer.on('mouseover', function() {
