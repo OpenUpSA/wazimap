@@ -469,7 +469,6 @@
 {% block body_javascript_extra %}{{ block.super }}
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-53744e46066d519d"></script>
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
-<script src="{{ STATIC_URL }}js/vendor/topojson.v1.min.js"></script>
 <script src="{% static 'js/vendor/leaflet.label.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
 <script type="text/javascript">
@@ -478,6 +477,8 @@ var drawMaps = function() {
     var geo = profileData.geography;
     var geo_level = geo.this.geo_level;
     var geo_code = geo.this.geo_code;
+    var mapit_type = MAPIT_LEVEL_TYPES[geo_level];
+    var mapit_simplify = MAPIT_LEVEL_SIMPLIFY[mapit_type];
 
     // draw a map
     var allowMapDrag = (browserWidth > 480) ? true : false;
@@ -508,7 +509,9 @@ var drawMaps = function() {
     if (geo_level == 'country') {
         map.setView({lat: -28.4796, lng: 10.698445}, 5);
     } else {
-        d3.json("http://mapit.code4sa.org/area/MDB:" + geo_code + ".geojson?generation=1&type=" + MAPIT_LEVEL_TYPES[geo_level], function(error, geojson) {
+        d3.json("http://mapit.code4sa.org/area/MDB:" + geo_code +
+                ".geojson?generation=1&simplify_tolerance=" + mapit_simplify +
+                "&type=" + mapit_type, function(error, geojson) {
           if (error) return console.warn(error);
 
           var featureLayer = L.geoJson(geojson, {
@@ -558,6 +561,7 @@ var drawMaps = function() {
     for (var i = 0; i < levels.length; i++) {
         var level = levels[i][0],
             code  = levels[i][1];
+        var mapit_level = MAPIT_LEVEL_TYPES[level];
 
         // For each level, add map shapes for that level, limited to within the
         // parent level (eg. wards within a municipality).
@@ -565,16 +569,18 @@ var drawMaps = function() {
         (function(level, code) {
             if (level == 'country') {
                 return;
-            } else if (level == 'province') {
-                var url = "province?";
-            } else {
-                var url = level + "?filter[" + levels[i+1][0] + "]=" + levels[i+1][1];
             }
 
-            d3.json("http://maps.code4sa.org/political/2011/" + url + '&quantization=5000', function(error, topo) {
+            var parent = levels[i+1];
+            parent = MAPIT_LEVEL_TYPES[parent[0]] + '-' + parent[1];
+
+            var url = '/areas/MDB-levels:' + parent + '|' + mapit_level +
+                      '.geojson?generation=1&simplify_tolerance=' + MAPIT_LEVEL_SIMPLIFY[mapit_level];
+
+            d3.json("http://mapit.code4sa.org" + url, function(error, geojson) {
                 if (error) return console.warn(error);
 
-                var featureLayer = L.geoJson(topojson.feature(topo, topo.objects.demarcation), {
+                var featureLayer = L.geoJson(geojson, {
                     style: {
                         "clickable": true,
                         "color": "#00d",
@@ -585,10 +591,12 @@ var drawMaps = function() {
                     },
                     filter: function(feature, layer) {
                         // don't include this smaller geo, we already have a shape for that
-                        return feature.id != code;
+                        return feature.properties.codes.MDB != code;
                     },
                     onEachFeature: function(feature, layer) {
-                        var name = feature.properties[level + '_name'] || (level + ' ' + feature.properties[level]);
+                        var name = feature.properties.name;
+                        if (level == 'ward') { name = 'Ward ' + name; }
+
                         layer.bindLabel(name, {direction: 'auto'});
 
                         layer.on('mouseover', function() {
@@ -604,7 +612,7 @@ var drawMaps = function() {
                             });
                         });
                         layer.on('click', function() {
-                            window.location = '/profiles/' + level + '-' + feature.properties[level] + '/';
+                            window.location = '/profiles/' + level + '-' + feature.properties.codes.MDB + '/';
                         });
                     },
                 });
