@@ -1,10 +1,10 @@
 import shutil
 import tempfile
 import os
-import urllib
 import logging
 import zipfile
 import re
+import json
 
 import requests
 from osgeo import ogr, osr
@@ -134,8 +134,10 @@ def load_geometries(geo_ids):
         layer = source.GetLayer(0)
         for i in xrange(layer.GetFeatureCount()):
             feat = layer.GetFeature(i)
-            featid = 'ZA' if level == 'country' else feat['id']
-            geometries[level + '-' + featid] = feat
+            # XXX: parse the codes attribute as a json string
+            # XXX: GDAL 2.0 might fix this?
+            code = json.loads(feat['codes'])['MDB']
+            geometries[level + '-' + code] = feat
 
     return geometries
 
@@ -150,7 +152,12 @@ def get_geojson_datasource(url):
         log.info("Fetched")
 
         resp.raise_for_status()
-        data = resp.text
+        data = resp.text.replace('"id"', '"_id"')
+
+        # XXX: hack around ogr not liking "id" property
+        # XXX: GDAL 2.0 might fix this?
+        data = data.replace('"id"', '"_id"')
+
         log.info("Caching")
         cache.set(url, data, CACHE_SECS)
         log.info("Cached")
@@ -161,35 +168,46 @@ def get_geojson_datasource(url):
     log.info("Parsed")
     return ds
 
+
+MAPIT_LEVEL_TYPES = {
+    'country': 'CY',
+    'district': 'DC',
+    'province': 'PR',
+    'municipality': 'MN',
+    'ward': 'WD',
+}
+
+MAPIT_LEVEL_SIMPLIFY = {
+    'CY': 0.01,
+    'DC': 0.01,
+    'PR': 0.005,
+    'MN': 0.005,
+    'WD': 0.0001,
+}
+
+
 def get_geometry_url(geoid):
     level, code = geoid.split('-', 1)
-    filter_level = level
-
-    if '|' in level:
-        # ward|province-CPT
-        level, filter_level = level.split('|', 1)
 
     if level == 'country':
-        url = 'http://maps.code4sa.org/political/country?format=topojson'
+        # NB: no simplify_tolerance
+        url = '/areas/MDB:ZA.geojson?generation=1'
+
+    elif '|' in level:
+        # ward|province-CPT
+        level, filter_level = level.split('|', 1)
+        url = '/areas/MDB-levels:%s-%s|%s.geojson?generation=1&simplify_tolerance=%s' % (
+              MAPIT_LEVEL_TYPES[filter_level],
+              code,
+              MAPIT_LEVEL_TYPES[level],
+              MAPIT_LEVEL_SIMPLIFY[MAPIT_LEVEL_TYPES[level]],
+        )
+
     else:
-        url = 'http://maps.code4sa.org/political/2011/%s?format=topojson' % level
+        url = '/areas/MDB:%s.geojson?generation=1&type=%s&simplify_tolerance=%s' % (
+              code,
+              MAPIT_LEVEL_TYPES[level],
+              MAPIT_LEVEL_SIMPLIFY[MAPIT_LEVEL_TYPES[level]],
+        )
 
-    if filter_level != 'country':
-        # hack around the maps api filtering weirdly
-        # for wards and provinces
-        if level == 'ward' and filter_level == 'province':
-            code = {
-                'EC': 'Eastern Cape',
-                'FS': 'Free State',
-                'GT': 'Gauteng',
-                'KZN': 'KwaZulu-Natal',
-                'LIM': 'Limpopo',
-                'MP': 'Mpumalanga',
-                'NC': 'Northern Cape',
-                'NW': 'North West',
-                'WC': 'Western Cape',
-            }[code]
-
-        url = '%s&filter[%s]=%s' %(url, urllib.quote_plus(filter_level), urllib.quote_plus(code))
-
-    return url
+    return 'http://mapit.code4sa.org' + url
