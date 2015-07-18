@@ -170,3 +170,11 @@ var MAPIT_LEVEL_TYPES = {
     'municipality': 'MN',
     'ward': 'WD',
 };
+
+var MAPIT_LEVEL_SIMPLIFY = {
+    'CY': 0.01,
+    'DC': 0.01,
+    'PR': 0.005,
+    'MN': 0.005,
+    'WD': 0.001,
+};

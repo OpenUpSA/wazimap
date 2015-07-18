@@ -1713,7 +1713,8 @@ function Comparison(options) {
             var parts = geoid.split('-'),
                 level = parts[0],
                 filter_code = parts[1],
-                filter_level = level;
+                filter_level = level,
+                url;
 
             if (level.indexOf('|') > -1) {
                 // compound level
@@ -1722,40 +1723,23 @@ function Comparison(options) {
                 filter_level = parts[1];
             }
 
-            var url = (level == 'country') ?
-                'http://maps.code4sa.org/political/country' :
-                'http://maps.code4sa.org/political/2011/' + level;
-
-            if (filter_level != 'country') {
-                // hack around the maps api filtering weirdly
-                // for wards and provinces
-                if (level == 'ward' && filter_level == 'province') {
-                    filter_code = {
-                        'EC': 'Eastern Cape',
-                        'FS': 'Free State',
-                        'GT': 'Gauteng',
-                        'KZN': 'KwaZulu-Natal',
-                        'LIM': 'Limpopo',
-                        'MP': 'Mpumalanga',
-                        'NC': 'Northern Cape',
-                        'NW': 'North West',
-                        'WC': 'Western Cape',
-                    }[filter_code];
-                }
-
-                url = url + '?filter[' + filter_level + ']=' + filter_code;
+            if (level == 'country') {
+                url = '/areas/MDB:ZA.geojson?generation=1'; // NB: no simplify_tolerance
+            } else {
+                url = '/areas/MDB-levels:' +
+                      MAPIT_LEVEL_TYPES[filter_level] + '-' + filter_code +
+                      '|' + MAPIT_LEVEL_TYPES[level] +
+                      '.geojson?generation=1&simplify_tolerance=' + MAPIT_LEVEL_SIMPLIFY[MAPIT_LEVEL_TYPES[level]];
             }
 
-            d3.json(url, function(error, topo) {
+            d3.json('http://mapit.code4sa.org' + url, function(error, geojson) {
                 --counter;
                 if (error) return console.warn(error);
-
-                var features = topojson.feature(topo, topo.objects.demarcation).features;
+                var features = geojson.features;
 
                 // index by geoid
                 _.each(features, function(feature) {
-                    if (level == 'country') feature.id = 'ZA';
-                    featureMap[level + '-' + feature.id] = feature;
+                    featureMap[level + '-' + feature.properties.codes.MDB] = feature;
                 });
 
                 if (counter == 0) {
