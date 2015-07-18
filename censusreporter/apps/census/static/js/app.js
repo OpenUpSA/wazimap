@@ -176,5 +176,5 @@ var MAPIT_LEVEL_SIMPLIFY = {
     'DC': 0.01,
     'PR': 0.005,
     'MN': 0.005,
-    'WD': 0.001,
+    'WD': 0.0001,
 };
