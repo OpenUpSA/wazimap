@@ -9,6 +9,7 @@ var textMatchEngine = new Bloodhound({
     limit: 20,
     remote: {
         url: textmatchAPI,
+        rateLimitWait: 600,
         replace: function (url, query) {
             return url += '?q=' + query;
         },
@@ -25,6 +26,7 @@ var geoSelectEngine = new Bloodhound({
     limit: 20,
     remote: {
         url: geocodingAPI,
+        rateLimitWait: 600,
         replace: function (url, query) {
             return url += '?address=' + query + '&database=wards_2011';
         },
