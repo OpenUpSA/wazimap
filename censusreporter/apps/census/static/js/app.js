@@ -171,8 +171,8 @@ var MAPIT_LEVEL_TYPES = {
     'ward': 'WD',
 };
 
+// NB: no simplify tolerance at the country level
 var MAPIT_LEVEL_SIMPLIFY = {
-    'CY': 0.01,
     'DC': 0.01,
     'PR': 0.005,
     'MN': 0.005,

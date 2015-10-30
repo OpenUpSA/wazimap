@@ -1710,26 +1710,29 @@ function Comparison(options) {
         var featureMap = {};
 
         _.each(comparison.geoIDs, function(geoid) {
+            // eg. province-WC
             var parts = geoid.split('-'),
                 level = parts[0],
-                filter_code = parts[1],
-                filter_level = level,
+                code = parts[1],
                 url;
 
-            if (level.indexOf('|') > -1) {
-                // compound level
+            if (level.indexOf('|') > -1 ) {
+                // compound level: province|country-ZA
                 parts = level.split('|');
                 level = parts[0];
-                filter_level = parts[1];
+                var filter_level = parts[1];
+
+                url = '/areas/MDB-levels:' +
+                      MAPIT_LEVEL_TYPES[filter_level] + '-' + code + '|' + MAPIT_LEVEL_TYPES[level];
+            } else {
+                // single code
+                url = '/areas/MDB:' + code;
             }
 
-            if (level == 'country') {
-                url = '/areas/MDB:ZA.geojson?generation=1'; // NB: no simplify_tolerance
-            } else {
-                url = '/areas/MDB-levels:' +
-                      MAPIT_LEVEL_TYPES[filter_level] + '-' + filter_code +
-                      '|' + MAPIT_LEVEL_TYPES[level] +
-                      '.geojson?generation=1&simplify_tolerance=' + MAPIT_LEVEL_SIMPLIFY[MAPIT_LEVEL_TYPES[level]];
+            url = url + '.geojson?generation=1';
+            var simplify = MAPIT_LEVEL_SIMPLIFY[MAPIT_LEVEL_TYPES[level]];
+            if (simplify) {
+                url = url + '&simplify_tolerance=' + simplify;
             }
 
             d3.json('http://mapit.code4sa.org' + url, function(error, geojson) {
