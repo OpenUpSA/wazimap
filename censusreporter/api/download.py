@@ -7,7 +7,7 @@ import re
 import json
 
 import requests
-# from osgeo import ogr, osr
+from osgeo import ogr, osr
 from django.core.cache import cache
 
 # Amount of time to cache geometry data
