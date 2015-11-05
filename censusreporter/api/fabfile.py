@@ -7,33 +7,13 @@ from api.config import DB_USER, DB_NAME, DB_PASSWORD
 DATA_DIR = 'censusreporter/api/data'
 PSQL_STRING = 'PGPASSWORD=%s psql -d %s -U %s -h localhost' \
               % (DB_PASSWORD, DB_NAME, DB_USER)
-PACKAGES = (
-    'postgresql-9.3',
-    'memcached',
-    'python-software-properties',
-)
 
-
-@task
-def provision_api():
-    require('deploy_type')
-
-    sudo('apt-get install --yes --no-upgrade %s' % ' '.join(PACKAGES))
-    sudo('sed -i "s/local   all             all                                     peer/local   all             all                                     trust/" /etc/postgresql/9.3/main/pg_hba.conf')
-    sudo('/etc/init.d/postgresql restart')
-
-    # install libgdal
-    sudo('apt-add-repository -y ppa:ubuntugis/ubuntugis-unstable')
-    sudo('apt-get -q update')
-    sudo('apt-get -q -y install libgdal1-dev')
-
-    create_api_database()
 
 @task
 def create_api_database():
     require('deploy_type')
 
-    create_user = "CREATE USER %s WITH PASSWORD '%s'" % (DB_USER, DB_PASSWORD) 
+    create_user = "CREATE USER %s WITH PASSWORD '%s'" % (DB_USER, DB_PASSWORD)
     create_db = "CREATE DATABASE %s WITH OWNER %s ENCODING 'UTF8' TEMPLATE template0" % (DB_NAME, DB_USER)
 
     if env.deploy_type == 'dev':
