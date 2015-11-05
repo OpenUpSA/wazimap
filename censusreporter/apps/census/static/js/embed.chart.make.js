@@ -1,3 +1,5 @@
+var EMBED_URL = 'http://embed.wazimap.co.za';
+
 function makeCensusEmbeds() {
     var embed = {
         embeds: {}
@@ -68,7 +70,7 @@ function makeCensusEmbeds() {
     embed.sendDataToFrames = function(data) {
         // IE9 can only send strings
         for (var i = 0; i < embed.numContainers; i++) {
-            embed.containers[i].contentWindow.postMessage(JSON.stringify(data), 'http://embed.wazimap.co.za');
+            embed.containers[i].contentWindow.postMessage(JSON.stringify(data), EMBED_URL);
         }
     }
     
