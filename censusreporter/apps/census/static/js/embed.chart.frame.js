@@ -106,7 +106,7 @@ function makeEmbedFrame() {
 
         embedFrame.elements.footer.append('a')
             .classed('title', true)
-            .attr('href', EMBED_URL + '/profiles/' + embedFrame.params.geoID + '/')
+            .attr('href', SITE_URL + '/profiles/' + embedFrame.params.geoID + '/')
             .attr('target', '_blank')
             .html('<img src="' + SITE_URL + '/static/img/wazi-logo.png"> Wazimap');
     }
