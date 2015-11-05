@@ -1,14 +1,12 @@
 import requests
-import re
 
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
 
-from .config import (DB_NAME, DB_USER, DB_PASSWORD, WARD_SEARCH_ENDPOINT)
+from .config import DATABASE_URL, WARD_SEARCH_ENDPOINT
 
 
-_engine = create_engine("postgresql://%s:%s@localhost/%s"
-                        % (DB_USER, DB_PASSWORD, DB_NAME))
+_engine = create_engine(DATABASE_URL)
 _metadata = MetaData()
 _Session = sessionmaker(bind=_engine)
 

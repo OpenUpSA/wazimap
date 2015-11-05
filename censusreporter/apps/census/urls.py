@@ -15,7 +15,7 @@ from .wazi import (GeographyDetailView, GeographyJsonView, WardSearchProxy, Plac
 
 admin.autodiscover()
 
-STANDARD_CACHE_TIME = 60*15 # 15-minute cache
+STANDARD_CACHE_TIME = 60*60 # 60-minute cache
 COMPARISON_FORMATS = 'map|table|distribution'
 BLOCK_ROBOTS = getattr(settings, 'BLOCK_ROBOTS', False)
 

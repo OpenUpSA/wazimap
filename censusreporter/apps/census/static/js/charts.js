@@ -769,8 +769,8 @@ function Chart(options) {
         var querystring = $.param(embedParams);
         
         var embedCode = [
-            '<iframe id="'+embedID+'" class="census-reporter-embed" src="http://embed.wazimap.co.za/static/iframe.html?'+querystring+'" frameborder="0" width="100%" height="300" style="margin: 1em; max-width: '+embedWidth+'px;' + embedAlign + '"></iframe>',
-            '\n<script src="http://embed.wazimap.co.za/static/js/embed.chart.make.js"></script>'
+            '<iframe id="'+embedID+'" class="census-reporter-embed" src="' + EMBED_URL + '/static/iframe.html?'+querystring+'" frameborder="0" width="100%" height="300" style="margin: 1em; max-width: '+embedWidth+'px;' + embedAlign + '"></iframe>',
+            '\n<script src="' + EMBED_URL + '/static/js/embed.chart.make.js"></script>'
         ].join('');
         
         textarea.html(embedCode);

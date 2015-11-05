@@ -57,7 +57,6 @@ class GeographyDetailView(BaseGeographyDetailView):
         page_context.update(profile_data)
 
         profile_data_json = SafeString(simplejson.dumps(profile_data, cls=LazyEncoder))
-        self.write_profile_json(profile_data_json)
 
         page_context.update({
             'profile_data_json': profile_data_json
@@ -68,19 +67,6 @@ class GeographyDetailView(BaseGeographyDetailView):
     def get_geography(self, geo_id):
         # stub this out to prevent the subclass for calling out to CR
         pass
-
-    def write_profile_json(self, data):
-        # unversioned, un-zipped embed data
-        key = settings.EMBED_DIR + '/profiles/%s.json' % self.geo_id
-        logger.debug(key)
-        if not os.path.isfile(key):
-            try:
-                # create file object
-                with open(key, 'w+') as f:
-                    f.write(data)
-            except Exception as e:
-                logger.error('Cannot write json data file to disk.', exc_info=e)
-                pass
 
 
 class GeographyJsonView(GeographyDetailView):

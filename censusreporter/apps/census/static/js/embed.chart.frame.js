@@ -21,7 +21,7 @@ function makeEmbedFrame() {
 
         embedFrame.parentContainerID = 'cr-embed-'+embedFrame.params.geoID+'-'+embedFrame.params.chartDataID;
         embedFrame.params.chartDataID = embedFrame.params.chartDataID.split('-');
-        embedFrame.dataSource = 'http://embed.wazimap.co.za/profiles/'+embedFrame.params.geoID+'.json';
+        embedFrame.dataSource = EMBED_URL + '/profiles/'+embedFrame.params.geoID+'.json';
         // avoid css media-query caching issues with multiple embeds on same page
         $('#chart-styles').attr('href','css/charts.css?'+embedFrame.parentContainerID)
 
@@ -106,9 +106,9 @@ function makeEmbedFrame() {
 
         embedFrame.elements.footer.append('a')
             .classed('title', true)
-            .attr('href', 'http://wazimap.co.za/profiles/' + embedFrame.params.geoID + '/')
+            .attr('href', SITE_URL + '/profiles/' + embedFrame.params.geoID + '/')
             .attr('target', '_blank')
-            .html('<img src="http://embed.wazimap.co.za/static/img/wazi-logo.png"> Wazi');
+            .html('<img src="' + SITE_URL + '/static/img/wazi-logo.png"> Wazimap');
     }
 
     embedFrame.addChartListeners = function() {
