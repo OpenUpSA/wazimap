@@ -237,31 +237,24 @@ new profile is accessed on the censusreporter site.
 Deployment
 ==========
 
-Once installed, deployments are done from the code on GitHub, NOT the code on your local machine.
-So be sure to run `git push` before deploying.
+Censusreporter is designed to be deployed on [Heroku](https://www.heroku.com/) or a Heroku-like environment like [Dokku](http://progrium.viewdocs.io/dokku/). Deployments are done simply by pushing to your remote branch:
 
-To deploy to an already provisioned machine, run:
-
-    >> fab prod deploy
-
-To reload all stats data, run:
-
-    >> fab prod deploy reload_api_data
+    git push dokku
 
 Provisioning a new server
 -------------------------
 
-To setup a new installation, you'll need an Ubuntu server.
+Follow the instructions to setup either a new [Dokku host](http://progrium.viewdocs.io/dokku/) or a new [Heroku](https://www.heroku.com/) app. You'll also
+need a PostgreSQL database.
 
-First create a user with passwordless sudo permissions called `mma` and ensure you can login to it using your ssh key.
-Configure options in `fabfile.py`, in particular set the `PROD_HOSTS` correctly.
+Then set some settings, filling in the details where necessary:
 
-Install dependencies and the database by running:
+```bash
+dokku config:set DJANGO_SETTINGS_MODULE=config.prod.settings \
+                 PYTHONPATH=/app/censusreporter:/app/censusreporter/apps
+dokku config:set DATABASE_URL=postgres://username:password@host/database
+```
 
-    >> fab prod provision
+Finally, push to the remote branch:
 
-Do an initial deployment.
-
-    >> fab prod deploy
-
-And the website should be up!
+    git push dokku
