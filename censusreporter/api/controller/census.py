@@ -5,6 +5,7 @@ from sqlalchemy import func
 from api.models import get_model_from_fields
 from api.models.tables import get_datatable, get_table_id
 from api.utils import get_session, LocationNotFound
+from api.controller.geography import get_geography
 
 from .utils import (collapse_categories, calculate_median, calculate_median_stat, get_summary_geo_info,
                     merge_dicts, group_remainder, add_metadata, get_stat_data, get_objects_by_geo, percent,
@@ -363,8 +364,16 @@ def get_demographics_profile(geo_code, geo_level, session):
         'sex_ratio': sex_data,
         'total_population': {
             "name": "People",
-            "values": {"this": total_pop}
-        }}
+            "values": {"this": total_pop},
+        }
+    }
+
+    geo = get_geography(geo_code, geo_level)
+    if geo.square_kms:
+        final_data['population_density'] = {
+            'name': "people per square kilometre",
+            'values': {"this": total_pop / geo.square_kms},
+        }
 
     # median age/age category
     db_model_age = get_model_from_fields(
