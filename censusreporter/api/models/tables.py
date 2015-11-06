@@ -53,6 +53,13 @@ class SimpleTable(object):
     has one or more numeric values, one for each column. Each geography
     has only one row.
 
+    A table can optionally have a total column, either named 'total' or
+    controlled with the +total_column+ parameter. Without a total column,
+    table values won't be shown as a percentage.
+
+    In the web view, the total column is removed from the view and is not
+    shown in the display.
+
     There is no way to have field combinations, such as 'Female, Age 18+'. For that,
     use a `FieldTable` below.
     """
@@ -75,8 +82,8 @@ class SimpleTable(object):
         if not self.columns:
             raise ValueError("I couldn't work out the columns from them model.")
 
-        if not self.total_column or self.total_column not in self.columns:
-            raise ValueError("No total column given or it's not in the column list. Given '%s', column list: %s" % (self.total_column, self.columns.keys()))
+        if self.total_column and self.total_column not in self.columns:
+            raise ValueError("Total column is not in the column list. Given '%s', column list: %s" % (self.total_column, self.columns.keys()))
 
         DATA_TABLES[self.id] = self
 
@@ -86,13 +93,15 @@ class SimpleTable(object):
         Work out our columns by finding those that aren't geo columns.
         """
         self.columns = OrderedDict()
-        self.columns['total'] = {'name': 'Total', 'indent': 0}
+        indent = 0
+        if self.total_column:
+            indent = 1
 
         for col in (c.name for c in self.table.columns if c.name not in ['geo_code', 'geo_level']):
             self.columns[col] = {
                 'name': capitalize(col.replace('_', ' ')),
-                'indent': 1
-                }
+                'indent': 0 if col == self.total_column else indent
+            }
 
 
     def raw_data_for_geos(self, geos):
@@ -122,12 +131,7 @@ class SimpleTable(object):
                     geo_values = data['%s-%s' % (geo_level, row.geo_code)]
 
                     for col in self.columns.iterkeys():
-                        if col == 'total':
-                            value = getattr(row, self.total_column)
-                        else:
-                            value = getattr(row, col)
-
-                        geo_values['estimate'][col] = value
+                        geo_values['estimate'][col] = getattr(row, col)
                         geo_values['error'][col] = 0
 
             finally:
