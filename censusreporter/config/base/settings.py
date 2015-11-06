@@ -35,6 +35,7 @@ LANGUAGE_CODE = 'en-za'
 SITE_ID = 1
 USE_I18N = False
 USE_L10N = True
+USE_THOUSAND_SEPARATOR = True
 FORMAT_MODULE_PATH = 'formats'
 USE_TZ = True
 SECRET_KEY = '!%j-u4&(q8qu4@dq=ukth27+q!v-!h^jck14bf=spqht847$4q'

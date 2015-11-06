@@ -1,8 +1,7 @@
-from itertools import chain
-
 from sqlalchemy import Column, ForeignKey, SmallInteger, String
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION
 
 from api.utils import get_session
 
@@ -21,11 +20,13 @@ class Base(object):
 Base = declarative_base(cls=Base)
 
 
-'''
-Geographic models
-'''
+# Geographic models
+
 
 class GeoMixin(object):
+    # Database columns
+    square_kms = Column(DOUBLE_PRECISION())
+
     child_level = None
 
     def as_dict(self):
@@ -38,6 +39,7 @@ class GeoMixin(object):
             'geo_code': self.code,
             'child_level': self.child_level,
             'parent_geoid': self.parent.full_geoid if self.parent else None,
+            'square_kms': self.square_kms,
         }
 
     def as_dict_deep(self):
@@ -62,7 +64,7 @@ class GeoMixin(object):
             session.close()
 
     def split_into(self, level):
-        if not level in geo_levels:
+        if level not in geo_levels:
             raise ValueError(level)
 
         kids = self.children()
@@ -79,7 +81,6 @@ class GeoMixin(object):
             for k in splits:
                 k.parent = self
             return splits
-        
 
     @property
     def short_name(self):
@@ -232,15 +233,14 @@ class Country(Base, GeoMixin):
 
     level = 'country'
     child_level = 'province'
+    countries = {}
 
     def parents(self):
         return []
 
-
-    countries = {}
     @classmethod
     def ZA(cls):
-        if not 'ZA' in cls.countries:
+        if 'ZA' not in cls.countries:
             c = cls()
             c.code = 'ZA'
             c.name = 'South Africa'
@@ -284,8 +284,6 @@ class PoliceDistrict(Base, GeoMixin):
 
     def parents(self):
         return [self.province, self.country]
-
-
 
 
 geo_models = {
