@@ -82,8 +82,8 @@ function Comparison(options) {
         comparison.sortedPlaces = comparison.getSortedPlaces('name');
 
         comparison.denominatorColumn = (!!comparison.table.denominator_column_id) ? jQuery.extend({id: comparison.table.denominator_column_id}, comparison.table.columns[comparison.table.denominator_column_id]) : null;
-        comparison.valueType = (!!comparison.denominatorColumn) ? 'percentage' : 'estimate';
-        comparison.valueType = comparison.hash.valueType || comparison.valueType;
+        comparison.valueType = comparison.hash.valueType || 'percentage';
+        comparison.valueType = (!!comparison.denominatorColumn) ? comparison.valueType : 'estimate';
 
         // prep the column keys and names
         if (!!comparison.denominatorColumn) {
