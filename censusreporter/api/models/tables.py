@@ -191,12 +191,14 @@ class FieldTable(SimpleTable):
         :param str universe: a description of the universe this table covers (default: "Population")
         :param str description: a description of this table. If None, this is derived from
                                 `universe` and the `fields`.
-        :param str denominator_key: the key value of the rightmost field that should be 
+        :param str denominator_key: the key value of the rightmost field that should be
                                     used as the "total" column, instead of summing over
                                     the values for each row. This is necessary when the
                                     table doesn't describe a true partitioning of the
                                     dataset (ie. the row values sum to more than the
                                     total population).
+                                    This will be used as the total column once
+                                    the id of the column has been calculated.
         """
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
@@ -272,13 +274,13 @@ class FieldTable(SimpleTable):
 
             # get distinct permutations for all fields
             rows = session\
-                    .query(*fields)\
-                    .order_by(*fields)\
-                    .distinct()\
-                    .all()
+                .query(*fields)\
+                .order_by(*fields)\
+                .distinct()\
+                .all()
 
             def permute(indent, field_values, rows):
-                field = self.fields[indent-1]
+                field = self.fields[indent - 1]
                 last = indent == len(self.fields)
 
                 for val, rows in groupby(rows, lambda r: getattr(r, field)):
@@ -287,13 +289,12 @@ class FieldTable(SimpleTable):
                     col_id = self.column_id(new_values)
 
                     self.columns[col_id] = {
-                            'name': capitalize(val) + ('' if last else ':'),
-                            'indent': indent,
-                            }
+                        'name': capitalize(val) + ('' if last else ':'),
+                        'indent': 0 if col_id == self.total_column else indent,
+                    }
 
                     if not last:
-                        permute(indent+1, new_values, rows)
-
+                        permute(indent + 1, new_values, rows)
 
             permute(1, [], rows)
         finally:
