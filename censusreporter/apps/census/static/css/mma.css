@@ -27,7 +27,7 @@
 #page-header-title .logo {
     margin: 0.3em 8px 0;
 }
-#page-header-title .logo img {
+.mma-logo {
     background-color: white;
     padding: 2px;
     vertical-align: baseline;
