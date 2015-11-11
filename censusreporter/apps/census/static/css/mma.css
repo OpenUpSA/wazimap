@@ -24,14 +24,20 @@
 #page-header-title .header-buttons {
     float: right;
 }
-#page-header-title .logo {
-    margin: 0.3em 8px 0;
+#page-header-title .fa-twitter {
+  margin-right: 5px;
 }
-#page-header-title .logo img {
-    background-color: white;
-    padding: 2px;
-    vertical-align: baseline;
+.mma-logo {
     height: 21px;
+    padding: 2px;
+    background-color: white;
+    vertical-align: baseline;
+}
+#page-header-title .mma-logo {
+    margin: 5px 3px 0px 0px;
+}
+#page-header-title .tool-group {
+  margin-left: 5px;
 }
 .box-header img {
     vertical-align: middle;

@@ -71,8 +71,8 @@
                 {% endif %}
                 <div class="header-buttons">
                     <a class="wide-only" href="https://twitter.com/@Wazimap" title="@Wazimap on Twitter"><i class="fa fa-2x fa-twitter"></i></a>
-                    <a class="wide-only logo" href="http://www.mediamonitoringafrica.org/" target="_blank">
-                        <img src="{% static 'img/mma.png' %}">
+                    <a href="http://www.mediamonitoringafrica.org/" target="_blank">
+                        <img class="mma-logo" src="{% static 'img/mma.png' %}">
                     </a>
                 </div>
             </div>
@@ -133,6 +133,9 @@
                 </div>
                 <div class="column-quarter">
                     <ul class="ul-icon-list">
+                        <li>
+                            <a href="http://www.mediamonitoringafrica.org/"><img class="mma-logo" src="{% static 'img/mma.png' %}"></a>
+                        </li>
                         <li>
                             <a href="http://www.code4sa.org/"><img src="{% static 'img/code4sa-logo-small.png' %}"></a>
                         </li>
