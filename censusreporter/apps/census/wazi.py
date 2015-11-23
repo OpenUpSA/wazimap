@@ -246,3 +246,24 @@ class TableAPIView(View):
 
 class AboutView(TemplateView):
     template_name = 'about.html'
+
+
+class GeographyCompareView(TemplateView):
+    template_name = 'profile/compare.html'
+
+    def get_context_data(self, geo_id1, geo_id2):
+        page_context = {
+            'geo_id1': geo_id1,
+            'geo_id2': geo_id2,
+        }
+
+        try:
+            level, code = geo_id1.split('-', 1)
+            page_context['geo1'] = get_geography(code, level)
+
+            level, code = geo_id2.split('-', 1)
+            page_context['geo2'] = get_geography(code, level)
+        except (ValueError, LocationNotFound):
+            raise Http404
+
+        return page_context

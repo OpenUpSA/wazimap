@@ -1,0 +1,10 @@
+{% extends '_base.html' %}
+
+{% block body_class %}profile-compare-view{% endblock %}
+
+{% block body %}
+
+<iframe class="frame-left" src="{% url 'geography_detail' geography_id=geo_id1 %}"></iframe>
+<iframe class="frame-right" src="{% url 'geography_detail' geography_id=geo_id2 %}"></iframe>
+
+{% endblock %}
