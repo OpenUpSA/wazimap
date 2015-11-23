@@ -544,6 +544,14 @@ FieldTable(['party'], universe='Votes', id='party_votes_provincial_2014', descri
 
 # Simple Tables
 SimpleTable(
+        id='population',
+        universe='Population',
+        total_column=None,
+        description='Total population',
+        dataset='Census 2011',
+        year='2011'
+        )
+SimpleTable(
         id='voter_turnout_national_2014',
         universe='Registered voters',
         total_column='registered_voters',
