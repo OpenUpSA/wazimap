@@ -1,5 +1,68 @@
-// Load data tiles from an AJAX data source
-L.TileLayer.Ajax = L.TileLayer.extend({
+CensusReporter = {
+    GeoIDLayer: L.GeoJSON.extend({
+        addGeoID: function(geoid) {
+            var request = new XMLHttpRequest();
+            var url = this.options.api_url + "/1.0/geo/show/tiger2013?geo_ids=" + geoid;
+            request.open('GET', url, true);
+            var self = this;
+            request.onreadystatechange = function() {
+              if (this.readyState === 4) {
+                if (this.status >= 200 && this.status < 400) {
+                  // Success!
+                  var data = JSON.parse(this.responseText);
+                  self.addData(data);
+                } else {
+                  if (typeof(console) != 'undefined' && typeof(console.log) == 'function') {
+                    console.log("Error ("+this.status+") getting data")
+                    console.log(this.responseText)                        
+                  }
+                }
+              }
+            };
+            request.send();
+            request = null;
+        },
+        removeGeoID: function(geoid) {
+            var layers = this.getLayers();
+            for (var i = 0; i < layers.length; i++) {
+                if (layers[i].feature.properties.geoid == geoid) {
+                    this.removeLayer(layers[i]);
+                    return layers[i];
+                }
+            }
+            return null;
+        },
+        initialize: function(geoid_spec, options) {
+            L.GeoJSON.prototype.initialize.call(this);
+            var options = L.extend({
+                api_url: 'http://api.censusreporter.org',
+                censusreporter_url: 'http://censusreporter.org',
+                autoclick: true
+            }, options);
+            if (options.autoclick) {
+                var censusreporter_url = options.censusreporter_url;
+                var autoclick_handler = function(data, layer) {
+                    layer.on('click',function() {
+                        window.open(censusreporter_url + "/profiles/" + data.properties.geoid);
+                    });
+                }
+                if (options.onEachFeature) {
+                    var old_handler = options.onEachFeature;
+                    options.onEachFeature = function(data, layer) {
+                        old_handler(data, layer);
+                        autoclick_handler(data, layer);
+                    }
+                } else {
+                    options.onEachFeature = autoclick_handler;
+                }
+            }
+            this.options = options;
+            this.addGeoID(geoid_spec);
+        }
+    })
+}
+
+CensusReporter.AjaxLayer = L.TileLayer.extend({
     _requests: [],
     _addTile: function (tilePoint) {
         var tile = { datum: null, processed: false };
@@ -46,7 +109,7 @@ L.TileLayer.Ajax = L.TileLayer.extend({
 });
 
 
-L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
+CensusReporter.GeoJSONLayer = CensusReporter.AjaxLayer.extend({
     // Store each GeometryCollection's layer by key, if options.unique function is present
     _keyLayers: {},
 
@@ -54,23 +117,23 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     _clipPathRectangles: {},
 
     initialize: function (url, options, geojsonOptions) {
-        L.TileLayer.Ajax.prototype.initialize.call(this, url, options);
+        CensusReporter.AjaxLayer.prototype.initialize.call(this, url, options);
         this.geojsonLayer = new L.GeoJSON(null, geojsonOptions);
     },
     onAdd: function (map) {
         this._map = map;
-        L.TileLayer.Ajax.prototype.onAdd.call(this, map);
+        CensusReporter.AjaxLayer.prototype.onAdd.call(this, map);
         map.addLayer(this.geojsonLayer);
     },
     onRemove: function (map) {
         map.removeLayer(this.geojsonLayer);
-        L.TileLayer.Ajax.prototype.onRemove.call(this, map);
+        CensusReporter.AjaxLayer.prototype.onRemove.call(this, map);
     },
     _reset: function () {
         this.geojsonLayer.clearLayers();
         this._keyLayers = {};
         this._removeOldClipPaths();
-        L.TileLayer.Ajax.prototype._reset.apply(this, arguments);
+        CensusReporter.AjaxLayer.prototype._reset.apply(this, arguments);
     },
 
     // Remove clip path elements from other earlier zoom levels
@@ -241,8 +304,96 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     },
 
     _tileLoaded: function (tile, tilePoint) {
-        L.TileLayer.Ajax.prototype._tileLoaded.apply(this, arguments);
+        CensusReporter.AjaxLayer.prototype._tileLoaded.apply(this, arguments);
         if (tile.datum === null) { return null; }
         this.addTileData(tile.datum, tilePoint);
     }
 });
+
+CensusReporter.SummaryLevelLayer = CensusReporter.GeoJSONLayer.extend({
+    summary_levels: {
+        '020': 'region',
+        '030': 'division',
+        '040': 'state',
+        '050': 'county',
+        '060': 'county subdivision',
+        '140': 'census tract',
+        '150': 'block group',
+        '160': 'place',
+        '170': 'consolidated city',
+        '230': 'Alaska native regional corporation',
+        '250': 'native area',
+        '251': 'tribal subdivision',
+        '256': 'tribal tract',
+        '310': 'metro area (CBSA)',
+        '314': 'metropolitan division',
+        '330': 'combined statistical area',
+        '335': 'combined NECTA',
+        '350': 'NECTA',
+        '364': 'NECTA division',
+        '400': 'urban area',
+        '500': 'congressional district',
+        '610': 'state house (upper)',
+        '620': 'state house (lower)',
+        '795': 'PUMA',
+        '860': 'ZIP code',
+        '950': 'school district (elementary)',
+        '960': 'school district (secondary)',
+        '970': 'school district (unified)'
+    },
+
+    _defaultOptions: {
+        clipTiles: true,
+        unique: function(feature) {
+            return feature.properties.geoid;
+        }
+    },
+    _defaultFeatureStyle: {
+        "clickable": true,
+        "color": "#00d",
+        "fillColor": "#ccc",
+        "weight": 1.0,
+        "opacity": 0.3,
+        "fillOpacity": 0.3,
+    },
+    _defaultGeojsonOptions: {
+        onEachFeature: function(feature, layer) {
+            // you can wire behavior to each "feature", or place outline.
+            var profileURL = 'http://censusreporter.org/profiles/' + feature.properties.geoid;
+            layer.bindPopup("<a href='" + profileURL + "'>" + feature.properties.name + "</a>");
+            if (this.style && this.mouseoverStyle) {
+                layer.on('mouseover', function() {
+                    layer.setStyle(this.mouseoverStyle);
+                });
+                layer.on('mouseout', function() {
+                    layer.setStyle(this.style);
+                });
+            }
+        }
+    },
+
+    initialize: function (summary_level, options, geojsonOptions) {
+        if (typeof(this.summary_levels[summary_level]) == "undefined") {
+            throw "Unsupported or invalid summary level."
+        }
+
+        var url = 'http://embed.censusreporter.org/1.0/geo/tiger2013/tiles/' + summary_level + '/{z}/{x}/{y}.geojson';
+
+        options = L.Util.extend(this._defaultOptions, options);
+        geojsonOptions = L.Util.extend(this._defaultGeojsonOptions, geojsonOptions);
+
+        if (!('style' in geojsonOptions)) {
+            geojsonOptions.style = this._defaultFeatureStyle;
+        }
+        CensusReporter.GeoJSONLayer.prototype.initialize.call(this, url, options, geojsonOptions);
+
+        if ('style' in geojsonOptions) {
+            this.style = geojsonOptions.style;
+        }
+
+        if ('mouseoverStyle' in options) {
+            this.mouseoverStyle = options.mouseoverStyle;
+        }
+    },
+});
+

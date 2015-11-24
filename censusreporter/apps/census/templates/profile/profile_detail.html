@@ -2,9 +2,11 @@
 
 {% block head_title %}{{ geography.this.short_name }} - {{ block.super }}{% endblock %}
 
+{% block head_meta_description %}Population data and election figures from {{ geography.this.short_name}}, broken down by category: Demographics, Service delivery, Economics and Education.{% endblock %}
+
 {% block head_facebook_tags %}
-    <meta property="og:title" content="Wazi profile: {% firstof geography.this.full_name geography.this.short_name %}" />
-    <meta property="og:site_name" content="Wazi" />
+    <meta property="og:title" content="Wazimap profile: {% firstof geography.this.full_name geography.this.short_name %}" />
+    <meta property="og:site_name" content="Wazimap" />
     <meta property="og:url" content="http://wazimap.co.za/profiles/{{ geography.this.full_geoid }}/" />
     <meta property="og:description" content="Population data and election figures from {{ geography.this.short_name}}, broken down by category: Demographics, Service delivery, Economics and Education." />
     <meta property="og:type" content="article" />
@@ -63,11 +65,11 @@
                 </div>
             </div>
             {% endif %}
-            
+
             {% if geography.this.show_extra_links %}
                 {% include "profile/_blocks/_header_extra_links.html" %}
             {% endif %}
-            
+
             <div class="column-full">
                 <p class="caption">
                     <strong>Census data:</strong> 2011
@@ -660,8 +662,8 @@ var makeCharts = function() {
         // allow arbitrary nesting in API data structure
         var drilldown = chartDataID.length - 1;
         if (drilldown >= 2) {
-            for (var i = 2; i <= drilldown; i++) {
-                chartData = chartData[chartDataID[i]]
+            for (var n = 2; n <= drilldown; n++) {
+                chartData = chartData[chartDataID[n]]
             }
         }
 
@@ -674,7 +676,7 @@ var makeCharts = function() {
         /*chartQualifier = (chartQualifier && noteRelease) ? Array(chartQualifier, noteRelease)
             .filter(function(n) { return n }).join('; ') : null;*/
 
-        Charts[i] = Chart({
+        var chartstuff = {
             chartContainer: chartID,
             chartDataKey: chartDataKey,
             chartType: chartType,
@@ -685,7 +687,13 @@ var makeCharts = function() {
             chartInitialSort: chartInitialSort,
             chartStatType: chartStatType,
             geographyData: geographyData
-        });
+        }
+        try {
+            Charts[i] = Chart(chartstuff);
+        } catch(e) {
+            console.log("Error making chart " + chartID)
+            console.log(chartstuff);
+        }
     });
 }
 drawMaps();

@@ -753,10 +753,12 @@ function Chart(options) {
         var embedHeight = 300,
             embedWidth = (chart.chartType == 'pie') ? 300 : 720,
             embedKey = chart.chartDataKey.substring(chart.chartDataKey.indexOf('-')+1),
+            embedDataYear = chart.initialData.metadata.year,
             embedID = 'cr-embed-'+chart.primaryGeoID+'-'+embedKey,
             embedParams = {
                 geoID: chart.primaryGeoID,
                 chartDataID: embedKey,
+                dataYear: embedDataYear,
                 chartType: chart.chartType,
                 chartHeight: 200,
                 chartQualifier: (chart.chartQualifier || ''),
@@ -1054,11 +1056,11 @@ function Chart(options) {
     chart.cardToggle = function(data) {
         var cardData = (chart.chartType == 'pie') ? data.data : data;
         if (!!chart.hovercard) {
-            if (chart.hovercard.style("opacity") == 1 && comparison.clicked == d) {
+            if (chart.hovercard.style("opacity") == 1 && chart.clicked == d) {
                 chart.mouseout();
             } else {
                 chart.mouseover(cardData);
-                comparison.clicked = d;
+                chart.clicked = d;
             }
         }
     }
