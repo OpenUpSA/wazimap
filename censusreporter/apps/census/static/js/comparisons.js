@@ -1004,6 +1004,9 @@ function Comparison(options) {
 
             return Bloodhound.tokenizers.whitespace(fields.join(' '));
         },
+        sorter: function(a, b) {
+            return a.table_id.localeCompare(b.table_id);
+        },
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         limit: 50,
         prefetch: {
