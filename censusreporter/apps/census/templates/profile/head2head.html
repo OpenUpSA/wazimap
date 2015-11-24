@@ -1,0 +1,11 @@
+{% extends '_base.html' %}
+
+{% block body_class %}profile-head2head-view{% endblock %}
+
+{% block nav_tools %}
+{% endblock %}
+
+{% block content_container %}
+<iframe class="frame-left" src="{% url 'geography_detail' geography_id=geo_id1 %}?h2h=1"></iframe>
+<iframe class="frame-right" src="{% url 'geography_detail' geography_id=geo_id2 %}?h2h=1"></iframe>
+{% endblock %}

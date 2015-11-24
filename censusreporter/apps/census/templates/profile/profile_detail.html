@@ -19,6 +19,7 @@
 <link href='{{STATIC_URL}}css/vendor/leaflet.label.css' rel='stylesheet' />
 {% endblock %}
 {% block body_id %}profile{% endblock %}
+{% block body_class %}{% if head2head %}profile-head2head-frame{% endif %}{% endblock %}
 
 {% block header_content %}
 <div id="cover-map" class="clearfix">
@@ -91,6 +92,13 @@
     </div>
 </section>
 {% endcomment %}
+
+<section class="clearfix" id="compare-place-picker">
+    <h2>Compare this place with another</h2>
+    <div class="typeahead-container">
+        <input name="place_select" id="compare-place-select" type="text" placeholder="Start typing a place name or address to compare with..." autocomplete="off">
+    </div>
+</section>
 
 <div id="share-this-page" style="text-align: right;">
     <!-- AddThis Button BEGIN -->

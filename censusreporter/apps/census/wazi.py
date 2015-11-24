@@ -62,6 +62,9 @@ class GeographyDetailView(BaseGeographyDetailView):
             'profile_data_json': profile_data_json
         })
 
+        # is this a head-to-head view?
+        page_context['head2head'] = 'h2h' in self.request.GET
+
         return page_context
 
     def get_geography(self, geo_id):
@@ -249,7 +252,7 @@ class AboutView(TemplateView):
 
 
 class GeographyCompareView(TemplateView):
-    template_name = 'profile/compare.html'
+    template_name = 'profile/head2head.html'
 
     def get_context_data(self, geo_id1, geo_id2):
         page_context = {

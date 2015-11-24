@@ -133,9 +133,24 @@ header.section-contents.table-explorer h1 a {
     }
 }
 
-.profile-compare-view iframe {
+#query-topic-picker #topic-select,
+#topic-picker #topic-select {
+    width: 100%;
+}
+
+.profile-head2head-view #page-header-title {
+  width: 100%;
+  padding-left: 1.2em;
+  padding-right: 1.2em;
+}
+
+.profile-head2head-view #page-footer {
+  display: none;
+}
+
+.profile-head2head-view iframe {
   position: fixed;
-  top: 0px;
+  top: 45px;
   bottom: 0px;
   width: 50%;
   height: 100%;
@@ -145,8 +160,13 @@ header.section-contents.table-explorer h1 a {
   border: 0px;
 }
 
-.profile-compare-view .frame-right {
+.profile-head2head-view .frame-right {
   left: 50%;
 
   border-left: 5px solid #f7f8f3;
+}
+
+.profile-head2head-frame #page-header,
+.profile-head2head-frame #compare-place-picker {
+  display: none;
 }

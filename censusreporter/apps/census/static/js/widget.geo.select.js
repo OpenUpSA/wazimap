@@ -50,7 +50,7 @@ var geoSelectEngine = new Bloodhound({
 });
 geoSelectEngine.initialize();
 
-function makeGeoSelectWidget(element) {
+function makeGeoSelectWidget(element, selected) {
     element.typeahead({
         autoselect: true,
         highlight: false,
@@ -76,10 +76,15 @@ function makeGeoSelectWidget(element) {
         },
     });
 
-    element.on('typeahead:selected', function(event, datum) {
+    element.on('typeahead:selected', selected || function(event, datum) {
         event.stopPropagation();
-        window.location = '/profiles/' + datum['full_geoid'] + '/';
+        window.location = '/profiles/' + datum.full_geoid + '/';
     });
 }
 
 makeGeoSelectWidget(geoSelect);
+makeGeoSelectWidget($('#compare-place-select'), function(event, datum) {
+    var geoId = [profileData.geography.this.geo_level, profileData.geography.this.geo_code].join('-');
+    event.stopPropagation();
+    window.location = '/compare/' + geoId + '/vs/' + datum.full_geoid + '/';
+});
