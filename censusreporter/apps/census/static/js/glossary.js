@@ -27,7 +27,9 @@ Glossary.init = function (url, selector, container_selector) {
     $(container_selector).off('click', selector);
     $(container_selector).on('click', selector, function(e) {
         e.stopPropagation();
+        e.preventDefault();
         Glossary.popup(this);
+        return false;
     });
 
     // handle alternate dismissals of glossary card

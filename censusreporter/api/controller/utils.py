@@ -192,6 +192,8 @@ def add_metadata(data, model):
         data['metadata']['table_id'] = data_table.id.upper()
         if data_table.universe:
             data['metadata']['universe'] = data_table.universe
+        if data_table.year:
+            data['metadata']['year'] = data_table.year
 
 
 def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, order_by=None):

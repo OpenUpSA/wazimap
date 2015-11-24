@@ -22,10 +22,10 @@ class ApiClient(object):
         return data
 
     def get_parent_geoids(self, geoid):
-        return self._get('/1.0/geo/tiger2012/{}/parents'.format(geoid))
+        return self._get('/1.0/geo/tiger2013/{}/parents'.format(geoid))
 
     def get_geoid_data(self, geoid):
-        return self._get('/1.0/geo/tiger2012/{}'.format(geoid))
+        return self._get('/1.0/geo/tiger2013/{}'.format(geoid))
 
     def get_data(self, table_ids, geo_ids, acs='latest'):
         if hasattr(table_ids, '__iter__'):
@@ -49,10 +49,20 @@ def moe_add(moe_a, moe_b):
     # From http://www.census.gov/acs/www/Downloads/handbooks/ACSGeneralHandbook.pdf
     return math.sqrt(moe_a**2 + moe_b**2)
 
+def moe_proportion(numerator, denominator, numerator_moe, denominator_moe):
+    # From http://www.census.gov/acs/www/Downloads/handbooks/ACSGeneralHandbook.pdf
+    # "Calculating MOEs for Derived Proportions" A-14 / A-15
+    proportion = float(numerator) / denominator
+    try:
+        return math.sqrt(numerator_moe**2 - (proportion**2 * denominator_moe**2)) / float(denominator)
+    except ValueError, e:
+        return moe_ratio(numerator, denominator, numerator_moe, denominator_moe)
+
 def moe_ratio(numerator, denominator, numerator_moe, denominator_moe):
     # From http://www.census.gov/acs/www/Downloads/handbooks/ACSGeneralHandbook.pdf
-    estimated_ratio = numerator / denominator
-    return math.sqrt(numerator_moe**2 + (estimated_ratio**2 * denominator_moe**2)) / denominator
+    # "Calculating MOEs for Derived Ratios" A-14 / A-15
+    ratio = float(numerator) / denominator
+    return math.sqrt(numerator_moe**2 + (ratio**2 * denominator_moe**2)) / float(denominator)
 
 ops = {
     '+': operator.add,
@@ -64,7 +74,7 @@ ops = {
 moe_ops = {
     '+': moe_add,
     '-': moe_add,
-    '/': moe_ratio,
+    '/': moe_proportion,
     '%': percentify,
     '%%': rateify,
 }
@@ -95,7 +105,7 @@ def value_rpn_calc(data, rpn_string):
                     c = None
                     c_moe = None
                 elif token == '/':
-                    # Broken out because MOE ratio needs both MOE and estimates
+                    # Broken out because MOE proportion needs both MOE and estimates
 
                     # We're dealing with ratios, not pure division.
                     if a == 0 or b == 0:
@@ -103,7 +113,7 @@ def value_rpn_calc(data, rpn_string):
                         c_moe = 0
                     else:
                         c = ops[token](a, b)
-                        c_moe = moe_ratio(a, b, a_moe, b_moe)
+                        c_moe = moe_proportion(a, b, a_moe, b_moe)
                     numerator = a
                     numerator_moe = round(a_moe, 1)
                 else:
@@ -791,15 +801,15 @@ def geo_profile(geoid, acs='latest'):
     place_of_birth_dict['europe'] = build_item('Europe', data, item_levels,
         'B05006002 B05006001 / %')
     place_of_birth_dict['asia'] = build_item('Asia', data, item_levels,
-        'B05006046 B05006001 / %')
+        'B05006047 B05006001 / %')
     place_of_birth_dict['africa'] = build_item('Africa', data, item_levels,
-        'B05006090 B05006001 / %')
+        'B05006091 B05006001 / %')
     place_of_birth_dict['oceania'] = build_item('Oceania', data, item_levels,
-        'B05006115 B05006001 / %')
+        'B05006116 B05006001 / %')
     place_of_birth_dict['latin_america'] = build_item('Latin America', data, item_levels,
-        'B05006122 B05006001 / %')
+        'B05006123 B05006001 / %')
     place_of_birth_dict['north_america'] = build_item('North America', data, item_levels,
-        'B05006158 B05006001 / %')
+        'B05006159 B05006001 / %')
 
     # Social: Percentage of Non-English Spoken at Home, Language Spoken at Home for Children, Adults
     data = api.get_data('B16001', comparison_geoids, acs)

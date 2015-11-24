@@ -118,7 +118,16 @@ var calcPctMOE = function(numerator, denominator, numerator_moe, denominator_moe
         return 0
     } else if (numerator >= 0 && denominator >= 0) {
         var estimated_ratio = (numerator / denominator),
-            moe_ratio = Math.sqrt(Math.pow(numerator_moe, 2) + (Math.pow(estimated_ratio, 2) * Math.pow(denominator_moe, 2))) / denominator;
+            to_square_root = Math.pow(numerator_moe, 2) - (Math.pow(estimated_ratio, 2) * Math.pow(denominator_moe, 2));
+            // "There are rare instances where this formula will fail—
+            // the value under the square root will be negative. If that
+            // happens, use the formula for derived ratios in the next
+            // section which will provide a conservative estimate of
+            // the MOE."
+            if (to_square_root < 0) {
+                to_square_root = Math.pow(numerator_moe, 2) + (Math.pow(estimated_ratio, 2) * Math.pow(denominator_moe, 2));
+            }
+            moe_ratio = Math.sqrt(to_square_root) / denominator;
         return Math.round((moe_ratio * 100) * 10) / 10
     }
     return null
@@ -132,7 +141,38 @@ var roundNumber = function(value, decimals) {
     return value;
 }
 
-var numberWithCommas = function(n) {
-    var parts = roundNumber(n).toString().split(".");
+var numberWithCommas = function(n, decimals) {
+    var parts = roundNumber(n, decimals).toString().split(".");
+
     return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (parts[1] ? "." + parts[1] : "");
 }
+// parseParams from https://gist.github.com/kares/956897#comment-802666
+;!(function($) {
+    var re = /([^&=]+)=?([^&]*)/g;
+    var decode = function(str) {
+        return decodeURIComponent(str.replace(/\+/g, ' '));
+    };
+    $.parseParams = function(query) {
+        var params = {}, e;
+        if (!query) {
+            query = window.location.search;
+        }
+        if (query.substr(0, 1) == '?') {
+            query = query.substr(1);
+        }
+
+        while (e = re.exec(query)) {
+            var k = decode(e[1]);
+            var v = decode(e[2]);
+            if (params[k] !== undefined) {
+                if (!$.isArray(params[k])) {
+                    params[k] = [params[k]];
+                }
+                params[k].push(v);
+            } else {
+                params[k] = v;
+            }
+        }
+        return params;
+    };
+})(jQuery);

@@ -25,6 +25,7 @@ from .models import Geography, Table, Column, SummaryLevel
 from .utils import LazyEncoder, get_max_value, get_object_or_none,\
      SUMMARY_LEVEL_DICT, NLTK_STOPWORDS, TOPIC_FILTERS, SUMLEV_CHOICES, ACS_RELEASES
 from .profile import geo_profile, enhance_api_data
+from .topics import TOPICS_MAP
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
@@ -142,10 +143,10 @@ class TableDetailView(TemplateView):
         'I': 'Hispanic or Latino',
     }
     TABLE_TYPE_TRANSLATE_DICT = {
-        'B': 'Base',
+        'B': 'Detailed',
         'C': 'Collapsed',
     }
-    
+
     def dispatch(self, *args, **kwargs):
         table_argument = self.kwargs.get('table', None)
         # canonicalize
@@ -158,7 +159,7 @@ class TableDetailView(TemplateView):
         self.tabulation_code = re.sub("\D", "", self.table_code)
 
         return super(TableDetailView, self).dispatch(*args, **kwargs)
-    
+
     def get_tabulation_data(self, table_code):
         endpoint = settings.API_URL + '/1.0/tabulation/%s' % table_code
         r = requests.get(endpoint)
@@ -172,7 +173,7 @@ class TableDetailView(TemplateView):
             raise_404_with_messages(self.request, error_data)
         else:
             raise Http404
-        
+
         # factories for organizing metadata on arbitrary sets of tables
         def table_dict_factory():
             return {
@@ -209,12 +210,12 @@ class TableDetailView(TemplateView):
                 # is this a B or C table?
                 letter_code = table_code.upper()[0]
                 tables[letter_code] = default_table_groups[letter_code]
-                
+
                 # keep the grids separate, track which releases a table is in
                 tables[letter_code] = default_table_list[letter_code]
                 tables[letter_code][table_code] = default_table[table_code]
                 tables[letter_code][table_code]['releases'][release] = self.RELEASE_TRANSLATE_DICT[release]
-                
+
                 # get the variant names
                 if len(table_code) == 7:
                     tables[letter_code][table_code]['version_name'] = self.VARIANT_TRANSLATE_DICT[table_code.upper()[-1]]
@@ -229,7 +230,7 @@ class TableDetailView(TemplateView):
             preview_table = next(group_values.iteritems())[0]
             tabulation_data['related_tables']['preview'][preview_table] = self.get_table_data(preview_table)
             tabulation_data['related_tables']['preview'][preview_table]['table_type'] = self.TABLE_TYPE_TRANSLATE_DICT[preview_table.upper()[0]]
-        
+
         return tabulation_data
 
     def get_topic_pages(self, table_topics):
@@ -239,9 +240,9 @@ class TableDetailView(TemplateView):
             matches = set(topics).intersection(table_topics)
             if matches:
                 related_topic_pages.append((key, TOPICS_MAP[key]['title']))
-        
+
         return related_topic_pages
-        
+
     def get_table_data(self, table_code):
         endpoint = settings.API_URL + '/1.0/table/%s' % table_code
         r = requests.get(endpoint)
@@ -261,7 +262,7 @@ class TableDetailView(TemplateView):
             'tabulation': self.get_tabulation_data(self.tabulation_code),
         }
         page_context['related_topic_pages'] = self.get_topic_pages(page_context['table']['topics'])
-        
+
         return page_context
 
 
@@ -317,23 +318,44 @@ class GeographySearchView(TemplateView):
 class GeographyDetailView(TemplateView):
     template_name = 'profile/profile_detail.html'
 
-    def dispatch(self, *args, **kwargs):
-        self.geo_id = self.kwargs.get('geography_id', None)
-        self.slug = self.kwargs.get('slug', None)
+    def parse_fragment(self,fragment):
+        """Given a URL, return a (geoid,slug) tuple. slug may be None. GeoIDs are not tested for structure, but are simply the part of the URL before any '-' character, also allowing for the curiosity of Vermont legislative districts. (see https://github.com/censusreporter/censusreporter/issues/50)"""
+        parts = fragment.split('-',1)
+        if len(parts) == 1:
+            return (fragment,None)
 
-        if not self.slug:
+        geoid,slug = parts
+        if len(slug) == 1:
+            geoid = '{}-{}'.format(geoid,slug)
+            slug = None
+        else:
+            parts = slug.split('-')
+            if len(parts) > 1 and len(parts[0]) == 1:
+                geoid = '{}-{}'.format(geoid,parts[0])
+                slug = '-'.join(parts[1:])
+
+        return (geoid,slug)
+
+    def dispatch(self, *args, **kwargs):
+
+        self.geo_id, self.slug = self.parse_fragment(kwargs.get('fragment'))
+
+        if self.slug is None:
             geo = self.get_geography(self.geo_id)
             if geo:
                 try:
                     # if possible, redirect to slugged URL
                     slug = slugify(geo['properties']['display_name'])
+                    fragment = '{}-{}'.format(self.geo_id, slug)
                     return HttpResponseRedirect(
-                        reverse('geography_detail', args=(self.geo_id, slug))
-                    )
-                except:
+                        reverse('geography_detail', args=(fragment,)
+                    ))
+                except Exception, e:
                     # if we have a strange situation where there's no
                     # display name attached to the geography, we should
                     # go ahead and display the profile page
+                    logger.warn(e)
+                    logger.warn("Geography {} has no display_name".format(self.geo_id))
                     pass
             else:
                 # if we get nothing from the API, pass through for 404
@@ -342,7 +364,7 @@ class GeographyDetailView(TemplateView):
         return super(GeographyDetailView, self).dispatch(*args, **kwargs)
 
     def get_geography(self, geo_id):
-        endpoint = settings.API_URL + '/1.0/geo/tiger2012/%s' % self.geo_id
+        endpoint = settings.API_URL + '/1.0/geo/tiger2013/%s' % self.geo_id
         r = requests.get(endpoint)
         status_code = r.status_code
 
@@ -352,7 +374,7 @@ class GeographyDetailView(TemplateView):
         return None
 
     def s3_keyname(self, geo_id):
-        return '/1.0/data/profiles/%s.json' % geo_id
+        return '/1.0/data/profiles/2013/%s.json' % geo_id
 
     def make_s3(self):
         if AWS_KEY and AWS_SECRET:
@@ -434,211 +456,6 @@ class GeographyDetailView(TemplateView):
         return page_context
 
 
-## TOPICS ##
-
-'''
-Hey, it's a CMS!
-
-Title/slug/description will be used to create the list page at /topics/
-
-Title/description will also be used to create the header on the detail page
-at /topics/{{ slug }}/. The contents of an individual page should go inside
-{{ template_name }}, which belongs in /templates/topics.
-
-Screenshots of survey questions should be placed in /static/img/questions,
-and the filenames listed in {{ question_images }} for each entry.
-
-Possible topics for matching table metadata:
-
-    'topics': ['poverty', 'health insurance', 'marital status', 'citizenship', 'mortgage', 'occupancy', 'education', 'sex', 'public assistance', 'income', 'disability', 'migration', 'housing', 'family type', 'group quarters', 'physical characteristics', 'employment', 'commute', 'tenure', 'place of birth', 'fertility', 'veterans', 'families', 'costs and value', 'language', 'technical', 'roommates', 'children', 'grandparents', 'age', 'race', 'seniors', 'ancestry']
-'''
-TOPICS_LIST = [
-    {
-        'title': 'Age and Sex',
-        'slug': 'age-sex',
-        'topics': ['sex', 'children', 'age', 'seniors'],
-        'description': 'How the Census approaches the topics of age and sex.',
-        'template_name': 'age_sex.html',
-        'question_images': ['age-sex.png',],
-        'question_pdfs': [
-            ('Age','http://www.census.gov/acs/www/Downloads/QbyQfact/age.pdf'),
-            ('Sex','http://www.census.gov/acs/www/Downloads/QbyQfact/sex.pdf')
-        ]
-    },
-
-    {
-        'title': 'Children',
-        'slug': 'children',
-        'topics': ['family type', 'families', 'children'],
-        'description': 'Tables concerning Children. Helpful to consider in relation to Families.',
-        'template_name': 'children.html',
-        'question_images': ['relationship.png',],
-        'question_pdfs': [
-            ('Questions on Family Relationships','http://www.census.gov/acs/www/Downloads/QbyQfact/relationship.pdf'),
-        ]
-    },
-
-    {
-        'title': 'Commute',
-        'slug': 'commute',
-        'topics': ['employment', 'commute'],
-        'description': 'Commute data from the American Community Survey.',
-        'template_name': 'commute.html',
-        'question_images': ['commuting.png',],
-        'question_pdfs': [
-            ('Vehicles Available','http://www.census.gov/acs/www/Downloads/QbyQfact/vehicle.pdf'),
-            ('Place of Work and Journey to Work','http://www.census.gov/acs/www/Downloads/QbyQfact/PJ_work.pdf')
-        ]
-    },
-
-       {
-        'title': 'Families',
-        'slug': 'families',
-        'topics': ['family type', 'families', 'marital status'],
-        'description': 'Families are an important topic in the ACS and a key framework for considering many kinds of data.',
-        'template_name': 'families.html',
-        'question_images': ['relationship.png',],
-        'question_pdfs': [
-            ('ACS Question on Householder Relationships','http://www.census.gov/acs/www/Downloads/QbyQfact/relationship.pdf'),
-        ]
-    },
-
-    {
-        'title': 'Geography',
-        'slug': 'geography',
-        'description': "Geography is fundamental to the Census Bureau's process of tabulating data. Here are the key concepts you need to understand.",
-        'template_name': 'geography.html',
-    },
-
-    {
-        'title': 'Health Insurance',
-        'slug': 'health-insurance',
-        'topics': ['health insurance',],
-        'description': 'The ACS has a number of questions that deal with health insurance and many corresponding tables.',
-        'template_name': 'health-insurance.html',
-        'question_images': ['health-insurance.png',],
-        'question_pdfs': [
-            ('Questions on Health Insurance Coverage','http://www.census.gov/acs/www/Downloads/QbyQfact/health_insurance.pdf'),
-        ]
-    },
-
-    {
-        'title': 'Race and Hispanic Origin',
-        'slug': 'race-hispanic',
-        'topics': ['race',],
-        'description': 'Race is a complex issue, and no less so with Census data. A large proportion of Census tables are broken down by race.',
-        'template_name': 'race_hispanic.html',
-        'question_images': ['race.png',],
-        'question_pdfs': [
-            ('Race','http://www.census.gov/acs/www/Downloads/QbyQfact/race.pdf'),
-            ('Hispanic or Latino Origin','http://www.census.gov/acs/www/Downloads/QbyQfact/hispanic.pdf')
-        ]
-    },
-
-    {
-        'title': 'Migration',
-        'slug': 'migration',
-        'topics': ['migration', 'tenure'],
-        'description': 'How the Census deals with migration data.',
-        'template_name': 'migration.html',
-         'question_images': ['migration.png',],
-        'question_pdfs': [
-            ('Questions related to Residence One Year Ago from ACS','http://www.census.gov/acs/www/Downloads/QbyQfact/residence.pdf')
-
-        ]
-    },
-
-    {
-        'title': 'Poverty',
-        'slug': 'poverty',
-        'topics': ['poverty', 'public assistance', 'income'],
-        'description': 'Poverty data and how it is used within the ACS.',
-        'template_name': 'poverty.html',
-         'question_images': ['income.png',],
-        'question_pdfs': [
-            ('Questions related to Income and Poverty from ACS','http://www.census.gov/acs/www/Downloads/QbyQfact/income.pdf')
-
-        ]
-    },
-
-    {
-        'title': 'Public Assistance',
-        'slug': 'public-assistance',
-        'topics': ['poverty', 'public assistance'],
-        'description': 'Public assistance data from the ACS.',
-        'template_name': 'public-assistance.html',
-         'question_images': ['public-assistance.png',],
-        'question_pdfs': [
-            ('Questions on Income Sources from ACS','http://www.census.gov/acs/www/Downloads/QbyQfact/income.pdf'),
-            ('Question about Food Stamps from ACS','http://www.census.gov/acs/www/Downloads/QbyQfact/food_stamp.pdf')
-
-        ]
-    },
-
-    {
-        'title': 'Same-Sex Couples',
-        'slug': 'same-sex',
-        'topics': ['marital status',],
-        'description': 'Although Census does not ask about them directly, there are a number of ways to get at data about same-sex couples using ACS data.',
-        'template_name': 'same-sex.html',
-        'question_images': ['same-sex.png',],
-        'question_pdfs': [
-            ('Questions on Relationships from ACS','http://www.census.gov/acs/www/Downloads/QbyQfact/relationship.pdf'),
-            ('Question on Gender from ACS','http://www.census.gov/acs/www/Downloads/QbyQfact/sex.pdf')
-        ]
-    },
-
-    {
-        'title': 'Income',
-        'slug': 'income',
-        'topics': ['poverty', 'income'],
-        'description': 'How the Census approaches the topic of income.',
-        'template_name': 'income.html',
-        'question_images': ['income.png',],
-        'question_pdfs': [
-            ('All Income Questions from the Census','http://www.census.gov/acs/www/Downloads/QbyQfact/income.pdf')
-        ]
-    },
-
-    {
-        'title': 'Table Codes',
-        'slug': 'table-codes',
-        'description': 'While Census Reporter hopes to save you from the details, you may be interested to understand some of the rationale behind American Community Survey table identifiers.',
-        'template_name': 'table-codes.html',
-    },
-
-    {
-        'title': 'Employment',
-        'slug': 'employment',
-        'topics': ['income', 'employment'],
-        'description': 'While the ACS is not always the best source for employment data, it provides interesting information for small geographies that other sources don&rsquo;t cover.',
-        'short_description': 'Interesting information for small geographies that other sources don&rsquo;t cover.',
-        'template_name': 'employment.html',
-        'question_images': ['employment.png',],
-        'question_pdfs': [
-            ('Labor Force Status','http://www.census.gov/acs/www/Downloads/QbyQfact/labor.pdf'),
-            ('Work Status','http://www.census.gov/acs/www/Downloads/QbyQfact/work_status.pdf'),
-            ('Class of Worker; Industry; Occupation','http://www.census.gov/acs/www/Downloads/QbyQfact/worker.pdf'),
-        ]
-    },
-
-    {
-        'title': 'Seniors',
-        'slug': 'seniors',
-        'topics': ['grandparents', 'seniors'],
-        'description': 'In addition to basic Census data about age, there are a small number of Census tables which focus directly on data about older Americans, and on grandparents as caregivers.',
-        'short_description': 'Data about older Americans, and on grandparents as caregivers.',
-        'template_name': 'seniors.html',
-        'question_images': ['seniors.png',],
-        'question_pdfs': [
-            ('Age','http://www.census.gov/acs/www/Downloads/QbyQfact/age.pdf'),
-            ('Grandparents as Caregivers','http://www.census.gov/acs/www/Downloads/QbyQfact/grandparents.pdf'),
-        ]
-    },
-]
-
-TOPICS_MAP = { topic['slug']: topic for topic in TOPICS_LIST }
-
 class TopicView(TemplateView):
     template_name = 'topics/topics_list.html'
 
@@ -659,7 +476,7 @@ class TopicView(TemplateView):
                     'slug': '',
                     'description': 'Pages describing the concepts and tables covered by the Census and American Community Survey.',
                 },
-                'topics_list': [v for k, v in sorted(TOPICS_MAP.items())],
+                'topics_list': sort_topics(TOPICS_MAP)
             }
 
         return page_context
@@ -728,7 +545,7 @@ class HomepageView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         page_context = {
             'hide_nav_tools': True,
-            'topics_list': [v for k, v in sorted(TOPICS_MAP.items())],
+            'topics_list': sort_topics(TOPICS_MAP),
         }
 
         return page_context
@@ -870,7 +687,7 @@ class Elasticsearch(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         page_context = {
-            'release_options': ['ACS 2012 1-Year', 'ACS 2012 3-Year', 'ACS 2012 5-Year']
+            'release_options': ['ACS 2014 1-Year', 'ACS 2013 1-Year', 'ACS 2013 3-Year', 'ACS 2013 5-Year', 'ACS 2012 1-Year', 'ACS 2012 3-Year', 'ACS 2012 5-Year']
         }
         tables = None
         columns = None
@@ -967,3 +784,6 @@ class LocateView(TemplateView):
             })
 
         return page_context
+
+def sort_topics(topic_map):
+    return [topic_map['getting-started']]+[v for k, v in sorted(topic_map.items()) if k != 'getting-started']

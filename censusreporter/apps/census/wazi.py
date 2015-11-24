@@ -34,7 +34,8 @@ def render_json_error(message, status_code=400):
 class GeographyDetailView(BaseGeographyDetailView):
     def dispatch(self, *args, **kwargs):
         self.geo_id = self.kwargs.get('geography_id', None)
-        return super(GeographyDetailView, self).dispatch(*args, **kwargs)
+        # Skip the parent class's logic completely and go back to basics
+        return TemplateView.dispatch(self, *args, **kwargs)
 
 
     def get_context_data(self, *args, **kwargs):
