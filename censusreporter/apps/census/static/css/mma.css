@@ -133,18 +133,14 @@ header.section-contents.table-explorer h1 a {
     }
 }
 
-#query-topic-picker #topic-select,
-#topic-picker #topic-select {
-    width: 100%;
-}
-
 .profile-head2head-view #page-header-title {
   width: 100%;
   padding-left: 1.2em;
   padding-right: 1.2em;
 }
 
-.profile-head2head-view #page-footer {
+.profile-head2head-view #page-footer,
+.profile-head2head-view #uvTab {
   display: none;
 }
 
@@ -167,6 +163,7 @@ header.section-contents.table-explorer h1 a {
 }
 
 .profile-head2head-frame #page-header,
+.profile-head2head-frame #page-footer,
 .profile-head2head-frame #compare-place-picker {
   display: none;
 }
