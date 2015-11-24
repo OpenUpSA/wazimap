@@ -1,4 +1,5 @@
 {% extends '_base.html' %}
+{% load static %}
 
 {% block body_class %}profile-head2head-view{% endblock %}
 
@@ -6,6 +7,10 @@
 {% endblock %}
 
 {% block content_container %}
-<iframe class="frame-left" src="{% url 'geography_detail' geography_id=geo_id1 %}?h2h=1"></iframe>
-<iframe class="frame-right" src="{% url 'geography_detail' geography_id=geo_id2 %}?h2h=1"></iframe>
+<iframe class="frame-left" src="{% url 'geography_detail' geography_id=geo_id1 %}"></iframe>
+<iframe class="frame-right" src="{% url 'geography_detail' geography_id=geo_id2 %}"></iframe>
+{% endblock %}
+
+{% block body_javascript_extra %}
+<script src="{% static 'js/head2head.js' %}"></script>
 {% endblock %}

@@ -19,7 +19,6 @@
 <link href='{{STATIC_URL}}css/vendor/leaflet.label.css' rel='stylesheet' />
 {% endblock %}
 {% block body_id %}profile{% endblock %}
-{% block body_class %}{% if head2head %}profile-head2head-frame{% endif %}{% endblock %}
 
 {% block header_content %}
 <div id="cover-map" class="clearfix">
@@ -481,6 +480,7 @@
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 <script src="{% static 'js/vendor/leaflet.label.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
+<script src="{% static 'js/head2head.js' %}"></script>
 <script type="text/javascript">
 
 var drawMaps = function() {
