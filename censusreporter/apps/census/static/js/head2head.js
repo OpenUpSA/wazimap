@@ -17,14 +17,41 @@ function Head2Head() {
     // this is a child frame in the head-to-head view
     self.isParent = false;
     self.isChild = true;
+    self.thisWindow = window;
 
     $('body').addClass('profile-head2head-frame');
 
-    $('a').on('click', function(e) {
-      e.preventDefault();
-      // open links in the parent window
-      window.parent.location = e.target.href;
+    // find the other window
+    var frames = $(window.parent.document).find('.frame-left, .frame-right');
+    frames.each(function(i) {
+      if (this.contentWindow != window) {
+        self.otherWindow = this.contentWindow;
+      }
     });
+
+    $('body').on('click', 'a[href]', self.navigateTo);
+    $(window).on('scroll', self.scrolled);
+  };
+
+  self.navigateTo = function(e) {
+    // open links in the parent window
+    if (e.target.href) {
+      e.preventDefault();
+      window.parent.location = e.target.href;
+    }
+  };
+
+  self.scrolled = function(e) {
+    self.otherWindow.h2h.scrollTo(window.scrollY);
+  };
+
+  self.scrollTo = function(y) {
+    // scroll to y coordinate, will be called by the OTHER window, so be
+    // sure to use our stashed window
+
+    $(self.thisWindow).off('scroll');
+    self.thisWindow.scrollTo(self.thisWindow.scrollX, y);
+    setTimeout(function() { $(self.thisWindow).on('scroll', self.scrolled); }, 50);
   };
 }
 
