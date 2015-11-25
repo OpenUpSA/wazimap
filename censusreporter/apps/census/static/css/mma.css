@@ -145,15 +145,17 @@ header.section-contents.table-explorer h1 a {
 }
 
 .profile-head2head-view iframe {
-  position: fixed;
+  position: absolute;
   top: 45px;
   bottom: 0px;
   width: 50%;
-  height: 100%;
+  height: 10000px;
 
   padding: 0px;
   margin: 0px;
   border: 0px;
+
+  overflow-y: hidden;
 }
 
 .profile-head2head-view .frame-right {
@@ -164,6 +166,7 @@ header.section-contents.table-explorer h1 a {
 
 .profile-head2head-frame #page-header,
 .profile-head2head-frame #page-footer,
-.profile-head2head-frame #compare-place-picker {
+.profile-head2head-frame #compare-place-picker,
+.profile-head2head-frame #uvTab {
   display: none;
 }

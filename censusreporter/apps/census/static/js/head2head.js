@@ -1,8 +1,7 @@
 /* Helper routines for managing the head-to-head comparison view.
  *
- * The two geographies are hosted in their own iframes. Because
- * it's all on the same domain, we can communicate between them
- * directly without using postMessage.
+ * They ensure that the two iframes are sized to match the height
+ * of their content, to prevent scrolling.
  */
 function Head2Head() {
   var self = this;
@@ -17,20 +16,25 @@ function Head2Head() {
     // this is a child frame in the head-to-head view
     self.isParent = false;
     self.isChild = true;
-    self.thisWindow = window;
 
     $('body').addClass('profile-head2head-frame');
-
-    // find the other window
-    var frames = $(window.parent.document).find('.frame-left, .frame-right');
-    frames.each(function(i) {
-      if (this.contentWindow != window) {
-        self.otherWindow = this.contentWindow;
-      }
-    });
-
     $('body').on('click', 'a[href]', self.navigateTo);
-    $(window).on('scroll', self.scrolled);
+
+    // set the frame height
+    setTimeout(self.resizeChild, 500);
+    $(window).on('resize', _.debounce(self.resizeChild, 500));
+  };
+
+  self.resizeChild = function(e) {
+    // set the iframe to fit the size of the child
+    var height = document.body.offsetHeight + 100,
+        frame = $(window.frameElement);
+
+    if (frame.height() != height) {
+      // height changed, update the iframe and check again in a few msecs
+      frame.height(height);
+      setTimeout(self.resizeChild, 500);
+    }
   };
 
   self.navigateTo = function(e) {
@@ -39,19 +43,6 @@ function Head2Head() {
       e.preventDefault();
       window.parent.location = e.target.href;
     }
-  };
-
-  self.scrolled = function(e) {
-    self.otherWindow.h2h.scrollTo(window.scrollY);
-  };
-
-  self.scrollTo = function(y) {
-    // scroll to y coordinate, will be called by the OTHER window, so be
-    // sure to use our stashed window
-
-    $(self.thisWindow).off('scroll');
-    self.thisWindow.scrollTo(self.thisWindow.scrollX, y);
-    setTimeout(function() { $(self.thisWindow).on('scroll', self.scrolled); }, 50);
   };
 }
 
