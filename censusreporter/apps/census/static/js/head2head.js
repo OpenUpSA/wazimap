@@ -27,7 +27,7 @@ function Head2Head() {
 
   self.resizeChild = function(e) {
     // set the iframe to fit the size of the child
-    var height = document.body.offsetHeight + 100,
+    var height = document.body.offsetHeight + 50,
         frame = $(window.frameElement);
 
     if (frame.height() != height) {

@@ -13,8 +13,13 @@
 {% block body_class %}profile-head2head-view{% endblock %}
 
 {% block content_container %}
-<iframe class="frame-left" scrolling="no" src="{% url 'geography_detail' geography_id=geo_id1 %}"></iframe>
-<iframe class="frame-right" scrolling="no" src="{% url 'geography_detail' geography_id=geo_id2 %}"></iframe>
+
+<div class="head2head-wrapper">
+    <iframe class="frame-left" scrolling="no" src="{% url 'geography_detail' geography_id=geo_id1 %}"></iframe>
+    <iframe class="frame-right" scrolling="no" src="{% url 'geography_detail' geography_id=geo_id2 %}"></iframe>
+
+    <div class="clear"></div>
+</div>
 {% endblock %}
 
 {% block body_javascript_extra %}

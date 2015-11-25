@@ -139,15 +139,16 @@ header.section-contents.table-explorer h1 a {
   padding-right: 1.2em;
 }
 
-.profile-head2head-view #page-footer,
+.head2head-wrapper {
+  background-color: #e0e4d4;
+}
+
 .profile-head2head-view #uvTab {
   display: none;
 }
 
 .profile-head2head-view iframe {
-  position: absolute;
-  top: 45px;
-  bottom: 0px;
+  float: left;
   width: 50%;
   height: 10000px;
 
