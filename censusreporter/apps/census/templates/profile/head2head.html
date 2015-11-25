@@ -1,0 +1,27 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block head_title %}{{ geo1.short_name }} vs {{ geo2.short_name }} - {{ block.super }}{% endblock %}
+{% block head_facebook_tags %}
+    <meta property="og:title" content="Wazimap comparison: {{ geo1.long_name }} vs {{ geo2.long_name }}" />
+    <meta property="og:site_name" content="Wazimap" />
+    <meta property="og:url" content="http://wazimap.co.za/compare/{{ geo_id1 }}/vs/{{ geo_id2 }}/" />
+    <meta property="og:description" content="Population data and election figures from {{ geography.this.short_name}}, broken down by category: Demographics, Service delivery, Economics and Education." />
+    <meta property="og:type" content="article" />
+{% endblock %}
+
+{% block body_class %}profile-head2head-view{% endblock %}
+
+{% block content_container %}
+
+<div class="head2head-wrapper">
+    <iframe class="frame-left" scrolling="no" src="{% url 'geography_detail' geography_id=geo_id1 %}"></iframe>
+    <iframe class="frame-right" scrolling="no" src="{% url 'geography_detail' geography_id=geo_id2 %}"></iframe>
+
+    <div class="clear"></div>
+</div>
+{% endblock %}
+
+{% block body_javascript_extra %}
+<script src="{% static 'js/head2head.js' %}"></script>
+{% endblock %}

@@ -132,3 +132,42 @@ header.section-contents.table-explorer h1 a {
         font-size: 2.2em;
     }
 }
+
+.profile-head2head-view #page-header-title {
+  width: 100%;
+  padding-left: 1.2em;
+  padding-right: 1.2em;
+}
+
+.head2head-wrapper {
+  background-color: #e0e4d4;
+}
+
+.profile-head2head-view #uvTab {
+  display: none;
+}
+
+.profile-head2head-view iframe {
+  float: left;
+  width: 50%;
+  height: 10000px;
+
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+
+  overflow-y: hidden;
+}
+
+.profile-head2head-view .frame-right {
+  left: 50%;
+
+  border-left: 5px solid #f7f8f3;
+}
+
+.profile-head2head-frame #page-header,
+.profile-head2head-frame #page-footer,
+.profile-head2head-frame #compare-place-picker,
+.profile-head2head-frame #uvTab {
+  display: none;
+}

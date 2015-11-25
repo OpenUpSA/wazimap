@@ -11,7 +11,7 @@ from .views import (HomepageView, GeographySearchView,
     HealthcheckView, DataView, TopicView, ExampleView, Elasticsearch)
 
 from .wazi import (GeographyDetailView, GeographyJsonView, WardSearchProxy, PlaceSearchJson,
-        LocateView, DataAPIView, TableAPIView, AboutView)
+        LocateView, DataAPIView, TableAPIView, AboutView, GeographyCompareView)
 
 admin.autodiscover()
 
@@ -51,6 +51,14 @@ urlpatterns = patterns('',
         view    = cache_page(STANDARD_CACHE_TIME)(GeographyJsonView.as_view()),
         kwargs  = {},
         name    = 'geography_json',
+    ),
+
+    # e.g. /compare/province-GT/vs/province-WC/
+    url(
+        regex   = '^compare/(?P<geo_id1>(%s)-[\w]+)/vs/(?P<geo_id2>(%s)-[\w]+)/$' % (geo_levels, geo_levels),
+        view    = cache_page(STANDARD_CACHE_TIME)(GeographyCompareView.as_view()),
+        kwargs  = {},
+        name    = 'geography_compare',
     ),
 
     # Custom data api

@@ -705,7 +705,8 @@ h1.article-header {
 }
 .data-builder h1.article-header,
 .data-view h1.article-header,
-#query-topic-picker h1 {
+#query-topic-picker h1,
+#compare-place-picker h1 {
     font-size: 2.5em;
 }
 h1.article-header-right {
@@ -733,7 +734,8 @@ h1.article-header-right {
     padding-top: .5em;
 }
 .big-action input,
-#query-topic-picker input {
+#query-topic-picker input,
+#compare-place-picker input {
     font-size: 1.6em;
     padding: .25em .5em 0;
     width: 100%;
@@ -751,6 +753,7 @@ h1.article-header-right {
 }
 
 #profile #query-topic-picker input,
+#profile #compare-place-picker input,
 #map-controls #query-topic-picker input {
     font-size: 1em;
 }
@@ -2317,10 +2320,12 @@ dl#racial-iteration dt {
 #profile .content-container {
     padding-top: .5em;
 }
-#profile #query-topic-picker {
+#profile #query-topic-picker,
+#profile #compare-place-picker {
     margin-bottom: 2em;
 }
-#profile #query-topic-picker h2 {
+#profile #query-topic-picker h2,
+#profile #compare-place-picker h2 {
     position: absolute;
     line-height: 1.8em;
     padding-left: .8em;
@@ -2329,8 +2334,13 @@ dl#racial-iteration dt {
     width: 100%;
     padding-left: 12em;
 }
+#profile #compare-place-picker .typeahead-container {
+    width: 100%;
+    padding-left: 16em;
+}
 #query-topic-picker #topic-select,
-#topic-picker #topic-select {
+#topic-picker #topic-select,
+#compare-place-picker #compare-place-select {
     width: 100%;
 }
 aside .search .tt-dropdown-menu {
@@ -2710,11 +2720,15 @@ blockquote {
     #query-geography-picker #sumlevs-schools {
         margin-top: 1.4em;
     }
-    #profile #query-topic-picker .typeahead-container {
+    #profile #query-topic-picker .typeahead-container,
+    #profile #compare-place-picker .typeahead-container
+    {
         display: block;
         padding: 0 .75em;
     }
-    #profile #query-topic-picker h2 {
+    #profile #query-topic-picker h2,
+    #profile #compare-place h2
+    {
         position: relative;
         margin-bottom: .33em;
     }
@@ -2742,6 +2756,9 @@ blockquote {
     }
     .header-container {
         padding-top: 1em;
+    }
+    #profile #compare-place-picker {
+        display: none;
     }
 } /* END: @media only screen and (max-width: 640px) */
 @media only screen and (max-width: 480px) {
