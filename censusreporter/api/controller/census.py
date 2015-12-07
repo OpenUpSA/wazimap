@@ -390,37 +390,14 @@ def get_demographics_profile(geo_code, geo_level, session):
         "name": "Median age",
         "values": {"this": median},
     }
+
     # age category
-    under_18 = 0.0
-    over_or_65 = 0.0
-    between_18_64 = 0.0
-    total = 0.0
-    for obj in objects:
-        age = int(getattr(obj, 'age in completed years'))
-        total += obj.total
-        if age < 18:
-            under_18 += obj.total
-        elif age >= 65:
-            over_or_65 += obj.total
-        else:
-            between_18_64 += obj.total
-
-    age_dist = OrderedDict((
-        ("under_18", {
-            "name": "Under 18",
-            "values": {"this": round(under_18 / total * 100, 2)}
-        }),
-        ("18_to_64", {
-            "name": "18 to 64",
-            "values": {"this": round(between_18_64 / total * 100, 2)}
-        }),
-        ("65_and_over", {
-            "name": "65 and over",
-            "values": {"this": round(over_or_65 / total * 100, 2)}
-        })))
-
-    add_metadata(age_dist, db_model_age)
-
+    age_dist, _ = get_stat_data(
+        ['age in completed years'], geo_level, geo_code, session,
+        table_name='ageincompletedyearssimplified_%s' % geo_level,
+        key_order=['Under 18', '18 to 64', '65 and over'],
+        recode={'< 18': 'Under 18',
+                '>= 65': '65 and over'})
     final_data['age_category_distribution'] = age_dist
 
     # citizenship
