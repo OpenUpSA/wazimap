@@ -137,25 +137,25 @@ urlpatterns = patterns('',
         name    = 'data_detail',
     ),
 
-    url(
-        regex   = '^topics/$',
-        view    = cache_page(STANDARD_CACHE_TIME)(TopicView.as_view()),
-        kwargs  = {},
-        name    = 'topic_list',
-    ),
+    #url(
+    #    regex   = '^topics/$',
+    #    view    = cache_page(STANDARD_CACHE_TIME)(TopicView.as_view()),
+    #    kwargs  = {},
+    #    name    = 'topic_list',
+    #),
 
-    url(
-        regex   = '^topics/race-latino/?$',
-        view    = RedirectView.as_view(url=reverse_lazy('topic_detail', kwargs={'topic_slug': 'race-hispanic'})),
-        name    = 'topic_latino_redirect',
-    ),
+    #url(
+    #    regex   = '^topics/race-latino/?$',
+    #    view    = RedirectView.as_view(url=reverse_lazy('topic_detail', kwargs={'topic_slug': 'race-hispanic'})),
+    #    name    = 'topic_latino_redirect',
+    #),
 
-    url(
-        regex   = '^topics/(?P<topic_slug>[-\w]+)/$',
-        view    = cache_page(STANDARD_CACHE_TIME)(TopicView.as_view()),
-        kwargs  = {},
-        name    = 'topic_detail',
-    ),
+    #url(
+    #    regex   = '^topics/(?P<topic_slug>[-\w]+)/$',
+    #    view    = cache_page(STANDARD_CACHE_TIME)(TopicView.as_view()),
+    #    kwargs  = {},
+    #    name    = 'topic_detail',
+    #),
 
     url(
         regex   = '^examples/(?P<example_slug>[-\w]+)/$',
@@ -164,12 +164,12 @@ urlpatterns = patterns('',
         name    = 'example_detail',
     ),
 
-    url(
-        regex   = '^glossary/$',
-        view    = cache_page(STANDARD_CACHE_TIME)(TemplateView.as_view(template_name="glossary.html")),
-        kwargs  = {},
-        name    = 'glossary',
-    ),
+    #url(
+    #    regex   = '^glossary/$',
+    #    view    = cache_page(STANDARD_CACHE_TIME)(TemplateView.as_view(template_name="glossary.html")),
+    #    kwargs  = {},
+    #    name    = 'glossary',
+    #),
 
     url(
         regex   = '^locate/$',
