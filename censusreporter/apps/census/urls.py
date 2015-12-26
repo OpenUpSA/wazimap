@@ -173,7 +173,7 @@ urlpatterns = patterns('',
 
     url(
         regex   = '^locate/$',
-        view    = cache_page(STANDARD_CACHE_TIME)(TemplateView.as_view(template_name="locate/locate.html")),
+        view    = cache_page(STANDARD_CACHE_TIME)(LocateView.as_view(template_name="locate/locate.html")),
         kwargs  = {},
         name    = 'locate',
     ),
