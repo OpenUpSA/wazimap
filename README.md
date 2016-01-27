@@ -46,11 +46,6 @@ If you've upgraded XCode on OS X Mavericks, you may well see some compilation er
 
     >> ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future pip install -r requirements.txt
 
-With your development environment still active, make sure it has the path settings it will need:
-
-    >> add2virtualenv ./censusreporter
-    >> add2virtualenv ./censusreporter/apps
-
 And make sure your development environment knows the proper DJANGO_SETTINGS_MODULE by creating a `postactivate` script ...
 
     >> cdvirtualenv bin
