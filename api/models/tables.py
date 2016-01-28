@@ -448,23 +448,36 @@ def build_model_from_fields(fields, geo_level=None, table_name=None):
     if table_name in _census_table_models:
         return _census_table_models[table_name]
 
-    field_columns = [Column(field, String(128), primary_key=True)
-                     for field in fields]
+    # We build this array in a particular order, with the geo-related fields first,
+    # to ensure that SQLAlchemy creates the underlying table with the compound primary
+    # key columns in the correct order:
+    #
+    #  geo_level, geo_code, field, [field, field, ...]
+    #
+    # This means postgresql will use the first two elements of the compound primary
+    # key -- geo_level and geo_code -- when looking up values for a particular
+    # geograhy. This saves us from having to create a secondary index.
+    table_args = []
 
     if geo_level:
-        # foreign keys
-        field_columns.append(Column('%s_code' % geo_level, String(10),
-                                    ForeignKey('%s.code' % geo_level),
-                                    primary_key=True, index=True))
+        # primary/foreign keys
+        table_args.append(Column('%s_code' % geo_level, String(10),
+                                 ForeignKey('%s.code' % geo_level),
+                                 primary_key=True, index=True))
     else:
         # will form a compound primary key on the fields, and the geo id
-        field_columns.append(Column('geo_level', String(15), index=True, nullable=False, primary_key=True))
-        field_columns.append(Column('geo_code', String(10), index=True, nullable=False, primary_key=True))
+        table_args.append(Column('geo_level', String(15), nullable=False, primary_key=True))
+        table_args.append(Column('geo_code', String(10), nullable=False, primary_key=True))
 
+    # Now add the columns
+    table_args.extend(Column(field, String(128), primary_key=True) for field in fields)
+
+    # and the value column
+    table_args.append(Column('total', Integer, nullable=False))
+
+    # create the table model
     class Model(Base):
-        __table__ = Table(table_name, Base.metadata,
-                          Column('total', Integer, nullable=False),
-                          *field_columns)
+        __table__ = Table(table_name, Base.metadata, *table_args)
     _census_table_models[table_name] = Model
 
     session = get_session()
