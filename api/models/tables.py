@@ -181,7 +181,7 @@ class FieldTable(SimpleTable):
 
     """
     def __init__(self, fields, id=None, universe='Population', description=None, denominator_key=None,
-                 **kwargs):
+                 table_per_level=True, **kwargs):
         """
         Describe a new field table.
 
@@ -198,6 +198,8 @@ class FieldTable(SimpleTable):
                                     total population).
                                     This will be used as the total column once
                                     the id of the column has been calculated.
+        :param bool table_per_level: is there a separate database table for each geo level,
+                                     or are all levels in one table (default: separate per level)
         """
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
@@ -205,6 +207,7 @@ class FieldTable(SimpleTable):
         self.fields = fields
         self.field_set = set(fields)
         self.denominator_key = denominator_key
+        self.table_per_level = table_per_level
 
         super(FieldTable, self).__init__(id=id, table=None, universe=universe, description=description, **kwargs)
 
@@ -217,15 +220,23 @@ class FieldTable(SimpleTable):
         """
         self.models = {}
 
-        for level in DATASET_GEO_LEVELS[self.dataset_name]:
-            model = build_model_from_fields(
-                self.fields, level,
-                table_name=get_table_name(id=self.id, geo_level=level))
-            model.field_table = self
-            self.models[level] = model
+        if self.table_per_level:
+            for level in DATASET_GEO_LEVELS[self.dataset_name]:
+                model = build_model_from_fields(
+                    self.fields, level,
+                    table_name=get_table_name(id=self.id, geo_level=level))
+                model.field_table = self
+                self.models[level] = model
+        else:
+            self.model = build_model_from_fields(
+                self.fields, table_name=get_table_name(id=self.id))
+            self.model.field_table = self
 
     def get_model(self, geo_level):
-        return self.models[geo_level]
+        if self.table_per_level:
+            return self.models[geo_level]
+        else:
+            return self.model
 
     def setup_columns(self):
         """
@@ -312,7 +323,11 @@ class FieldTable(SimpleTable):
         for geo_level, geos in groupby(geos, lambda g: g.level):
             model = self.get_model(geo_level)
             geo_codes = [g.code for g in geos]
-            code = '%s_code' % geo_level
+
+            if self.table_per_level:
+                code = '%s_code' % geo_level
+            else:
+                code = 'geo_code'
             code_attr = getattr(model, code)
 
             # initial values
@@ -331,7 +346,12 @@ class FieldTable(SimpleTable):
                            *fields)\
                     .group_by(code_attr, *fields)\
                     .order_by(code_attr, *fields)\
-                    .filter(code_attr.in_(geo_codes)).all()
+                    .filter(code_attr.in_(geo_codes))
+
+                if not self.table_per_level:
+                    rows = rows.filter(model.geo_level == geo_level)
+
+                rows = rows.all()
 
                 def permute(level, field_keys, rows):
                     field = self.fields[level]
@@ -412,12 +432,12 @@ def get_model_from_fields(fields, geo_level, table_name=None):
     return table.get_model(geo_level)
 
 
-def build_model_from_fields(fields, geo_level, table_name=None):
+def build_model_from_fields(fields, geo_level=None, table_name=None):
     '''
     Generates an ORM model for arbitrary census fields by geography.
 
     :param list fields: the census fields in `api.models.tables.FIELD_TABLE_FIELDS`, e.g. ['highest educational level', 'type of sector']
-    :param str geo_level: one of the geographics levels defined in `api.base.geo_levels`, e.g. 'province'
+    :param str geo_level: one of the geographics levels defined in `api.base.geo_levels`, e.g. 'province', or None if the table doesn't use them
     :param str table_name: the name of the database table, if different from the default table
     :return: ORM model class containing the given fields with type String(128), a 'total' field
     with type Integer and '%(geo_level)s_code' with type ForeignKey('%(geo_level)s.code')
@@ -431,10 +451,15 @@ def build_model_from_fields(fields, geo_level, table_name=None):
     field_columns = [Column(field, String(128), primary_key=True)
                      for field in fields]
 
-    # foreign keys
-    field_columns.append(Column('%s_code' % geo_level, String(5),
-                                ForeignKey('%s.code' % geo_level),
-                                primary_key=True, index=True))
+    if geo_level:
+        # foreign keys
+        field_columns.append(Column('%s_code' % geo_level, String(10),
+                                    ForeignKey('%s.code' % geo_level),
+                                    primary_key=True, index=True))
+    else:
+        # will form a compound primary key on the fields, and the geo id
+        field_columns.append(Column('geo_level', String(15), index=True, nullable=False, primary_key=True))
+        field_columns.append(Column('geo_code', String(10), index=True, nullable=False, primary_key=True))
 
     class Model(Base):
         __table__ = Table(table_name, Base.metadata,
@@ -459,13 +484,16 @@ def get_table_id(fields):
 
 
 def get_table_name(fields=None, geo_level=None, id=None):
-    if geo_level not in geo_levels:
+    if geo_level is not None and geo_level not in geo_levels:
         raise ValueError('Invalid geo_level: %s' % geo_level)
 
     if not id:
         id = get_table_id(fields)
 
-    return '%s_%s' % (id, geo_level)
+    if geo_level:
+        return '%s_%s' % (id, geo_level)
+
+    return id
 
 
 # the geo levels applicable to different datasets
@@ -494,7 +522,7 @@ FieldTable(['language'], description='Population by primary language spoken at h
 FieldTable(['employed individual monthly income'], universe='Employed individuals')
 FieldTable(['official employment status'], universe='Workers 15 and over')
 FieldTable(['type of sector'], universe='Workers 15 and over')
-FieldTable(['population group'])
+FieldTable(['population group'], table_per_level=False)
 FieldTable(['refuse disposal'])
 FieldTable(['source of water'])
 FieldTable(['toilet facilities'])
