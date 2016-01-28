@@ -471,7 +471,7 @@ def get_model_by_name(name):
     return _census_table_models[name]
 
 
-def get_model_from_fields(fields, geo_level, table_name=None):
+def get_model_from_fields(fields, geo_level, table_name=None, table_dataset=None):
     """
     Find a model that can provide us these fields, at this level.
     TODO: If table_name = None, give preference to tables with an
@@ -487,9 +487,13 @@ def get_model_from_fields(fields, geo_level, table_name=None):
     # try find it based on fields
     field_set = set(fields)
 
+    candidates = FIELD_TABLES.values()
+    if table_dataset:
+        candidates = [t for t in candidates if t.dataset_name == table_dataset]
+
     possibilities = [
         (t, len(t.field_set - field_set))
-        for t in FIELD_TABLES.itervalues() if len(t.field_set) >= len(field_set) and len(field_set - t.field_set) == 0]
+        for t in candidates if len(t.field_set) >= len(field_set) and len(field_set - t.field_set) == 0]
     table, _ = min(possibilities, key=lambda p: p[1])
 
     if not table:
@@ -508,6 +512,7 @@ def get_table_id(fields):
 # the geo levels applicable to different datasets
 DATASET_GEO_LEVELS = {
     'Census 2011': ['country', 'province', 'municipality', 'ward'],
+    '2011 Municipal Elections': ['country', 'province', 'municipality', 'ward'],
     '2014 National Elections': ['country', 'province', 'municipality', 'ward'],
     '2014 Provincial Elections': ['country', 'province', 'municipality', 'ward'],
     'Police Crime Statistics 2014': ['country', 'province'],
@@ -570,6 +575,8 @@ FieldTable(['party'], universe='Votes', id='party_votes_national_2014', descript
            dataset='2014 National Elections', year='2014')
 FieldTable(['party'], universe='Votes', id='party_votes_provincial_2014', description='2014 Provincial Election results',
            dataset='2014 Provincial Elections', year='2014')
+FieldTable(['party'], universe='Votes', id='party_votes_municipal_2011', description='2011 Municipal Election results',
+           dataset='2011 Municipal Elections', year='2011', table_per_level=False)
 
 # Simple Tables
 SimpleTable(

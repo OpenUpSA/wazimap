@@ -246,7 +246,7 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
 def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                   percent=True, total=None, table_fields=None,
                   table_name=None, only=None, exclude=None, exclude_zero=False,
-                  recode=None, key_order=None):
+                  recode=None, key_order=None, table_dataset=None):
     """
     This is our primary helper routine for building a dictionary suitable for
     a place's profile page, based on a statistic.
@@ -284,6 +284,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     :param dict or list key_order: ordering for keys in result dictionary. If +fields+ has many items,
                                    this must be a dict from field names to orderings.
                                    The default ordering is determined by +order+.
+    :param str table_dataset: dataset used to help find the table if +table_name+ isn't given.
 
     :return: (data-dictionary, total)
     """
@@ -327,8 +328,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         if not isinstance(recode, dict) or not many_fields:
             recode = dict((f, recode) for f in fields)
 
-
-    model = get_model_from_fields(table_fields or fields, geo_level, table_name)
+    model = get_model_from_fields(table_fields or fields, geo_level, table_name, table_dataset)
     objects = get_objects_by_geo(model, geo_code, geo_level, session, fields=fields, order_by=order_by)
 
     root_data = OrderedDict()
