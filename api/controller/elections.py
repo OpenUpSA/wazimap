@@ -1,26 +1,29 @@
 from collections import OrderedDict
 
-from sqlalchemy import func, desc
-
-from api.models import VoteSummary
 from api.utils import get_session
 from api.models.tables import get_datatable
 
-from .utils import get_summary_geo_info, add_metadata, get_stat_data, merge_dicts, group_remainder
+from .utils import get_summary_geo_info, get_stat_data, merge_dicts, group_remainder
 
 
-AVAILABLE_ELECTIONS = [
+ELECTIONS = [
     {
-        'electoral_event': '2014 PROVINCIAL ELECTION',
-        'name': 'Provincial 2014',
-        'table_code': 'provincial_2014'
+        'name': 'National 2014',
+        'table_code': 'national_2014',
+        'dataset': '2014 National Elections',
     },
     {
-        'electoral_event': '2014 NATIONAL ELECTION',
-        'name': 'National 2014',
-        'table_code': 'national_2014'
+        'name': 'Provincial 2014',
+        'table_code': 'provincial_2014',
+        'dataset': '2014 Provincial Elections',
+    },
+    {
+        'name': 'Municipal 2011',
+        'table_code': 'municipal_2011',
+        'dataset': '2011 Municipal Elections',
     },
 ]
+
 
 def make_party_acronym(name):
     '''
@@ -37,6 +40,7 @@ def make_party_acronym(name):
         "VRYHEIDSFRONT PLUS": "VF+",
         "PAN AFRICANIST CONGRESS OF AZANIA": "PAC",
         "FRONT NASIONAAL/FRONT NATIONAL": "FN",
+        "INDEPENDENT": "INDEP.",
     }
     try:
         return exceptions[name]
@@ -48,12 +52,12 @@ def make_party_acronym(name):
 
 
 def get_elections_profile(geo_code, geo_level):
-    data = {}
+    data = OrderedDict()
     session = get_session()
     try:
         geo_summary_levels = get_summary_geo_info(geo_code, geo_level, session)
 
-        for election in AVAILABLE_ELECTIONS:
+        for election in ELECTIONS:
             section = election['name'].lower().replace(' ', '_')
             data[section] = get_election_data(geo_code, geo_level, election, session)
 
@@ -76,33 +80,36 @@ def get_elections_profile(geo_code, geo_level):
 
 def get_election_data(geo_code, geo_level, election, session):
     party_data, total_valid_votes = get_stat_data(
-            ['party'], geo_level, geo_code, session,
-            table_name='party_votes_%s_%s' % (election['table_code'], geo_level),
-            recode=lambda f, v: make_party_acronym(v),
-            order_by='-total')
+        ['party'], geo_level, geo_code, session,
+        table_dataset=election['dataset'],
+        recode=lambda f, v: make_party_acronym(v),
+        order_by='-total')
+
+    results = {
+        'name': election['name'],
+        'party_distribution': party_data,
+    }
 
     # voter registration and turnout
     table = get_datatable('voter_turnout_%s' % election['table_code']).table
     registered_voters, total_votes = session\
-            .query(table.c.registered_voters,
-                   table.c.total_votes) \
-            .filter(table.c.geo_level == geo_level) \
-            .filter(table.c.geo_code == geo_code) \
-            .one()
+        .query(table.c.registered_voters,
+               table.c.total_votes) \
+        .filter(table.c.geo_level == geo_level) \
+        .filter(table.c.geo_code == geo_code) \
+        .one()
 
-    return {
-        'name': election['name'],
-        'party_distribution': party_data,
-        'registered_voters': {
-            "name": "Number of registered voters",
-            "values": {"this": registered_voters},
-            },
-        'average_turnout': {
-            "name": "Of registered voters cast their vote",
-            "values": {"this": round(float(total_votes) / registered_voters * 100, 2)},
-            "numerators": {"this": total_votes},
-            }
+    results['registered_voters'] = {
+        "name": "Number of registered voters",
+        "values": {"this": registered_voters},
     }
+    results['average_turnout'] = {
+        "name": "Of registered voters cast their vote",
+        "values": {"this": round(float(total_votes) / registered_voters * 100, 2)},
+        "numerators": {"this": total_votes},
+    }
+
+    return results
 
 
 def add_elections_media_coverage(data):
@@ -114,7 +121,7 @@ def add_elections_media_coverage(data):
         ('AGANG', 3.24),
         ('IFP', 2.55),
         ('Other', 13.47),
-        ]
+    ]
 
     gender_coverage = [
         ('Female', 22.02),
@@ -129,14 +136,12 @@ def add_elections_media_coverage(data):
             'values': {'this': perc}
         }
 
-
     genders = OrderedDict()
     for key, perc in gender_coverage:
         genders[key] = {
             'name': key,
             'values': {'this': perc}
         }
-
 
     data['national_2014']['media_coverage'] = {
         'parties': parties,

@@ -121,12 +121,10 @@
     </header>
     <div class="section-container">
 
-        {% for key in election_list %}
+        {% for key in elections %}
         {% with elections|get:key as election_data %}
         <section class="clearfix stat-row">
             <h2 class="header-for-columns"><a class="permalink" href="#{{ election_data.name }}" id="{{ election_data.name }}">{{ election_data.name.capitalize }} <i class="fa fa-link"></i></a></h2>
-            <aside>
-            </aside>
             <div class="column-quarter">
                 {% include 'profile/_blocks/_stat_list.html' with stat=election_data.registered_voters stat_type='number' %}
             </div>

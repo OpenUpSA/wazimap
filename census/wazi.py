@@ -1,11 +1,9 @@
 import requests
-import os
 from itertools import chain
 
 import logging
 logger = logging.getLogger('censusreporter')
 
-from django.conf import settings
 from django.utils.safestring import SafeString
 from django.utils import simplejson
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
@@ -37,21 +35,19 @@ class GeographyDetailView(BaseGeographyDetailView):
         # Skip the parent class's logic completely and go back to basics
         return TemplateView.dispatch(self, *args, **kwargs)
 
-
     def get_context_data(self, *args, **kwargs):
         geography_id = self.geo_id
         page_context = {}
 
         try:
             geo_level, geo_code = geography_id.split('-', 1)
-            
+
             geo = get_geography(geo_code, geo_level)
         except (ValueError, LocationNotFound):
             raise Http404
 
         profile_data = get_census_profile(geo_code, geo_level)
         profile_data['elections'] = get_elections_profile(geo_code, geo_level)
-        profile_data['election_list'] = ["national_2014", "provincial_2014"]
         profile_data['geography'] = geo.as_dict_deep()
 
         profile_data = enhance_api_data(profile_data)
@@ -135,7 +131,7 @@ class LocateView(BaseLocateView):
 
 
 class DataAPIView(View):
-    """ 
+    """
     View that provides an API for census table information, mimicking that
     of the Censusreporter API described at https://github.com/censusreporter/census-api#get-10datashowacs
 
@@ -176,12 +172,12 @@ class DataAPIView(View):
             'tables': dict((t.id.upper(), t.as_dict()) for t in self.tables),
             'data': data,
             'geography': dict((g.full_geoid, g.as_dict()) for g in chain(self.data_geos, self.info_geos)),
-            })
+        })
 
     def download(self, request):
         fmt = request.GET.get('format', 'csv')
-        if not fmt in supported_formats:
-            response = HttpResponse('Unspported format %s. Supported formats: %s' %(fmt, ', '.join(supported_formats.keys())))
+        if fmt not in supported_formats:
+            response = HttpResponse('Unspported format %s. Supported formats: %s' % (fmt, ', '.join(supported_formats.keys())))
             response.status_code = 400
             return response
 
@@ -206,7 +202,7 @@ class DataAPIView(View):
         for geo_id in geo_ids:
             # either country-KE or level|country-KE, which indicates
             # we must break country-KE into +levels+
-            if not '-' in geo_id:
+            if '-' not in geo_id:
                 raise LocationNotFound('Invalid geo id: %s' % geo_id)
 
             level, code = geo_id.split('-', 1)
@@ -218,7 +214,7 @@ class DataAPIView(View):
                 info_geos.append(geo)
                 try:
                     data_geos.extend(geo.split_into(split_level))
-                except ValueError as e:
+                except ValueError:
                     raise LocationNotFound('Invalid geo level: %s' % split_level)
 
             else:
@@ -227,7 +223,6 @@ class DataAPIView(View):
 
         return data_geos, info_geos
 
-    
     def get_data(self, geos, tables):
         data = {}
 
@@ -238,9 +233,8 @@ class DataAPIView(View):
         return data
 
 
-
 class TableAPIView(View):
-    """ 
+    """
     View that lists data tables.
     """
 
