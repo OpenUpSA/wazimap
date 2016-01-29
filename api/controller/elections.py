@@ -11,19 +11,16 @@ ELECTIONS = [
         'name': 'National 2014',
         'table_code': 'national_2014',
         'dataset': '2014 National Elections',
-        'show_turnout': True,
     },
     {
         'name': 'Provincial 2014',
         'table_code': 'provincial_2014',
         'dataset': '2014 Provincial Elections',
-        'show_turnout': True,
     },
     {
         'name': 'Municipal 2011',
         'table_code': 'municipal_2011',
         'dataset': '2011 Municipal Elections',
-        'show_turnout': False,
     },
 ]
 
@@ -94,24 +91,23 @@ def get_election_data(geo_code, geo_level, election, session):
     }
 
     # voter registration and turnout
-    if election['show_turnout']:
-        table = get_datatable('voter_turnout_%s' % election['table_code']).table
-        registered_voters, total_votes = session\
-            .query(table.c.registered_voters,
-                   table.c.total_votes) \
-            .filter(table.c.geo_level == geo_level) \
-            .filter(table.c.geo_code == geo_code) \
-            .one()
+    table = get_datatable('voter_turnout_%s' % election['table_code']).table
+    registered_voters, total_votes = session\
+        .query(table.c.registered_voters,
+               table.c.total_votes) \
+        .filter(table.c.geo_level == geo_level) \
+        .filter(table.c.geo_code == geo_code) \
+        .one()
 
-        results['registered_voters'] = {
-            "name": "Number of registered voters",
-            "values": {"this": registered_voters},
-        }
-        results['average_turnout'] = {
-            "name": "Of registered voters cast their vote",
-            "values": {"this": round(float(total_votes) / registered_voters * 100, 2)},
-            "numerators": {"this": total_votes},
-        }
+    results['registered_voters'] = {
+        "name": "Number of registered voters",
+        "values": {"this": registered_voters},
+    }
+    results['average_turnout'] = {
+        "name": "Of registered voters cast their vote",
+        "values": {"this": round(float(total_votes) / registered_voters * 100, 2)},
+        "numerators": {"this": total_votes},
+    }
 
     return results
 

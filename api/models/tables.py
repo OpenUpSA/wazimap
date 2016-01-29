@@ -619,3 +619,11 @@ SimpleTable(
     dataset='2014 National Elections',
     year='2014'
 )
+SimpleTable(
+    id='voter_turnout_municipal_2011',
+    universe='Registered and MEC7 voters',
+    total_column='registered_voters',
+    description='2011 Municipal Election voter turnout',
+    dataset='2011 Municipal Elections',
+    year='2011'
+)
