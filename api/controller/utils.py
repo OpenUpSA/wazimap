@@ -7,7 +7,6 @@ from sqlalchemy.orm import class_mapper
 from api.controller.geography import LocationNotFound
 from api.models import Ward, Municipality, District, Province
 from api.models import get_model_from_fields
-from api.models.tables import get_datatable
 from api.utils import capitalize
 
 
@@ -119,11 +118,11 @@ def get_summary_geo_info(geo_code=None, geo_level=None, session=None,
 
 def get_geo_object(geo_code, geo_level, session):
     model = {
-            'ward': Ward,
-            'district': District,
-            'municipality': Municipality,
-            'province': Province,
-            'country': None,
+        'ward': Ward,
+        'district': District,
+        'municipality': Municipality,
+        'province': Province,
+        'country': None,
     }[geo_level]
 
     if model is None:
@@ -183,8 +182,9 @@ def group_remainder(data, num_items=4, make_percentage=True,
                 values['values'] = dict((k, percent(v, total_all[k]))
                                         for k, v in values['numerators'].iteritems())
 
+
 def add_metadata(data, model):
-    if not 'metadata' in data:
+    if 'metadata' not in data:
         data['metadata'] = {}
 
     if hasattr(model, 'field_table'):
@@ -260,8 +260,8 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     The field values can be recoded using +recode+ and and re-ordered using +key_order+.
 
     :param str or list fields: the census field to build stats for. Specify a list of fields to build
-                               nested statistics. If multiple fields are specified, then the values 
-                               of parameters such as +only+, +exclude+ and +recode+ will change. 
+                               nested statistics. If multiple fields are specified, then the values
+                               of parameters such as +only+, +exclude+ and +recode+ will change.
                                These must be fields in `api.models.census.census_fields`, e.g. 'highest educational level'
     :param str geo_level: the geographical level
     :param str geo_code: the geographical code
@@ -369,7 +369,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             data = data[key]
 
             # default values for intermediate fields
-            if data is not None and i < n_fields-1:
+            if data is not None and i < n_fields - 1:
                 data['metadata'] = {'name': key}
 
         # data is now the dict where the end value is going to go
@@ -378,7 +378,6 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             data['numerators'] = {'this': 0.0}
 
         return key, data
-
 
     # run the stats for the objects
     for obj in objects:
@@ -419,11 +418,12 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
 
     return root_data, grand_total
 
+
 def percent(num, denom, places=2):
     if denom == 0:
-      return 0
+        return 0
     else:
-      return round(num / denom * 100, places)
+        return round(num / denom * 100, places)
 
 
 def create_debug_dump(data, geo_level, name):
