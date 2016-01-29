@@ -2,7 +2,7 @@ import re
 from itertools import groupby
 from collections import OrderedDict
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, distinct, func
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, func
 
 from .base import Base, geo_levels
 from api.utils import get_session, get_table_model, capitalize
@@ -36,13 +36,14 @@ for a set of fields, the one with the fewest extraneous fields is chosen.
 
 # Postgres has a max name length of 63 by default, reserving up to
 # 13 chars for the _municipality ending
-MAX_TABLE_NAME_LENGTH = 63-13
+MAX_TABLE_NAME_LENGTH = 63 - 13
 
 # Characters we strip from table names
 TABLE_BAD_CHARS = re.compile('[ /-]')
 
 # All SimpleTable and FieldTable instances by id
 DATA_TABLES = {}
+
 
 def get_datatable(id):
     return DATA_TABLES[id.lower()]
@@ -65,7 +66,7 @@ class SimpleTable(object):
     """
 
     def __init__(self, id, universe, description, table='auto', total_column='total',
-            year='2011', dataset='Census 2011'):
+                 year='2011', dataset='Census 2011'):
         self.id = id
 
         if table == 'auto':
@@ -87,7 +88,6 @@ class SimpleTable(object):
 
         DATA_TABLES[self.id] = self
 
-
     def setup_columns(self):
         """
         Work out our columns by finding those that aren't geo columns.
@@ -102,7 +102,6 @@ class SimpleTable(object):
                 'name': capitalize(col.replace('_', ' ')),
                 'indent': 0 if col == self.total_column else indent
             }
-
 
     def raw_data_for_geos(self, geos):
         data = {}
@@ -122,10 +121,10 @@ class SimpleTable(object):
             try:
                 geo_values = None
                 rows = session\
-                        .query(self.table)\
-                        .filter(self.table.c.geo_level == geo_level)\
-                        .filter(self.table.c.geo_code.in_(geo_codes))\
-                        .all()
+                    .query(self.table)\
+                    .filter(self.table.c.geo_level == geo_level)\
+                    .filter(self.table.c.geo_code.in_(geo_codes))\
+                    .all()
 
                 for row in rows:
                     geo_values = data['%s-%s' % (geo_level, row.geo_code)]
@@ -139,7 +138,6 @@ class SimpleTable(object):
 
         return data
 
-
     def as_dict(self, columns=True):
         return {
             'title': self.description,
@@ -152,6 +150,7 @@ class SimpleTable(object):
 
 FIELD_TABLE_FIELDS = set()
 FIELD_TABLES = {}
+
 
 class FieldTable(SimpleTable):
     """
@@ -169,7 +168,7 @@ class FieldTable(SimpleTable):
         ZA        male    < 18        80
         ZA        male    > 18        20
 
-    What are called +columns+ here are actually an abstraction used by the 
+    What are called +columns+ here are actually an abstraction used by the
     data API. They are nested combinations of field values, such as:
 
         col0: total
@@ -182,7 +181,7 @@ class FieldTable(SimpleTable):
 
     """
     def __init__(self, fields, id=None, universe='Population', description=None, denominator_key=None,
-            **kwargs):
+                 table_per_level=True, **kwargs):
         """
         Describe a new field table.
 
@@ -199,6 +198,8 @@ class FieldTable(SimpleTable):
                                     total population).
                                     This will be used as the total column once
                                     the id of the column has been calculated.
+        :param bool table_per_level: is there a separate database table for each geo level,
+                                     or are all levels in one table (default: separate per level)
         """
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
@@ -206,12 +207,12 @@ class FieldTable(SimpleTable):
         self.fields = fields
         self.field_set = set(fields)
         self.denominator_key = denominator_key
+        self.table_per_level = table_per_level
 
         super(FieldTable, self).__init__(id=id, table=None, universe=universe, description=description, **kwargs)
 
         FIELD_TABLE_FIELDS.update(self.fields)
         FIELD_TABLES[self.id] = self
-
 
     def build_models(self):
         """
@@ -219,17 +220,20 @@ class FieldTable(SimpleTable):
         """
         self.models = {}
 
-        for level in DATASET_GEO_LEVELS[self.dataset_name]:
-            model = build_model_from_fields(
-                    self.fields, level,
-                    table_name=get_table_name(id=self.id, geo_level=level))
-            model.field_table = self
-            self.models[level] = model
-
+        if self.table_per_level:
+            for level in DATASET_GEO_LEVELS[self.dataset_name]:
+                model = self._build_model_from_fields(self.fields, self._table_name(level), level)
+                model.field_table = self
+                self.models[level] = model
+        else:
+            self.model = self._build_model_from_fields(self.fields, self.id)
+            self.model.field_table = self
 
     def get_model(self, geo_level):
-        return self.models[geo_level]
-
+        if self.table_per_level:
+            return self.models[geo_level]
+        else:
+            return self.model
 
     def setup_columns(self):
         """
@@ -300,11 +304,8 @@ class FieldTable(SimpleTable):
         finally:
             session.close()
 
-
     def column_id(self, field_values):
         return '-'.join(field_values)
-
-
 
     def raw_data_for_geos(self, geos):
         """
@@ -319,7 +320,11 @@ class FieldTable(SimpleTable):
         for geo_level, geos in groupby(geos, lambda g: g.level):
             model = self.get_model(geo_level)
             geo_codes = [g.code for g in geos]
-            code = '%s_code' % geo_level
+
+            if self.table_per_level:
+                code = '%s_code' % geo_level
+            else:
+                code = 'geo_code'
             code_attr = getattr(model, code)
 
             # initial values
@@ -333,12 +338,17 @@ class FieldTable(SimpleTable):
                 geo_values = None
                 fields = [getattr(model, f) for f in self.fields]
                 rows = session\
-                        .query(code_attr,
-                               func.sum(model.total).label('total'),
-                               *fields)\
-                        .group_by(code_attr, *fields)\
-                        .order_by(code_attr, *fields)\
-                        .filter(code_attr.in_(geo_codes)).all()
+                    .query(code_attr,
+                           func.sum(model.total).label('total'),
+                           *fields)\
+                    .group_by(code_attr, *fields)\
+                    .order_by(code_attr, *fields)\
+                    .filter(code_attr.in_(geo_codes))
+
+                if not self.table_per_level:
+                    rows = rows.filter(model.geo_level == geo_level)
+
+                rows = rows.all()
 
                 def permute(level, field_keys, rows):
                     field = self.fields[level]
@@ -349,8 +359,8 @@ class FieldTable(SimpleTable):
                         new_keys = field_keys + [key]
                         col_id = self.column_id(new_keys)
 
-                        if level+1 < len(self.fields):
-                            count = permute(level+1, new_keys, rows)
+                        if level + 1 < len(self.fields):
+                            count = permute(level + 1, new_keys, rows)
                         else:
                             # we've bottomed out
                             count = sum(row.total for row in rows)
@@ -370,7 +380,6 @@ class FieldTable(SimpleTable):
 
                     return total
 
-
                 # rows for each geo
                 for geo_code, geo_rows in groupby(rows, lambda r: getattr(r, code)):
                     geo_values = data['%s-%s' % (geo_level, geo_code)]
@@ -385,8 +394,78 @@ class FieldTable(SimpleTable):
 
         return data
 
+    def _build_model_from_fields(self, fields, table_name, geo_level=None):
+        '''
+        Generates an ORM model for arbitrary census fields by geography.
+
+        :param list fields: the census fields in `api.models.tables.FIELD_TABLE_FIELDS`, e.g. ['highest educational level', 'type of sector']
+        :param str table_name: the name of the database table
+        :param str geo_level: one of the geographics levels defined in `api.base.geo_levels`, e.g. 'province', or None if the table doesn't use them
+        :return: ORM model class containing the given fields with type String(128), a 'total' field
+        with type Integer and '%(geo_level)s_code' with type ForeignKey('%(geo_level)s.code')
+        :rtype: Model
+        '''
+        if table_name in _census_table_models:
+            return _census_table_models[table_name]
+
+        # We build this array in a particular order, with the geo-related fields first,
+        # to ensure that SQLAlchemy creates the underlying table with the compound primary
+        # key columns in the correct order:
+        #
+        #  geo_level, geo_code, field, [field, field, ...]
+        #
+        # This means postgresql will use the first two elements of the compound primary
+        # key -- geo_level and geo_code -- when looking up values for a particular
+        # geograhy. This saves us from having to create a secondary index.
+        table_args = []
+
+        if geo_level:
+            # primary/foreign keys
+            table_args.append(Column('%s_code' % geo_level, String(10),
+                                     ForeignKey('%s.code' % geo_level),
+                                     primary_key=True, index=True))
+        else:
+            # will form a compound primary key on the fields, and the geo id
+            table_args.append(Column('geo_level', String(15), nullable=False, primary_key=True))
+            table_args.append(Column('geo_code', String(10), nullable=False, primary_key=True))
+
+        # Now add the columns
+        table_args.extend(Column(field, String(128), primary_key=True) for field in fields)
+
+        # and the value column
+        table_args.append(Column('total', Integer, nullable=False))
+
+        # create the table model
+        class Model(Base):
+            __table__ = Table(table_name, Base.metadata, *table_args)
+        _census_table_models[table_name] = Model
+
+        # ensure it exists in the DB
+        session = get_session()
+        try:
+            Model.__table__.create(session.get_bind(), checkfirst=True)
+        finally:
+            session.close()
+
+        return Model
+
+    def _table_name(self, geo_level=None):
+        """ What is the name for the underlying database table for this table,
+        for the given geo_level?
+        """
+        if geo_level is not None and geo_level not in geo_levels:
+            raise ValueError('Invalid geo_level: %s' % geo_level)
+
+        if self.table_per_level:
+            if geo_level is None:
+                raise ValueError('Expected a geo_level')
+            return '%s_%s' % (self.id, geo_level)
+
+        return self.id
+
 
 _census_table_models = {}
+
 
 def get_model_by_name(name):
     return _census_table_models[name]
@@ -408,7 +487,8 @@ def get_model_from_fields(fields, geo_level, table_name=None):
     # try find it based on fields
     field_set = set(fields)
 
-    possibilities = [(t, len(t.field_set - field_set))
+    possibilities = [
+        (t, len(t.field_set - field_set))
         for t in FIELD_TABLES.itervalues() if len(t.field_set) >= len(field_set) and len(field_set - t.field_set) == 0]
     table, _ = min(possibilities, key=lambda p: p[1])
 
@@ -418,47 +498,6 @@ def get_model_from_fields(fields, geo_level, table_name=None):
     return table.get_model(geo_level)
 
 
-
-def build_model_from_fields(fields, geo_level, table_name=None):
-    '''
-    Generates an ORM model for arbitrary census fields by geography.
-
-    :param list fields: the census fields in `api.models.tables.FIELD_TABLE_FIELDS`, e.g. ['highest educational level', 'type of sector']
-    :param str geo_level: one of the geographics levels defined in `api.base.geo_levels`, e.g. 'province'
-    :param str table_name: the name of the database table, if different from the default table
-    :return: ORM model class containing the given fields with type String(128), a 'total' field
-    with type Integer and '%(geo_level)s_code' with type ForeignKey('%(geo_level)s.code')
-    :rtype: Model
-    '''
-    if table_name is None:
-        table_name = get_table_name(fields, geo_level)
-    if table_name in _census_table_models:
-        return _census_table_models[table_name]
-
-    field_columns = [Column(field, String(128), primary_key=True)
-                     for field in fields]
-
-    # foreign keys
-    field_columns.append(Column('%s_code' % geo_level, String(5),
-                                ForeignKey('%s.code' % geo_level),
-                                primary_key=True, index=True))
-
-    class Model(Base):
-        __table__ = Table(table_name, Base.metadata,
-            Column('total', Integer, nullable=False),
-            *field_columns
-        )
-    _census_table_models[table_name] = Model
-
-    session = get_session()
-    try:
-        Model.__table__.create(session.get_bind(), checkfirst=True)
-    finally:
-        session.close()
-
-    return Model
-
-
 def get_table_id(fields):
     sorted_fields = sorted(fields)
     table_id = TABLE_BAD_CHARS.sub('', '_'.join(sorted_fields))
@@ -466,22 +505,12 @@ def get_table_id(fields):
     return table_id[:MAX_TABLE_NAME_LENGTH]
 
 
-def get_table_name(fields=None, geo_level=None, id=None):
-    if geo_level not in geo_levels:
-        raise ValueError('Invalid geo_level: %s' % geo_level)
-
-    if not id:
-        id = get_table_id(fields)
-
-    return '%s_%s' % (id, geo_level)
-
-
 # the geo levels applicable to different datasets
 DATASET_GEO_LEVELS = {
-    'Census 2011'               : ['country', 'province', 'municipality', 'ward'],
-    '2014 National Elections'   : ['country', 'province', 'municipality', 'ward'],
-    '2014 Provincial Elections' : ['country', 'province', 'municipality', 'ward'],
-    'Police Crime Statistics 2014'   : ['country', 'province'],
+    'Census 2011': ['country', 'province', 'municipality', 'ward'],
+    '2014 National Elections': ['country', 'province', 'municipality', 'ward'],
+    '2014 Provincial Elections': ['country', 'province', 'municipality', 'ward'],
+    'Police Crime Statistics 2014': ['country', 'province'],
 }
 
 
@@ -502,7 +531,7 @@ FieldTable(['language'], description='Population by primary language spoken at h
 FieldTable(['employed individual monthly income'], universe='Employed individuals')
 FieldTable(['official employment status'], universe='Workers 15 and over')
 FieldTable(['type of sector'], universe='Workers 15 and over')
-FieldTable(['population group'])
+FieldTable(['population group'], table_per_level=False)
 FieldTable(['refuse disposal'])
 FieldTable(['source of water'])
 FieldTable(['toilet facilities'])
@@ -538,48 +567,48 @@ FieldTable(['crime'], universe='Crimes', dataset='Police Crime Statistics 2014',
 
 # Elections
 FieldTable(['party'], universe='Votes', id='party_votes_national_2014', description='2014 National Election results',
-        dataset='2014 National Elections', year='2014')
+           dataset='2014 National Elections', year='2014')
 FieldTable(['party'], universe='Votes', id='party_votes_provincial_2014', description='2014 Provincial Election results',
-        dataset='2014 Provincial Elections', year='2014')
+           dataset='2014 Provincial Elections', year='2014')
 
 # Simple Tables
 SimpleTable(
-        id='population',
-        universe='Population',
-        total_column=None,
-        description='Total population',
-        dataset='Census 2011',
-        year='2011'
-        )
+    id='population',
+    universe='Population',
+    total_column=None,
+    description='Total population',
+    dataset='Census 2011',
+    year='2011'
+)
 SimpleTable(
-        id='voter_turnout_national_2014',
-        universe='Registered voters',
-        total_column='registered_voters',
-        description='2014 National Election voter turnout',
-        dataset='2014 National Elections',
-        year='2014'
-        )
+    id='voter_turnout_national_2014',
+    universe='Registered voters',
+    total_column='registered_voters',
+    description='2014 National Election voter turnout',
+    dataset='2014 National Elections',
+    year='2014'
+)
 SimpleTable(
-        id='voter_turnout_provincial_2014',
-        universe='Registered voters',
-        total_column='registered_voters',
-        description='2014 Provincial Election voter turnout',
-        dataset='2014 Provincial Elections',
-        year='2014'
-        )
+    id='voter_turnout_provincial_2014',
+    universe='Registered voters',
+    total_column='registered_voters',
+    description='2014 Provincial Election voter turnout',
+    dataset='2014 Provincial Elections',
+    year='2014'
+)
 SimpleTable(
-        id='votes_provincial_2014',
-        universe='Valid votes',
-        total_column='total_votes',
-        description='2014 Provincial Election votes',
-        dataset='2014 Provincial Elections',
-        year='2014'
-        )
+    id='votes_provincial_2014',
+    universe='Valid votes',
+    total_column='total_votes',
+    description='2014 Provincial Election votes',
+    dataset='2014 Provincial Elections',
+    year='2014'
+)
 SimpleTable(
-        id='votes_national_2014',
-        universe='Valid votes',
-        total_column='total_votes',
-        description='2014 National Election votes',
-        dataset='2014 National Elections',
-        year='2014'
-        )
+    id='votes_national_2014',
+    universe='Valid votes',
+    total_column='total_votes',
+    description='2014 National Election votes',
+    dataset='2014 National Elections',
+    year='2014'
+)

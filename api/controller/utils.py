@@ -201,18 +201,23 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
     geo_code and geo_level, summing over the 'total' field and grouping by
     +fields+.
     """
-    geo_attr = '%s_code' % geo_level
+    if db_model.field_table.table_per_level:
+        geo_attr = '%s_code' % geo_level
+    else:
+        geo_attr = 'geo_code'
 
     if fields is None:
-        fields = [c.key for c in class_mapper(db_model).attrs if c.key not in [geo_attr, 'total']]
+        fields = [c.key for c in class_mapper(db_model).attrs if c.key not in [geo_attr, 'geo_level', 'total']]
 
     fields = [getattr(db_model, f) for f in fields]
 
     objects = session\
-            .query(func.sum(db_model.total).label('total'),
-                   *fields)\
-            .group_by(*fields)\
-            .filter(getattr(db_model, geo_attr) == geo_code)
+        .query(func.sum(db_model.total).label('total'), *fields)\
+        .group_by(*fields)\
+        .filter(getattr(db_model, geo_attr) == geo_code)
+
+    if not db_model.field_table.table_per_level:
+        objects = objects.filter(db_model.geo_level == geo_level)
 
     if order_by is not None:
         attr = order_by
@@ -233,8 +238,8 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
 
     objects = objects.all()
     if len(objects) == 0:
-        raise LocationNotFound("%s.%s with code '%s' not found"
-                               % (db_model.__tablename__, geo_attr, geo_code))
+        raise LocationNotFound("%s for geography '%s-%s' not found"
+                               % (db_model.__table__.name, geo_level, geo_code))
     return objects
 
 
