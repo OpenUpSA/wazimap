@@ -231,6 +231,7 @@ COLLAPSED_TOILET_CATEGORIES = {
 
 HOUSEHOLD_GOODS_RECODE = {
     'cell phone': 'Cellphone',
+    'computer': 'Computer',
     'dvd player': 'DVD player',
     'electric/gas stove': 'Stove',
     'landline/telephone': 'Telephone',
