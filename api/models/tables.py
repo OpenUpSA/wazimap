@@ -138,6 +138,74 @@ class SimpleTable(object):
 
         return data
 
+    def get_stat_data(self, geo_level, geo_code, fields=None, order_by=None,
+                      percent=True, total=None, exclude_zero=False,
+                      recode=None):
+        """ Get a data dictionary for a place from this table.
+
+        This fetches the values for each column in this table and returns a data
+        dictionary for those values, with appropriate names and metadata.
+
+        :param str geo_level: the geographical level
+        :param str geo_code: the geographical code
+        :param str or list fields: the columns to fetch stats for. By default, all columns except
+                                   geo-related and the total column (if any) are used.
+        :param str order_by: how to order the columns in the dictonary. Either 'key' or '-key' to
+                             order alphabetically based on (possibly re-coded) key, or 'value' or '-value'
+                             to order by the value for that column. Defaults to 'key'.
+        :param bool percent: should we calculate percentages, or just include raw values?
+        :param int total: the total value to use for percentages, or None to use the table's total column,
+                          or the sum of all fields if the table has no total column
+        :param bool exclude_zero: ignore fields that have a zero value
+        :param dict recode: map from field names to strings to recode column names.
+
+        :return: (data-dictionary, total)
+        """
+
+        session = get_session()
+        try:
+            if fields:
+                for f in fields:
+                    if f not in self.columns:
+                        raise ValueError('Invalid field/column for %s: %s' % (self.id, f))
+            else:
+                fields = self.columns.keys()
+
+            recode = recode or {}
+            if recode:
+                # change lambda to dicts
+                if not isinstance(recode, dict):
+                    recode = {f: recode(f) for f in fields}
+
+            # table columns
+            cols = [self.table.columns[c] for c in fields]
+
+            # do the query
+            row = session\
+                .query(*cols)\
+                .filter(self.table.c.geo_level == geo_level,
+                        self.table.c.geo_code == geo_code)\
+                .first()
+            if not row:
+                raise ValueError("No data in %s for %s-%s" % (self.id, geo_level, geo_code))
+
+            # TODO: ordering
+            # TODO: percents
+            # TODO: total
+            results = OrderedDict()
+            for field in fields:
+                results[field] = {
+                    'name': recode.get(field, self.columns[field]['name']),
+                    'values': {'this': getattr(row, field)},
+                }
+
+            # TODO: metadata
+
+            return results
+
+        finally:
+            session.close()
+
     def as_dict(self, columns=True):
         return {
             'title': self.description,
