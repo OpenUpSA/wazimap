@@ -129,7 +129,7 @@
                 {% include 'profile/_blocks/_stat_list.html' with stat=election_data.registered_voters stat_type='number' %}
             </div>
             <div class="column-quarter">
-                {% include 'profile/_blocks/_stat_list.html' with stat=election_data.average_turnout stat_type='percentage' %}
+                {% include 'profile/_blocks/_stat_list.html' with stat=election_data.total_votes stat_type='percentage' %}
             </div>
             <div class="column-half" id="chart-histogram-elections-{{ key }}-party_distribution" data-stat-type="scaled-percentage" data-chart-title="Voters by party"></div>
         </section>
