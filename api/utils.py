@@ -1,3 +1,5 @@
+from __future__ import division
+
 import requests
 
 from sqlalchemy import create_engine, MetaData, Table
@@ -118,3 +120,10 @@ def capitalize(s):
         return s
 
     return ''.join([s[0].upper(), s[1:]])
+
+
+def percent(num, denom, places=2):
+    if denom == 0:
+        return 0
+    else:
+        return round(num / denom * 100, places)

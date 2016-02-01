@@ -7,7 +7,7 @@ from sqlalchemy.orm import class_mapper
 from api.controller.geography import LocationNotFound
 from api.models import Ward, Municipality, District, Province
 from api.models import get_model_from_fields
-from api.utils import capitalize
+from api.utils import capitalize, percent
 
 
 # dictionaries that merge_dicts will merge
@@ -417,13 +417,6 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     add_metadata(root_data, model)
 
     return root_data, grand_total
-
-
-def percent(num, denom, places=2):
-    if denom == 0:
-        return 0
-    else:
-        return round(num / denom * 100, places)
 
 
 def create_debug_dump(data, geo_level, name):

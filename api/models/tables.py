@@ -5,7 +5,7 @@ from collections import OrderedDict
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, func
 
 from .base import Base, geo_levels
-from api.utils import get_session, get_table_model, capitalize
+from api.utils import get_session, get_table_model, capitalize, percent as p
 
 
 '''
@@ -139,8 +139,7 @@ class SimpleTable(object):
         return data
 
     def get_stat_data(self, geo_level, geo_code, fields=None, order_by=None,
-                      percent=True, total=None, exclude_zero=False,
-                      recode=None):
+                      percent=True, total=None, recode=None):
         """ Get a data dictionary for a place from this table.
 
         This fetches the values for each column in this table and returns a data
@@ -154,9 +153,9 @@ class SimpleTable(object):
                              order alphabetically based on (possibly re-coded) key, or 'value' or '-value'
                              to order by the value for that column. Defaults to 'key'.
         :param bool percent: should we calculate percentages, or just include raw values?
-        :param int total: the total value to use for percentages, or None to use the table's total column,
-                          or the sum of all fields if the table has no total column
-        :param bool exclude_zero: ignore fields that have a zero value
+        :param int total: the total value to use for percentages, name of a
+                          field, or None to use the table's total column, or the sum of
+                          all fields if the table has no total column
         :param dict recode: map from field names to strings to recode column names.
 
         :return: (data-dictionary, total)
@@ -164,6 +163,8 @@ class SimpleTable(object):
 
         session = get_session()
         try:
+            if fields is not None and not isinstance(fields, list):
+                fields = [fields]
             if fields:
                 for f in fields:
                     if f not in self.columns:
@@ -177,8 +178,17 @@ class SimpleTable(object):
                 if not isinstance(recode, dict):
                     recode = {f: recode(f) for f in fields}
 
-            # table columns
-            cols = [self.table.columns[c] for c in fields]
+            if total is None:
+                total = self.total_column
+
+            # table columns to fetch
+            if total is None:
+                # get everything, since we need to sum up to get a total
+                cols = self.columns.keys()
+            else:
+                cols = [self.table.columns[c] for c in fields]
+                if isinstance(total, basestring) and total not in cols:
+                    cols.append(total)
 
             # do the query
             row = session\
@@ -189,15 +199,25 @@ class SimpleTable(object):
             if not row:
                 raise ValueError("No data in %s for %s-%s" % (self.id, geo_level, geo_code))
 
+            if percent:
+                # what's our denominator?
+                if total is None:
+                    # sum of all columns
+                    total = sum(getattr(row, f) for f in fields)
+                elif isinstance(total, basestring):
+                    total = getattr(row, total)
+
             # TODO: ordering
-            # TODO: percents
-            # TODO: total
             results = OrderedDict()
             for field in fields:
-                results[field] = {
-                    'name': recode.get(field, self.columns[field]['name']),
-                    'values': {'this': getattr(row, field)},
-                }
+                results[field] = {'name': recode.get(field, self.columns[field]['name'])}
+                val = getattr(row, field)
+
+                if percent:
+                    results[field]['values'] = {'this': p(val, total)}
+                    results[field]['numerators'] = {'this': val}
+                else:
+                    results[field]['values'] = {'this': val}
 
             # TODO: metadata
 
