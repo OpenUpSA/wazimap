@@ -152,8 +152,7 @@ class SimpleTable(object):
         :param str key_order: explicit ordering of (recoded) keys, or None for the default order
         :param bool percent: should we calculate percentages, or just include raw values?
         :param int total: the total value to use for percentages, name of a
-                          field, or None to use the table's total column, or the sum of
-                          all fields if the table has no total column
+                          field, or None to use the sum of all retrieved fields (default)
         :param dict recode: map from field names to strings to recode column names.
 
         :return: (data-dictionary, total)
@@ -176,17 +175,10 @@ class SimpleTable(object):
                 if not isinstance(recode, dict):
                     recode = {f: recode(f) for f in fields}
 
-            if total is None:
-                total = self.total_column
-
             # table columns to fetch
-            if total is None:
-                # get everything, since we need to sum up to get a total
-                cols = self.columns.keys()
-            else:
-                cols = [self.model.columns[c] for c in fields]
-                if isinstance(total, basestring) and total not in cols:
-                    cols.append(total)
+            cols = [self.model.columns[c] for c in fields]
+            if total is not None and isinstance(total, basestring) and total not in cols:
+                cols.append(total)
 
             # do the query. If this returns no data, row is None
             row = session\
@@ -209,7 +201,6 @@ class SimpleTable(object):
             elif isinstance(total, basestring):
                 total = getattr(row, total)
 
-            # TODO: ordering
             results = OrderedDict()
             key_order = key_order or fields
             for field in key_order:
