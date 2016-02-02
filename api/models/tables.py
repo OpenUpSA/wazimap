@@ -138,7 +138,7 @@ class SimpleTable(object):
 
         return data
 
-    def get_stat_data(self, geo_level, geo_code, fields=None, order_by=None,
+    def get_stat_data(self, geo_level, geo_code, fields=None, key_order=None,
                       percent=True, total=None, recode=None):
         """ Get a data dictionary for a place from this table.
 
@@ -149,9 +149,7 @@ class SimpleTable(object):
         :param str geo_code: the geographical code
         :param str or list fields: the columns to fetch stats for. By default, all columns except
                                    geo-related and the total column (if any) are used.
-        :param str order_by: how to order the columns in the dictonary. Either 'key' or '-key' to
-                             order alphabetically based on (possibly re-coded) key, or 'value' or '-value'
-                             to order by the value for that column. Defaults to 'key'.
+        :param str key_order: explicit ordering of (recoded) keys, or None for the default order
         :param bool percent: should we calculate percentages, or just include raw values?
         :param int total: the total value to use for percentages, name of a
                           field, or None to use the table's total column, or the sum of
@@ -190,29 +188,33 @@ class SimpleTable(object):
                 if isinstance(total, basestring) and total not in cols:
                     cols.append(total)
 
-            # do the query
+            # do the query. If this returns no data, row is None
             row = session\
                 .query(*cols)\
                 .filter(self.model.c.geo_level == geo_level,
                         self.model.c.geo_code == geo_code)\
                 .first()
-            if not row:
-                raise ValueError("No data in %s for %s-%s" % (self.id, geo_level, geo_code))
 
-            if percent:
-                # what's our denominator?
-                if total is None:
-                    # sum of all columns
-                    total = sum(getattr(row, f) for f in fields)
-                elif isinstance(total, basestring):
-                    total = getattr(row, total)
+            # TODO: HACK
+            if row is None:
+                def zero(self, attr):
+                    return 0
+                row = object()
+                row.__getattr__ = zero
+
+            # what's our denominator?
+            if total is None:
+                # sum of all columns
+                total = sum(getattr(row, f) or 0 for f in fields)
+            elif isinstance(total, basestring):
+                total = getattr(row, total)
 
             # TODO: ordering
             results = OrderedDict()
-            for field in fields:
+            key_order = key_order or fields
+            for field in key_order:
                 results[field] = {'name': recode.get(field, self.columns[field]['name'])}
-                val = getattr(row, field)
-                add_metadata(results[field], self)
+                val = getattr(row, field) or 0
 
                 if percent:
                     results[field]['values'] = {'this': p(val, total)}
@@ -220,7 +222,8 @@ class SimpleTable(object):
                 else:
                     results[field]['values'] = {'this': val}
 
-            return results
+            add_metadata(results, self)
+            return results, total
         finally:
             session.close()
 
