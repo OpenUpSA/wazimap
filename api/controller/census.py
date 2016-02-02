@@ -4,12 +4,11 @@ from sqlalchemy import func
 
 from api.models import get_model_from_fields
 from api.models.tables import get_datatable, get_table_id
-from api.utils import get_session, LocationNotFound
+from api.utils import get_session, add_metadata
 from api.controller.geography import get_geography
 
 from .utils import (collapse_categories, calculate_median, calculate_median_stat, get_summary_geo_info,
-                    merge_dicts, group_remainder, add_metadata, get_stat_data, get_objects_by_geo, percent,
-                    create_debug_dump)
+                    merge_dicts, group_remainder, get_stat_data, get_objects_by_geo, percent)
 
 
 PROFILE_SECTIONS = (

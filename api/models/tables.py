@@ -5,7 +5,7 @@ from collections import OrderedDict
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, func
 
 from .base import Base, geo_levels
-from api.utils import get_session, get_table_model, capitalize, percent as p
+from api.utils import get_session, get_table_model, capitalize, percent as p, add_metadata
 
 
 '''
@@ -65,14 +65,14 @@ class SimpleTable(object):
     use a `FieldTable` below.
     """
 
-    def __init__(self, id, universe, description, table='auto', total_column='total',
+    def __init__(self, id, universe, description, model='auto', total_column='total',
                  year='2011', dataset='Census 2011'):
         self.id = id
 
-        if table == 'auto':
-            table = get_table_model(id)
+        if model == 'auto':
+            model = get_table_model(id)
 
-        self.table = table
+        self.model = model
         self.universe = universe
         self.description = description
         self.year = year
@@ -97,7 +97,7 @@ class SimpleTable(object):
         if self.total_column:
             indent = 1
 
-        for col in (c.name for c in self.table.columns if c.name not in ['geo_code', 'geo_level']):
+        for col in (c.name for c in self.model.columns if c.name not in ['geo_code', 'geo_level']):
             self.columns[col] = {
                 'name': capitalize(col.replace('_', ' ')),
                 'indent': 0 if col == self.total_column else indent
@@ -121,9 +121,9 @@ class SimpleTable(object):
             try:
                 geo_values = None
                 rows = session\
-                    .query(self.table)\
-                    .filter(self.table.c.geo_level == geo_level)\
-                    .filter(self.table.c.geo_code.in_(geo_codes))\
+                    .query(self.model)\
+                    .filter(self.model.c.geo_level == geo_level)\
+                    .filter(self.model.c.geo_code.in_(geo_codes))\
                     .all()
 
                 for row in rows:
@@ -186,15 +186,15 @@ class SimpleTable(object):
                 # get everything, since we need to sum up to get a total
                 cols = self.columns.keys()
             else:
-                cols = [self.table.columns[c] for c in fields]
+                cols = [self.model.columns[c] for c in fields]
                 if isinstance(total, basestring) and total not in cols:
                     cols.append(total)
 
             # do the query
             row = session\
                 .query(*cols)\
-                .filter(self.table.c.geo_level == geo_level,
-                        self.table.c.geo_code == geo_code)\
+                .filter(self.model.c.geo_level == geo_level,
+                        self.model.c.geo_code == geo_code)\
                 .first()
             if not row:
                 raise ValueError("No data in %s for %s-%s" % (self.id, geo_level, geo_code))
@@ -212,6 +212,7 @@ class SimpleTable(object):
             for field in fields:
                 results[field] = {'name': recode.get(field, self.columns[field]['name'])}
                 val = getattr(row, field)
+                add_metadata(results[field], self)
 
                 if percent:
                     results[field]['values'] = {'this': p(val, total)}
@@ -219,10 +220,7 @@ class SimpleTable(object):
                 else:
                     results[field]['values'] = {'this': val}
 
-            # TODO: metadata
-
             return results
-
         finally:
             session.close()
 
@@ -297,7 +295,7 @@ class FieldTable(SimpleTable):
         self.denominator_key = denominator_key
         self.table_per_level = table_per_level
 
-        super(FieldTable, self).__init__(id=id, table=None, universe=universe, description=description, **kwargs)
+        super(FieldTable, self).__init__(id=id, model=None, universe=universe, description=description, **kwargs)
 
         FIELD_TABLE_FIELDS.update(self.fields)
         FIELD_TABLES[self.id] = self
@@ -311,11 +309,11 @@ class FieldTable(SimpleTable):
         if self.table_per_level:
             for level in DATASET_GEO_LEVELS[self.dataset_name]:
                 model = self._build_model_from_fields(self.fields, self._table_name(level), level)
-                model.field_table = self
+                model.data_table = self
                 self.models[level] = model
         else:
             self.model = self._build_model_from_fields(self.fields, self.id)
-            self.model.field_table = self
+            self.model.data_table = self
 
     def get_model(self, geo_level):
         if self.table_per_level:

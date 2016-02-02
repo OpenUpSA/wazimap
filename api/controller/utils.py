@@ -7,7 +7,7 @@ from sqlalchemy.orm import class_mapper
 from api.controller.geography import LocationNotFound
 from api.models import Ward, Municipality, District, Province
 from api.models import get_model_from_fields
-from api.utils import capitalize, percent
+from api.utils import capitalize, percent, add_metadata
 
 
 # dictionaries that merge_dicts will merge
@@ -183,25 +183,12 @@ def group_remainder(data, num_items=4, make_percentage=True,
                                         for k, v in values['numerators'].iteritems())
 
 
-def add_metadata(data, model):
-    if 'metadata' not in data:
-        data['metadata'] = {}
-
-    if hasattr(model, 'field_table'):
-        data_table = model.field_table
-        data['metadata']['table_id'] = data_table.id.upper()
-        if data_table.universe:
-            data['metadata']['universe'] = data_table.universe
-        if data_table.year:
-            data['metadata']['year'] = data_table.year
-
-
 def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, order_by=None):
     """ Get rows of statistics from the stats mode +db_model+ at a particular
     geo_code and geo_level, summing over the 'total' field and grouping by
     +fields+.
     """
-    if db_model.field_table.table_per_level:
+    if db_model.data_table.table_per_level:
         geo_attr = '%s_code' % geo_level
     else:
         geo_attr = 'geo_code'
@@ -216,7 +203,7 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
         .group_by(*fields)\
         .filter(getattr(db_model, geo_attr) == geo_code)
 
-    if not db_model.field_table.table_per_level:
+    if not db_model.data_table.table_per_level:
         objects = objects.filter(db_model.geo_level == geo_level)
 
     if order_by is not None:

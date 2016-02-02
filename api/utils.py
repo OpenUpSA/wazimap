@@ -127,3 +127,19 @@ def percent(num, denom, places=2):
         return 0
     else:
         return round(num / denom * 100, places)
+
+
+def add_metadata(data, table):
+    if 'metadata' not in data:
+        data['metadata'] = {}
+
+    # this might be a SQLAlchemy model that is linked back to
+    # a data table
+    if hasattr(table, 'data_table'):
+        table = table.data_table
+
+    data['metadata']['table_id'] = table.id.upper()
+    if table.universe:
+        data['metadata']['universe'] = table.universe
+    if table.year:
+        data['metadata']['year'] = table.year
