@@ -159,7 +159,8 @@ class SimpleTable(object):
         :param bool percent: should we calculate percentages, or just include raw values?
         :param int total: the total value to use for percentages, name of a
                           field, or None to use the sum of all retrieved fields (default)
-        :param dict recode: map from field names to strings to recode column names.
+        :param dict recode: map from field names to strings to recode column names. Many fields
+                            can be recoded to the same thing, their values will be summed.
 
         :return: (data-dictionary, total)
         """
@@ -206,14 +207,23 @@ class SimpleTable(object):
             results = OrderedDict()
             key_order = key_order or fields
             for field in key_order:
-                results[field] = {'name': recode.get(field, self.columns[field]['name'])}
                 val = getattr(row, field) or 0
 
+                # recode the key, default is to keep it the same
+                key = recode.get(field, field)
+
+                # key may already exist if another column recoded to it
+                results.setdefault(key, {'name': recode.get(field, self.columns[field]['name'])})
+
                 if percent:
-                    results[field]['values'] = {'this': p(val, total)}
-                    results[field]['numerators'] = {'this': val}
+                    # sum up existing values, if any
+                    val = val + results.get('numerators', {}).get('this', 0)
+                    results[key]['values'] = {'this': p(val, total)}
+                    results[key]['numerators'] = {'this': val}
                 else:
-                    results[field]['values'] = {'this': val}
+                    # sum up existing values, if any
+                    val = val + results.get('values', {}).get('this', 0)
+                    results[key]['values'] = {'this': val}
 
             add_metadata(results, self)
             return results, total
