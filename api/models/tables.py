@@ -49,6 +49,12 @@ def get_datatable(id):
     return DATA_TABLES[id.lower()]
 
 
+class ZeroRow(object):
+    # object that acts as a SQLAlchemy row of zeros
+    def __getattribute__(self, attr):
+        return 0
+
+
 class SimpleTable(object):
     """ A Simple data table follows a normal spreadsheet format. Each row
     has one or more numeric values, one for each column. Each geography
@@ -187,12 +193,8 @@ class SimpleTable(object):
                         self.model.c.geo_code == geo_code)\
                 .first()
 
-            # TODO: HACK
             if row is None:
-                def zero(self, attr):
-                    return 0
-                row = object()
-                row.__getattr__ = zero
+                row = ZeroRow()
 
             # what's our denominator?
             if total is None:
