@@ -155,7 +155,9 @@ class SimpleTable(object):
         :param str geo_code: the geographical code
         :param str or list fields: the columns to fetch stats for. By default, all columns except
                                    geo-related and the total column (if any) are used.
-        :param str key_order: explicit ordering of (recoded) keys, or None for the default order
+        :param str key_order: explicit ordering of (recoded) keys, or None for the default order.
+                              Default order is the order in +fields+ if given, otherwise
+                              it's the natural column order from the DB.
         :param bool percent: should we calculate percentages, or just include raw values?
         :param int total: the total value to use for percentages, name of a
                           field, or None to use the sum of all retrieved fields (default)
@@ -210,15 +212,21 @@ class SimpleTable(object):
             elif isinstance(total, basestring):
                 total = getattr(row, total)
 
+            # Now build a data dictionary based on the columns in +row+.
+            # Multiple columns may be recoded into one, so we have to
+            # accumulate values as we go.
             results = OrderedDict()
-            key_order = key_order or fields
+
+            key_order = key_order or fields  # default key order is just the list of fields
+
             for field in key_order:
                 val = getattr(row, field) or 0
 
-                # recode the key, default is to keep it the same
+                # recode the key for this field, default is to keep it the same
                 key = recode.get(field, field)
 
-                # key may already exist if another column recoded to it
+                # set the recoded field name, noting that the key may already
+                # exist if another column recoded to it
                 results.setdefault(key, {'name': recode.get(field, self.columns[field]['name'])})
 
                 if percent:
