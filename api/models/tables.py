@@ -172,7 +172,8 @@ class SimpleTable(object):
             if fields:
                 for f in fields:
                     if f not in self.columns:
-                        raise ValueError('Invalid field/column for %s: %s' % (self.id, f))
+                        raise ValueError("Invalid field/column '%s' for table '%s'. Valid columns are: %s" % (
+                            f, self.id, ', '.join(self.columns.keys())))
             else:
                 fields = self.columns.keys()
 
@@ -181,6 +182,11 @@ class SimpleTable(object):
                 # change lambda to dicts
                 if not isinstance(recode, dict):
                     recode = {f: recode(f) for f in fields}
+
+            # is the total column valid?
+            if isinstance(total, basestring) and total not in self.columns:
+                raise ValueError("Total column '%s' isn't one of the columns for table '%s'. Valid columns are: %s" % (
+                    total, self.id, ', '.join(self.columns.keys())))
 
             # table columns to fetch
             cols = [self.model.columns[c] for c in fields]
