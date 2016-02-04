@@ -227,17 +227,17 @@ class SimpleTable(object):
 
                 # set the recoded field name, noting that the key may already
                 # exist if another column recoded to it
-                results.setdefault(key, {'name': recode.get(field, self.columns[field]['name'])})
+                field_info = results.setdefault(key, {'name': recode.get(field, self.columns[field]['name'])})
 
                 if percent:
                     # sum up existing values, if any
-                    val = val + results.get('numerators', {}).get('this', 0)
-                    results[key]['values'] = {'this': p(val, total)}
-                    results[key]['numerators'] = {'this': val}
+                    val = val + field_info.get('numerators', {}).get('this', 0)
+                    field_info['values'] = {'this': p(val, total)}
+                    field_info['numerators'] = {'this': val}
                 else:
                     # sum up existing values, if any
-                    val = val + results.get('values', {}).get('this', 0)
-                    results[key]['values'] = {'this': val}
+                    val = val + field_info.get('values', {}).get('this', 0)
+                    field_info['values'] = {'this': val}
 
             add_metadata(results, self)
             return results, total
