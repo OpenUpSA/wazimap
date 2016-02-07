@@ -149,5 +149,7 @@ WAZIMAP = {
     # Twitter handle
     'twitter': '@Wazimap',
     # Google Analytics tracking id (ua-xxxxx-x)
-    'ga_tracking_id':
+    'ga_tracking_id': '',
+    # How many seconds should cacheable Wazimap pages be cached for?
+    'cache_secs': 60 * 60,
 }
