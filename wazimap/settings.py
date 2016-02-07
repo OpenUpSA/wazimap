@@ -31,8 +31,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
-    'census',
     'pipeline',
+    'census',
+    'wazimap',
 )
 
 ALLOWED_HOSTS = ['*']
@@ -51,6 +52,8 @@ if DEBUG:
 else:
     SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
+
+# Static files
 MEDIA_ROOT = ''
 MEDIA_URL = ''
 
@@ -63,6 +66,8 @@ STATICFILES_FINDERS = (
 )
 STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineCachedStorage'
 
+
+# Templates
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
@@ -74,7 +79,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.auth.context_processors.auth',
     'census.context_processors.api_url',
+    'wazimap.context_processors.wazimap_settings',
 )
+
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -85,6 +92,8 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+
+# Databases and caches
 if DEBUG:
     CACHES = {
         'default': {
@@ -98,6 +107,7 @@ else:
             'LOCATION': '/var/tmp/wazimap_cache',
         }
     }
+
 
 LOGGING = {
     'version': 1,
@@ -129,4 +139,15 @@ LOGGING = {
             'level': 'DEBUG' if DEBUG else 'INFO',
         },
     }
+}
+
+
+# Wazimap-specific settings
+WAZIMAP = {
+    # The full name of the website
+    'name': 'Wazimap',
+    # Twitter handle
+    'twitter': '@Wazimap',
+    # Google Analytics tracking id (ua-xxxxx-x)
+    'ga_tracking_id':
 }
