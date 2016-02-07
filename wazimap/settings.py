@@ -1,20 +1,26 @@
-# Django settings for censusreporter project.
+# Django settings for Wazimap
 import os
 
 dirname = os.path.dirname
-PROJECT_ROOT = os.path.abspath(os.path.join(dirname(__file__),"..",".."))
+# TODO: XXX?
+PROJECT_ROOT = os.path.abspath(os.path.join(dirname(__file__), "..", ".."))
 
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'true') == 'true'
 TEMPLATE_DEBUG = DEBUG
-# should be set by each settings file
-# ROOT_URLCONF = 'config.dev.urls'
 
+ROOT_URLCONF = 'wazimap.urls'
+WSGI_APPLICATION = 'wazimap.wsgi.application'
+
+ADMINS = (('Greg Kempe', 'greg@code4sa.org'),)
+MANAGERS = ADMINS
+
+# TODO: XXX: sqlalchemy url?
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '%s/census_app_db' % PROJECT_ROOT,
-        },
-    }
+    },
+}
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -29,7 +35,7 @@ INSTALLED_APPS = (
     'pipeline',
 )
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 TIME_ZONE = 'Africa/Johannesburg'
 LANGUAGE_CODE = 'en-za'
 SITE_ID = 1
@@ -38,7 +44,12 @@ USE_L10N = True
 USE_THOUSAND_SEPARATOR = True
 FORMAT_MODULE_PATH = 'formats'
 USE_TZ = True
-SECRET_KEY = '!%j-u4&(q8qu4@dq=ukth27+q!v-!h^jck14bf=spqht847$4q'
+
+# SECURITY WARNING: keep the secret key used in production secret!
+if DEBUG:
+    SECRET_KEY = '!%j-u4&(q8qu4@dq=ukth27+q!v-!h^jck14bf=spqht847$4q'
+else:
+    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 MEDIA_ROOT = ''
 MEDIA_URL = ''
@@ -74,14 +85,20 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-# Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'censusreporter.wsgi.application'
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '/var/tmp/wazimap_cache',
+        }
+    }
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -102,18 +119,14 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'ERROR',
         },
-        'censusreporter': {
-            'level': 'INFO',
+        'census': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
         },
         'django': {
-            'level': 'INFO',
+            'level': 'DEBUG' if DEBUG else 'INFO',
+        },
+        'wazimap': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
         },
     }
 }
-
-ADMINS = (
-    ('Greg Kempe', 'greg@code4sa.org'),
-)
-MANAGERS = ADMINS
-
-API_URL = 'http://api.censusreporter.org'

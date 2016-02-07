@@ -1,5 +1,5 @@
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.prod.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "wazimap.settings")
 
 import newrelic.agent
 newrelic.agent.initialize(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../conf/newrelic.ini'))
