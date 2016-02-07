@@ -1,22 +1,21 @@
 import requests
 from itertools import chain
 
-import logging
-logger = logging.getLogger('censusreporter')
-
 from django.utils.safestring import SafeString
 from django.utils import simplejson
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.views.generic import View, TemplateView
 
-from .views import GeographyDetailView as BaseGeographyDetailView, LocateView as BaseLocateView, render_json_to_response
-from .utils import LazyEncoder
-from .profile import enhance_api_data
+from census.views import GeographyDetailView as BaseGeographyDetailView, LocateView as BaseLocateView, render_json_to_response
+from census.utils import LazyEncoder
+from census.profile import enhance_api_data
 
-from api.models.tables import get_datatable, DATA_TABLES
-from api.controller import get_census_profile, get_geography, get_locations, get_locations_from_coords, get_elections_profile
-from api.utils import LocationNotFound
-from api.download import generate_download_bundle, supported_formats
+# TODO: XXX
+# TODO: move all this into wazimap.data.{utils, geo, tables, etc.}
+from wazimap.data.models.tables import get_datatable, DATA_TABLES
+from wazimap.data.controller import get_census_profile, get_geography, get_locations, get_locations_from_coords, get_elections_profile
+from wazimap.data.utils import LocationNotFound
+from wazimap.data.download import generate_download_bundle, supported_formats
 
 
 def render_json_error(message, status_code=400):
