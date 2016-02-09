@@ -1,2 +1,0 @@
-include LICENSE README.md VERSION
-recursive-include census wazimap
