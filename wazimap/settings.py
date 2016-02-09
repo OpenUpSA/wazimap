@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'pipeline',
-    'wazimap',
+    'wazimap.apps.WazimapConfig',
     'census',
 ]
 
