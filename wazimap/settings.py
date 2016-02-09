@@ -15,6 +15,7 @@ ADMINS = (('Greg Kempe', 'greg@code4sa.org'),)
 MANAGERS = ADMINS
 
 # TODO: XXX: sqlalchemy url?
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://wazimap:wazimap@localhost/wazimap')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -22,7 +23,7 @@ DATABASES = {
     },
 }
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -32,9 +33,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'pipeline',
-    'census',
     'wazimap',
-)
+    'census',
+]
 
 ALLOWED_HOSTS = ['*']
 TIME_ZONE = 'Africa/Johannesburg'
@@ -156,3 +157,6 @@ WAZIMAP = {
     # How many seconds should cacheable Wazimap pages be cached for?
     'cache_secs': 60 * 60,
 }
+
+# XXX TODO remove this
+WARD_SEARCH_ENDPOINT = 'http://wards.code4sa.org/'

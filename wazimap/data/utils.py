@@ -5,11 +5,10 @@ import requests
 
 from sqlalchemy import create_engine, MetaData, Table, func
 from sqlalchemy.orm import sessionmaker, class_mapper
+from django.conf import settings
 
-from .config import DATABASE_URL, WARD_SEARCH_ENDPOINT
 
-
-_engine = create_engine(DATABASE_URL)
+_engine = create_engine(settings.DATABASE_URL)
 _metadata = MetaData()
 _Session = sessionmaker(bind=_engine)
 
@@ -107,7 +106,7 @@ class WardSearchAPI(object):
                 pass
 
 
-ward_search_api = WardSearchAPI(WARD_SEARCH_ENDPOINT)
+ward_search_api = WardSearchAPI(settings.WARD_SEARCH_ENDPOINT)
 
 
 def capitalize(s):

@@ -1,6 +1,7 @@
 import requests
 from itertools import chain
 
+from django.conf import settings
 from django.utils.safestring import SafeString
 from django.utils import simplejson
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
@@ -10,12 +11,13 @@ from census.views import GeographyDetailView as BaseGeographyDetailView, LocateV
 from census.utils import LazyEncoder
 from census.profile import enhance_api_data
 
+from wazimap.geo import get_geography, get_locations, get_locations_from_coords
 # TODO: XXX
 # TODO: move all this into wazimap.data.{utils, geo, tables, etc.}
 from wazimap.data.models.tables import get_datatable, DATA_TABLES
-from wazimap.data.controller import get_census_profile, get_geography, get_locations, get_locations_from_coords, get_elections_profile
 from wazimap.data.utils import LocationNotFound
 from wazimap.data.download import generate_download_bundle, supported_formats
+from wazimap.utils import import_string
 
 
 def render_json_error(message, status_code=400):
@@ -45,8 +47,15 @@ class GeographyDetailView(BaseGeographyDetailView):
         except (ValueError, LocationNotFound):
             raise Http404
 
-        profile_data = get_census_profile(geo_code, geo_level)
-        profile_data['elections'] = get_elections_profile(geo_code, geo_level)
+        # load the profile
+        profile_method = settings.WAZIMAP.get('profile_builder', None)
+        profile_name = settings.WAZIMAP.get('default_profile', 'default')
+
+        if not profile_method:
+            raise ValueError("You must define WAZIMAP.profile_builder in settings.py")
+        profile_method = import_string(profile_method)
+        profile_data = profile_method(geo_code, geo_level, profile_name)
+
         profile_data['geography'] = geo.as_dict_deep()
 
         profile_data = enhance_api_data(profile_data)
