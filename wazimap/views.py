@@ -4,6 +4,7 @@ import json
 
 from django.conf import settings
 from django.utils.safestring import SafeString
+from django.utils.module_loading import import_string
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.views.generic import View, TemplateView
 
@@ -17,7 +18,6 @@ from wazimap.geo import get_geography, get_locations, get_locations_from_coords
 from wazimap.data.models.tables import get_datatable, DATA_TABLES
 from wazimap.data.utils import LocationNotFound
 from wazimap.data.download import generate_download_bundle, supported_formats
-from wazimap.utils import import_string
 
 
 def render_json_error(message, status_code=400):

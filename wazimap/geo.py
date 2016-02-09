@@ -1,11 +1,11 @@
 from django.conf import settings
+from django.utils.module_loading import import_string
 
 from sqlalchemy.sql.expression import or_
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
-from wazimap.utils import import_string
 from wazimap.data.utils import get_session, ward_search_api, LocationNotFound
 
 

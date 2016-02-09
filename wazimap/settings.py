@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
-    'pipeline',
     'wazimap.apps.WazimapConfig',
     'census',
 ]
@@ -68,7 +67,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
-STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineCachedStorage'
+#STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineCachedStorage'
 
 
 # Templates
