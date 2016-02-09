@@ -64,7 +64,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'Django==1.5.4',
+        'Django==1.9.2',
         'Fabric==1.8.3',
         'GDAL==1.11.0',
         'SQLAlchemy==0.9.4',

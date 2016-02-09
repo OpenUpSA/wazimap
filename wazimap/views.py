@@ -1,9 +1,9 @@
 import requests
 from itertools import chain
+import json
 
 from django.conf import settings
 from django.utils.safestring import SafeString
-from django.utils import simplejson
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.views.generic import View, TemplateView
 
@@ -24,7 +24,7 @@ def render_json_error(message, status_code=400):
     '''
     Utility method for rendering a view's data to JSON response.
     '''
-    result = simplejson.dumps({'error': message}, indent=4)
+    result = json.dumps({'error': message}, indent=4)
     response = HttpResponse(result, mimetype='application/javascript')
     response.status_code = status_code
     return response
@@ -61,7 +61,7 @@ class GeographyDetailView(BaseGeographyDetailView):
         profile_data = enhance_api_data(profile_data)
         page_context.update(profile_data)
 
-        profile_data_json = SafeString(simplejson.dumps(profile_data, cls=LazyEncoder))
+        profile_data_json = SafeString(json.dumps(profile_data, cls=LazyEncoder))
 
         page_context.update({
             'profile_data_json': profile_data_json
