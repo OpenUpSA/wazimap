@@ -15,7 +15,7 @@ from wazimap.views import (GeographyDetailView, GeographyJsonView, WardSearchPro
 admin.autodiscover()
 handler500 = 'census.views.server_error'
 
-STANDARD_CACHE_TIME = settings.WAZIMAP['standard_cache_secs']
+STANDARD_CACHE_TIME = settings.WAZIMAP['cache_secs']
 
 
 urlpatterns = patterns('',
@@ -223,6 +223,4 @@ urlpatterns = patterns('',
 # TODO: is this needed when using modern django and whitenoise?
 if settings.DEBUG:
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-    from django.conf.urls.static import static
     urlpatterns += staticfiles_urlpatterns()
-    urlpatterns += static(settings.EMBED_DATA_URL, document_root=settings.EMBED_DATA_ROOT)

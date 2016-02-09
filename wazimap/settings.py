@@ -53,6 +53,9 @@ else:
     SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 
+API_URL = None
+
+
 # Static files
 MEDIA_ROOT = ''
 MEDIA_URL = ''

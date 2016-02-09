@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION
 
-from api.utils import get_session
+from wazimap.data.utils import get_session
 
 
 class Base(object):

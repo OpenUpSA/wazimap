@@ -1,13 +1,6 @@
-from collections import OrderedDict
+from ...geo import get_summary_geo_info
 
-from sqlalchemy import func
-
-from api.models import get_model_from_fields
-from api.utils import get_session, LocationNotFound
-
-from .utils import (collapse_categories, calculate_median, calculate_median_stat, get_summary_geo_info,
-                    merge_dicts, group_remainder, add_metadata, get_stat_data, get_objects_by_geo, percent,
-                    create_debug_dump)
+from ..utils import get_session, merge_dicts, get_stat_data
 
 
 def get_crime_profile(geo_code, geo_level):

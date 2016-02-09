@@ -1,9 +1,8 @@
 from collections import OrderedDict
 
-from api.utils import get_session
-from api.models.tables import get_datatable
-
-from .utils import get_summary_geo_info, get_stat_data, merge_dicts, group_remainder
+from ...geo import get_summary_geo_info
+from ..utils import get_session, get_stat_data, merge_dicts, group_remainder
+from ..models.tables import get_datatable
 
 
 ELECTIONS = [
@@ -92,10 +91,14 @@ def get_election_data(geo_code, geo_level, election, session):
 
     # voter registration and turnout
     table = get_datatable('voter_turnout_%s' % election['table_code'])
-    results.update(table.get_stat_data(geo_level, geo_code, 'registered_voters', percent=False,
-                                       recode={'registered_voters': 'Number of registered voters'}))
-    results.update(table.get_stat_data(geo_level, geo_code, 'total_votes', percent=True,
-                                       recode={'total_votes': 'Of registered voters cast their vote'}))
+    data, _ = table.get_stat_data(geo_level, geo_code, 'registered_voters', percent=False,
+                                  recode={'registered_voters': 'Number of registered voters'})
+    results['registered_voters'] = data['Number of registered voters']
+
+    data, _ = table.get_stat_data(geo_level, geo_code, 'total_votes', percent=True,
+                                  total='registered_voters',
+                                  recode={'total_votes': 'Of registered voters cast their vote'})
+    results['total_votes'] = data['Of registered voters cast their vote']
 
     return results
 

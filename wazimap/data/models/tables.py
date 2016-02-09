@@ -5,7 +5,7 @@ from collections import OrderedDict
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, func
 
 from .base import Base, geo_levels
-from api.utils import get_session, get_table_model, capitalize, percent as p, add_metadata
+from wazimap.data.utils import get_session, get_table_model, capitalize, percent as p, add_metadata
 
 
 '''

@@ -2,8 +2,8 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import or_
 from sqlalchemy import func
 
-from api.models import Ward, District, Municipality, Province, Subplace, Country, geo_levels, get_geo_model
-from api.utils import get_session, ward_search_api, LocationNotFound
+from ..models import Ward, District, Municipality, Province, Subplace, Country, geo_levels, get_geo_model
+from ..utils import get_session, ward_search_api, LocationNotFound
 
 
 def get_geography(geo_code, geo_level):
