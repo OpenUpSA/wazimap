@@ -9,10 +9,9 @@ class GeoMixin(object):
 
     def as_dict(self):
         return {
-            'geoid': self.geoid,
+            'full_geoid': self.geoid,
             'full_name': self.long_name,
-            'short_name': self.short_name,
-            'name': self.context_name,
+            'short_name': self.name,
             'geo_level': self.geo_level,
             'geo_code': self.geo_code,
             'child_level': self.child_level,
@@ -55,19 +54,11 @@ class GeoMixin(object):
             return splits
 
     @property
-    def short_name(self):
-        return getattr(self, 'name', '')
-
-    @property
-    def context_name(self):
-        return self.short_name
-
-    @property
     def long_name(self):
         if hasattr(self, 'full_name'):
             return self.full_name
 
-        names = [self.short_name]
+        names = [self.name]
         names += [p.name for p in self.parents()]
         return ', '.join(names)
 
