@@ -69,6 +69,7 @@ setup(
         'GDAL==1.11.0',
         'SQLAlchemy==0.9.4',
         'boto==2.27.0',
+        'dj-database-url==0.4.0',
         'django-pipeline>=1.6.4',
         'ecdsa==0.11',
         'futures>=3.0.4',

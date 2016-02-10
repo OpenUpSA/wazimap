@@ -12,7 +12,7 @@ from census.views import GeographyDetailView as BaseGeographyDetailView, LocateV
 from census.utils import LazyEncoder
 from census.profile import enhance_api_data
 
-from wazimap.geo import get_geography, get_locations, get_locations_from_coords
+from wazimap.geo import geo_data
 # TODO: XXX
 # TODO: move all this into wazimap.data.{utils, geo, tables, etc.}
 from wazimap.data.models.tables import get_datatable, DATA_TABLES
@@ -43,7 +43,7 @@ class GeographyDetailView(BaseGeographyDetailView):
         try:
             geo_level, geo_code = geography_id.split('-', 1)
 
-            geo = get_geography(geo_code, geo_level)
+            geo = geo_data.get_geography(geo_code, geo_level)
         except (ValueError, LocationNotFound):
             raise Http404
 
@@ -90,7 +90,7 @@ class PlaceSearchJson(View):
             search_term = request.GET['q']
             geo_levels = request.GET.get('geolevels', None)
             return render_json_to_response(
-                {'results': get_locations(search_term, geo_levels)}
+                {'results': geo_data.get_locations(search_term, geo_levels)}
             )
 
         return HttpResponseBadRequest('"q" parameter is required')
@@ -126,7 +126,7 @@ class LocateView(BaseLocateView):
         lon = self.request.GET.get('lon', None)
 
         if lat and lon:
-            places = get_locations_from_coords(latitude=lat, longitude=lon)
+            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon)
             page_context.update({
                 'location': {
                     'lat': lat,
@@ -218,7 +218,7 @@ class DataAPIView(View):
             if '|' in level:
                 # break geo down further
                 split_level, level = level.split('|', 1)
-                geo = get_geography(code, level)
+                geo = geo_data.get_geography(code, level)
                 info_geos.append(geo)
                 try:
                     data_geos.extend(geo.split_into(split_level))
@@ -227,7 +227,7 @@ class DataAPIView(View):
 
             else:
                 # normal geo
-                data_geos.append(get_geography(code, level))
+                data_geos.append(geo_data.get_geography(code, level))
 
         return data_geos, info_geos
 
@@ -265,10 +265,10 @@ class GeographyCompareView(TemplateView):
 
         try:
             level, code = geo_id1.split('-', 1)
-            page_context['geo1'] = get_geography(code, level)
+            page_context['geo1'] = geo_data.get_geography(code, level)
 
             level, code = geo_id2.split('-', 1)
-            page_context['geo2'] = get_geography(code, level)
+            page_context['geo2'] = geo_data.get_geography(code, level)
         except (ValueError, LocationNotFound):
             raise Http404
 

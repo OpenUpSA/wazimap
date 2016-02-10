@@ -1,5 +1,6 @@
 # Django settings for Wazimap
 import os
+import dj_database_url
 
 dirname = os.path.dirname
 # TODO: XXX?
@@ -14,14 +15,16 @@ WSGI_APPLICATION = 'wazimap.wsgi.application'
 ADMINS = (('Greg Kempe', 'greg@code4sa.org'),)
 MANAGERS = ADMINS
 
-# TODO: XXX: sqlalchemy url?
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://wazimap:wazimap@localhost/wazimap')
 DATABASES = {
-    'default': {
+    'default': dj_database_url.parse(DATABASE_URL),
+    # this is the old censusreporter database and can be removed at some point
+    'census': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '%s/census_app_db' % PROJECT_ROOT,
     },
 }
+DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 INSTALLED_APPS = [
     'django.contrib.auth',
