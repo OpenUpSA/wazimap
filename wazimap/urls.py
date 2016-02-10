@@ -35,7 +35,7 @@ urlpatterns = patterns('',
 
     # e.g. /profiles/province-GT/
     url(
-        regex   = '^profiles/(?P<geography_id>\w+-\w+)/$',
+        regex   = '^profiles/(?P<geography_id>\w+-\w+)(-(?P<slug>[\w-]+))?/$',
         view    = cache_page(STANDARD_CACHE_TIME)(GeographyDetailView.as_view()),
         kwargs  = {},
         name    = 'geography_detail',
@@ -43,7 +43,7 @@ urlpatterns = patterns('',
 
     # e.g. /profiles/province-GT.json
     url(
-        regex   = '^(embed_data/)?profiles/(?P<geography_id>\w+-\w+)\.json$',
+        regex   = '^(embed_data/)?profiles/(?P<geography_id>\w+-\w+)(-(?P<slug>[\w-]+))\.json$',
         view    = cache_page(STANDARD_CACHE_TIME)(GeographyJsonView.as_view()),
         kwargs  = {},
         name    = 'geography_json',

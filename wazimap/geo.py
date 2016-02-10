@@ -45,9 +45,8 @@ class GeoData(object):
         if year is not None:
             query = query.filter(year=year)
 
-        objects = query.limit(10).all()
         # TODO: order by level?
-        objects = sorted(objects, key=lambda o: [o.geo_level, o.name, o.geo_code])
+        objects = sorted(query[:10], key=lambda o: [o.geo_level, o.name, o.geo_code])
 
         return [o.as_dict() for o in objects]
 
@@ -74,4 +73,4 @@ class GeoData(object):
             return tuple()
 
 
-geo_data = import_string(settings.WAZIMAP.get('geodata', 'wazimap.geo.GeoData'))
+geo_data = import_string(settings.WAZIMAP.get('geodata', 'wazimap.geo.GeoData'))()

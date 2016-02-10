@@ -7,6 +7,7 @@ from django.utils.safestring import SafeString
 from django.utils.module_loading import import_string
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.views.generic import View, TemplateView
+from django.shortcuts import redirect
 
 from census.views import GeographyDetailView as BaseGeographyDetailView, LocateView as BaseLocateView, render_json_to_response
 from census.utils import LazyEncoder
@@ -33,19 +34,25 @@ def render_json_error(message, status_code=400):
 class GeographyDetailView(BaseGeographyDetailView):
     def dispatch(self, *args, **kwargs):
         self.geo_id = self.kwargs.get('geography_id', None)
+
+        try:
+            self.geo_level, self.geo_code = self.geo_id.split('-', 1)
+            self.geo = geo_data.get_geography(self.geo_code, self.geo_level)
+        except (ValueError, LocationNotFound):
+            raise Http404
+
+        # check slug
+        if kwargs.get('slug') or self.geo.slug:
+            if kwargs['slug'] != self.geo.slug:
+                kwargs['slug'] = self.geo.slug
+                url = '/profiles/%s-%s-%s' % (self.geo_level, self.geo_code, self.geo.slug)
+                return redirect(url, permanent=True)
+
         # Skip the parent class's logic completely and go back to basics
         return TemplateView.dispatch(self, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
-        geography_id = self.geo_id
         page_context = {}
-
-        try:
-            geo_level, geo_code = geography_id.split('-', 1)
-
-            geo = geo_data.get_geography(geo_code, geo_level)
-        except (ValueError, LocationNotFound):
-            raise Http404
 
         # load the profile
         profile_method = settings.WAZIMAP.get('profile_builder', None)
@@ -54,9 +61,9 @@ class GeographyDetailView(BaseGeographyDetailView):
         if not profile_method:
             raise ValueError("You must define WAZIMAP.profile_builder in settings.py")
         profile_method = import_string(profile_method)
-        profile_data = profile_method(geo_code, geo_level, profile_name)
+        profile_data = profile_method(self.geo_code, self.geo_level, profile_name)
 
-        profile_data['geography'] = geo.as_dict_deep()
+        profile_data['geography'] = self.geo.as_dict_deep()
 
         profile_data = enhance_api_data(profile_data)
         page_context.update(profile_data)

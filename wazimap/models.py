@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 
 
 # Geographies
@@ -96,6 +97,10 @@ class GeoMixin(object):
     def parents(self):
         # XXX
         return []
+
+    @property
+    def slug(self):
+        return slugify(self.name)
 
     def __unicode__(self):
         return self.long_name
