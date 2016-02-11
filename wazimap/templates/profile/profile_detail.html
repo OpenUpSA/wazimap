@@ -119,6 +119,7 @@
 <script src="{% static 'js/vendor/leaflet.label.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
 <script src="{% static 'js/head2head.js' %}"></script>
+<script src="{% static 'js/maps.js' %}"></script>
 <script type="text/javascript">
 
 var drawMaps = function() {
@@ -152,59 +153,44 @@ var drawMaps = function() {
       maxZoom: 17
     }).addTo(map);
 
-    // load all county map shapes
-    d3.json('{% static 'geo/county.topojson' %}', function(error, topo) {
-        if (error) return console.warn(error);
+    // load all map shaps for this level
+    GeometryLoader.loadGeometryForLevel(geo_level, function(features) {
+        var this_geo = _.find(features.features, function(f) {
+            return f.properties.code == geo_code;
+        });
 
-        var features = topojson.feature(topo, topo.objects.county);
-
-        var county = null;
-        if (geo_level == 'county') {
-            for (var i = 0; i < features.features.length; i++) {
-                if (features.features[i].properties.code == geo_code) {
-                    county = features.features[i];
-                    break;
+        // draw the current geo
+        if (this_geo) {
+            var featureLayer = L.geoJson([this_geo], {
+                style: {
+                    "fillColor": "#66c2a5",
+                    "color": "#777",
+                    "weight": 2,
+                    "opacity": 0.3,
+                    "fillOpacity": 0.5,
+                    "clickable": false
                 }
-            }
+            });
+            map.addLayer(featureLayer);
+            var objBounds = featureLayer.getBounds();
 
-            // draw the current county
-            if (county) {
-                var featureLayer = L.geoJson([county], {
-                    style: {
-                        "fillColor": "#66c2a5",
-                        "color": "#777",
-                        "weight": 2,
-                        "opacity": 0.3,
-                        "fillOpacity": 0.5,
-                        "clickable": false
+            if (browserWidth > 768) {
+                var z;
+                for(z = 16; z > 2; z--) {
+                    var swPix = map.project(objBounds.getSouthWest(), z),
+                        nePix = map.project(objBounds.getNorthEast(), z),
+                        pixWidth = Math.abs(nePix.x - swPix.x),
+                        pixHeight = Math.abs(nePix.y - swPix.y);
+                    if (pixWidth <  500 && pixHeight < 400) {
+                        break;
                     }
-                });
-                map.addLayer(featureLayer);
-                var objBounds = featureLayer.getBounds();
-
-                if (browserWidth > 768) {
-                    var z;
-                    for(z = 16; z > 2; z--) {
-                        var swPix = map.project(objBounds.getSouthWest(), z),
-                            nePix = map.project(objBounds.getNorthEast(), z),
-                            pixWidth = Math.abs(nePix.x - swPix.x),
-                            pixHeight = Math.abs(nePix.y - swPix.y);
-                        if (pixWidth <  500 && pixHeight < 400) {
-                            break;
-                        }
-                    }
-
-                    map.setView(featureLayer.getBounds().getCenter(), z);
-                    map.panBy([-270, 0], {animate: false});
-                } else {
-                    map.fitBounds(featureLayer.getBounds());
                 }
-            }
-        }
 
-        // center map
-        if (!county) {
-            map.setView({lat: 0.220815, lng: 31.001832}, 6);
+                map.setView(featureLayer.getBounds().getCenter(), z);
+                map.panBy([-270, 0], {animate: false});
+            } else {
+                map.fitBounds(featureLayer.getBounds());
+            }
         }
 
         // draw all others
@@ -238,7 +224,7 @@ var drawMaps = function() {
                     });
                 });
                 layer.on('click', function() {
-                    window.location = '/profiles/county-' + feature.properties.code + '-' + slugify(feature.properties.name) + '/';
+                    window.location = '/profiles/' + geo_level + '-' + feature.properties.code + '/';
                 });
             },
         });

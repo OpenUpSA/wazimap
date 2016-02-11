@@ -47,6 +47,12 @@ function StaticGeometryLoader(geometry_urls) {
         });
     };
 
+    this.loadGeometryForLevel = function(level, success) {
+        self.loadLevels([level], function() {
+            success({features: _.values(self.geometry[level])});
+        });
+    };
+
     /**
      * Load the geometry data for +levels+ and then call +success+.
      */
