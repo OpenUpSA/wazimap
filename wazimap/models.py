@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import itertools
 
 from django.db import models
 from django.utils.text import slugify
@@ -6,9 +7,6 @@ from django.utils.text import slugify
 
 # Geographies
 class GeoMixin(object):
-
-    child_level = None
-
     def as_dict(self):
         return {
             'full_geoid': self.geoid,
@@ -29,28 +27,25 @@ class GeoMixin(object):
         }
 
     def children(self):
-        # TODO
-        if not self.child_level:
-            return []
-
-        return []
+        """ Get all objects that are direct children of this object.
+        """
+        return self.__class__.objects\
+            .filter(parent_level=self.geo_level,
+                    parent_code=self.geo_code)\
+            .all()
 
     def split_into(self, level):
-        # TODO
-        kids = self.children()
-        if level == self.child_level:
-            return kids
-        else:
-            splits = []
-            for k in kids:
-                splits.extend(k.split_into(level))
-            # when splitting into a lower level, ensure
-            # that we update the children's parent to be us,
-            # which allows the UI to handle that case
-            # correctly
-            for k in splits:
-                k.parent = self
-            return splits
+        """ Walk down the level hierarchy from here and return
+        all the objects that are of geo_level +level+ and descendents
+        of this geography.
+        """
+        candidates = self.children()
+        while candidates:
+            kids = set(c for c in candidates if c.geo_level == level)
+            if kids:
+                return list(kids)
+            candidates = list(itertools.chain(c.children() for c in candidates))
+        return []
 
     @property
     def long_name(self):
@@ -60,11 +55,6 @@ class GeoMixin(object):
         names = [self.name]
         names += [a.name for a in self.ancestors()]
         return ', '.join(names)
-
-    @property
-    def country(self):
-        # TODO
-        return None
 
     @property
     def geoid(self):
@@ -79,6 +69,14 @@ class GeoMixin(object):
     @property
     def slug(self):
         return slugify(self.name)
+
+    @property
+    def child_level(self):
+        # official child level
+        from wazimap.geo import geo_data
+        kids = geo_data.geo_levels[self.geo_level]['children']
+        print kids
+        return kids[0] if kids else None
 
     def __unicode__(self):
         return self.long_name

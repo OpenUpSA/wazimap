@@ -24,6 +24,7 @@ class GeoData(object):
             level.setdefault('name', code)
             level.setdefault('plural', code + 's')
             level.setdefault('children', [])
+            level['sumlev'] = code
 
             for kid in level['children']:
                 ancestors.setdefault(kid, []).append(code)
@@ -34,6 +35,10 @@ class GeoData(object):
 
     def geo_levels_as_json(self):
         return json.dumps(self.geo_levels)
+
+    def root_geography(self):
+        """ First geography with no parents. """
+        return self.geo_model.objects.filter(parent_level=None, parent_code=None).first()
 
     def get_geography(self, geo_code, geo_level):
         """
