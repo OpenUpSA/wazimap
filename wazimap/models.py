@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import itertools
 
 from django.db import models
 from django.utils.text import slugify
@@ -29,28 +30,25 @@ class GeoMixin(object):
         }
 
     def children(self):
-        # TODO
-        if not self.child_level:
-            return []
-
-        return []
+        """ Get all objects that are direct children of this object.
+        """
+        return self.__class__.objects\
+            .filter(parent_level=self.geo_level,
+                    parent_code=self.geo_code)\
+            .all()
 
     def split_into(self, level):
-        # TODO
-        kids = self.children()
-        if level == self.child_level:
-            return kids
-        else:
-            splits = []
-            for k in kids:
-                splits.extend(k.split_into(level))
-            # when splitting into a lower level, ensure
-            # that we update the children's parent to be us,
-            # which allows the UI to handle that case
-            # correctly
-            for k in splits:
-                k.parent = self
-            return splits
+        """ Walk down the level hierarchy from here and return
+        all the objects that are of geo_level +level+ and descendents
+        of this geography.
+        """
+        candidates = self.children()
+        while candidates:
+            kids = set(c for c in candidates if c.geo_level == level)
+            if kids:
+                return list(kids)
+            candidates = list(itertools.chain(c.children() for c in candidates))
+        return []
 
     @property
     def long_name(self):
