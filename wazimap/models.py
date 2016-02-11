@@ -7,9 +7,6 @@ from django.utils.text import slugify
 
 # Geographies
 class GeoMixin(object):
-
-    child_level = None
-
     def as_dict(self):
         return {
             'full_geoid': self.geoid,
@@ -72,6 +69,14 @@ class GeoMixin(object):
     @property
     def slug(self):
         return slugify(self.name)
+
+    @property
+    def child_level(self):
+        # official child level
+        from wazimap.geo import geo_data
+        kids = geo_data.geo_levels[self.geo_level]['children']
+        print kids
+        return kids[0] if kids else None
 
     def __unicode__(self):
         return self.long_name

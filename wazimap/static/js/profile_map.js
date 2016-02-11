@@ -70,54 +70,61 @@ var ProfileMaps = function() {
                 self.drawFocusFeature(this_geo);
             }
 
-            // draw the rest
+            // draw the others at this level
             self.drawFeatures(features);
         });
 
-        this.drawFocusFeature = function(feature) {
-            var layer = L.geoJson([feature], {
-                style: self.featureGeoStyle,
+        // load shapes at the child level, if any
+        if (child_level) {
+            GeometryLoader.loadGeometryForLevel(child_level, function(features) {
+                self.drawFeatures(features);
             });
-            this.map.addLayer(layer);
-            var objBounds = layer.getBounds();
+        }
+    };
 
-            if (browserWidth > 768) {
-                var z;
-                for(z = 16; z > 2; z--) {
-                    var swPix = this.map.project(objBounds.getSouthWest(), z),
-                        nePix = this.map.project(objBounds.getNorthEast(), z),
-                        pixWidth = Math.abs(nePix.x - swPix.x),
-                        pixHeight = Math.abs(nePix.y - swPix.y);
-                    if (pixWidth <  500 && pixHeight < 400) {
-                        break;
-                    }
+    this.drawFocusFeature = function(feature) {
+        var layer = L.geoJson([feature], {
+            style: self.featureGeoStyle,
+        });
+        this.map.addLayer(layer);
+        var objBounds = layer.getBounds();
+
+        if (browserWidth > 768) {
+            var z;
+            for(z = 16; z > 2; z--) {
+                var swPix = this.map.project(objBounds.getSouthWest(), z),
+                    nePix = this.map.project(objBounds.getNorthEast(), z),
+                    pixWidth = Math.abs(nePix.x - swPix.x),
+                    pixHeight = Math.abs(nePix.y - swPix.y);
+                if (pixWidth <  500 && pixHeight < 400) {
+                    break;
                 }
-
-                this.map.setView(layer.getBounds().getCenter(), z);
-                this.map.panBy([-270, 0], {animate: false});
-            } else {
-                this.map.fitBounds(layer.getBounds());
             }
-        };
 
-        this.drawFeatures = function(features) {
-            // draw all others
-            L.geoJson(features, {
-                style: this.layerStyle,
-                onEachFeature: function(feature, layer) {
-                    layer.bindLabel(feature.properties.name, {direction: 'auto'});
+            this.map.setView(layer.getBounds().getCenter(), z);
+            this.map.panBy([-270, 0], {animate: false});
+        } else {
+            this.map.fitBounds(layer.getBounds());
+        }
+    };
 
-                    layer.on('mouseover', function() {
-                        layer.setStyle(self.hoverStyle);
-                    });
-                    layer.on('mouseout', function() {
-                        layer.setStyle(self.layerStyle);
-                    });
-                    layer.on('click', function() {
-                        window.location = '/profiles/' + feature.properties.level + '-' + feature.properties.code + '/';
-                    });
-                },
-            }).addTo(this.map);
-        };
+    this.drawFeatures = function(features) {
+        // draw all others
+        L.geoJson(features, {
+            style: this.layerStyle,
+            onEachFeature: function(feature, layer) {
+                layer.bindLabel(feature.properties.name, {direction: 'auto'});
+
+                layer.on('mouseover', function() {
+                    layer.setStyle(self.hoverStyle);
+                });
+                layer.on('mouseout', function() {
+                    layer.setStyle(self.layerStyle);
+                });
+                layer.on('click', function() {
+                    window.location = '/profiles/' + feature.properties.level + '-' + feature.properties.code + '/';
+                });
+            },
+        }).addTo(this.map);
     };
 };
