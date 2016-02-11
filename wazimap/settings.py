@@ -152,18 +152,44 @@ LOGGING = {
 WAZIMAP = {
     # The full name of the website
     'name': 'Wazimap',
+
+    # The site's base URL, including scheme
+    'url': 'http://wazimap.example',
+
     # Twitter handle
     'twitter': '@Wazimap',
+
     # Google Analytics tracking id (ua-xxxxx-x)
     'ga_tracking_id': '',
+
     # How many seconds should cacheable Wazimap pages be cached for?
     'cache_secs': 60 * 60,
+
     # the dotted-path of the class to use for geo data helper routines
     'geodata': 'wazimap.geo.GeoData',
-    # geography levels, must be an ordered dict from level type to children
-    'levels': {},
+
+    # Geography levels. This must be a dict similar to the following:
+    #
+    # {
+    #   'country': {
+    #     'name': 'country',      # optional, defaults to the level code
+    #     'plural': 'countries',  # plural version of the name
+    #     'children': ['province'],
+    #   },
+    #   ...
+    # }
+    'levels': {
+        'country': {
+            'plural': 'countries',
+            'children': [],
+        }
+    },
+
     # ordered list of levels to compare a place to; should generally be 2-3 levels only.
     'comparative_levels': [],
+
+    # URL where embeds are hosted, default is the site URL
+    'embed_url': None,
 }
 
 # XXX TODO remove this

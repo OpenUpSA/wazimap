@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 from django.utils.module_loading import import_string
 from django.db.models import Q
@@ -14,8 +16,24 @@ class GeoData(object):
         self.setup_levels()
 
     def setup_levels(self):
-        self.geo_levels = settings.WAZIMAP['levels'].keys()
-        self.comparative_levels = ['this'] + settings.WAZIMAP['comparitive_levels']
+        self.comparative_levels = ['this'] + settings.WAZIMAP['comparative_levels']
+        self.geo_levels = settings.WAZIMAP['levels']
+
+        ancestors = {}
+        for code, level in self.geo_levels.iteritems():
+            level.setdefault('name', code)
+            level.setdefault('plural', code + 's')
+            level.setdefault('children', [])
+
+            for kid in level['children']:
+                ancestors.setdefault(kid, []).append(code)
+
+        # fold in the ancestors
+        for code, items in ancestors.iteritems():
+            self.geo_levels[code]['ancestors'] = items
+
+    def geo_levels_as_json(self):
+        return json.dumps(self.geo_levels)
 
     def get_geography(self, geo_code, geo_level):
         """
