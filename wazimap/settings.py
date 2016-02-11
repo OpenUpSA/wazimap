@@ -188,6 +188,11 @@ WAZIMAP = {
     # ordered list of levels to compare a place to; should generally be 2-3 levels only.
     'comparative_levels': [],
 
+    # map from geometry names to local static files with geometry data
+    'geometry_data': {
+        '': 'geo/all.geojson',
+    },
+
     # URL where embeds are hosted, default is the site URL
     'embed_url': None,
 }
