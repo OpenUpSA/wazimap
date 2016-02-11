@@ -158,6 +158,12 @@ WAZIMAP = {
     'ga_tracking_id': '',
     # How many seconds should cacheable Wazimap pages be cached for?
     'cache_secs': 60 * 60,
+    # the dotted-path of the class to use for geo data helper routines
+    'geodata': 'wazimap.geo.GeoData',
+    # geography levels, must be an ordered dict from level type to children
+    'levels': {},
+    # ordered list of levels to compare a place to; should generally be 2-3 levels only.
+    'comparative_levels': [],
 }
 
 # XXX TODO remove this

@@ -11,6 +11,11 @@ class GeoData(object):
     """
     def __init__(self):
         self.geo_model = Geography
+        self.setup_levels()
+
+    def setup_levels(self):
+        self.geo_levels = settings.WAZIMAP['levels'].keys()
+        self.comparative_levels = ['this'] + settings.WAZIMAP['comparitive_levels']
 
     def get_geography(self, geo_code, geo_level):
         """
@@ -51,26 +56,24 @@ class GeoData(object):
         return [o.as_dict() for o in objects]
 
     def get_locations_from_coords(self, longitude, latitude):
-        '''
+        """
         Finds the place containing this point. Returns
         County and Country model instances.
-        '''
+        """
         # TODO: XXX
         return []
 
-    def get_summary_geo_info(self, geo_code=None, geo_level=None, session=None,
-                             geo_object=None):
-        if geo_object is not None:
-            geo_level = geo_object.level
+    def get_summary_geo_info(self, geo_code=None, geo_level=None):
+        """ Get a list of (level, code) tuples of geographies that
+        this geography should be compared against.
 
-        if geo_level in set(['ward', 'municipality', 'district']):
-            if geo_object is None:
-                geo_object = self.get_geography(geo_code, geo_level)
-            return zip(('country', 'province'), ('ZA', geo_object.province_code))
-        elif geo_level == 'province':
-            return zip(('country', ), ('ZA', ))
-        else:
-            return tuple()
+        This is the intersection of +comparative_levels+ and the
+        ancestors of the geography.
+        """
+        geo = self.get_geography(geo_code, geo_level)
+        ancestors = {g.geo_level: g for g in geo.ancestors()}
+
+        return [(lev, ancestors[lev].geo_code) for lev in self.comparative_levels if lev in ancestors]
 
 
-geo_data = import_string(settings.WAZIMAP.get('geodata', 'wazimap.geo.GeoData'))()
+geo_data = import_string(settings.WAZIMAP['geodata'])()

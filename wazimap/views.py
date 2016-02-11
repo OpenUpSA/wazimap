@@ -11,9 +11,9 @@ from django.shortcuts import redirect
 
 from census.views import GeographyDetailView as BaseGeographyDetailView, LocateView as BaseLocateView, render_json_to_response
 from census.utils import LazyEncoder
-from census.profile import enhance_api_data
 
 from wazimap.geo import geo_data
+from wazimap.profiles import enhance_api_data
 # TODO: XXX
 # TODO: move all this into wazimap.data.{utils, geo, tables, etc.}
 from wazimap.data.models.tables import get_datatable, DATA_TABLES
