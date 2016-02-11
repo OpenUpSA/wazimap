@@ -24,6 +24,7 @@ class GeoData(object):
             level.setdefault('name', code)
             level.setdefault('plural', code + 's')
             level.setdefault('children', [])
+            level['sumlev'] = code
 
             for kid in level['children']:
                 ancestors.setdefault(kid, []).append(code)
