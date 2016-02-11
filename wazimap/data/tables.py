@@ -4,7 +4,8 @@ from collections import OrderedDict
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, func
 
-from .base import Base, geo_levels
+from wazimap.geo import geo_data
+from wazimap.data.base import Base
 from wazimap.data.utils import get_session, get_table_model, capitalize, percent as p, add_metadata
 
 
@@ -559,7 +560,7 @@ class FieldTable(SimpleTable):
         """ What is the name for the underlying database table for this table,
         for the given geo_level?
         """
-        if geo_level is not None and geo_level not in geo_levels:
+        if geo_level is not None and geo_level not in geo_data.geo_levels:
             raise ValueError('Invalid geo_level: %s' % geo_level)
 
         if self.table_per_level:

@@ -381,7 +381,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
 
     :return: (data-dictionary, total)
     """
-    from .models.tables import get_model_from_fields
+    from .tables import get_model_from_fields
 
     if not isinstance(fields, list):
         fields = [fields]

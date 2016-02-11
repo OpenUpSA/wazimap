@@ -14,9 +14,7 @@ from census.utils import LazyEncoder
 
 from wazimap.geo import geo_data
 from wazimap.profiles import enhance_api_data
-# TODO: XXX
-# TODO: move all this into wazimap.data.{utils, geo, tables, etc.}
-from wazimap.data.models.tables import get_datatable, DATA_TABLES
+from wazimap.data.tables import get_datatable, DATA_TABLES
 from wazimap.data.utils import LocationNotFound
 from wazimap.data.download import generate_download_bundle, supported_formats
 
