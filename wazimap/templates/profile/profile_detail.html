@@ -1,0 +1,378 @@
+{% extends 'profile/_base_profile.html' %}{% load humanize lookup staticfiles %}
+
+{% block head_title %}{{ geography.this.short_name }} - {{ block.super }}{% endblock %}
+
+{% block head_meta_description %}Population data from {{ geography.this.short_name}}, broken down by category.{% endblock %}
+
+{% block head_facebook_tags %}
+    <meta property="og:title" content="{{ WAZIMAP.name}} profile: {% firstof geography.this.full_name geography.this.short_name %}" />
+    <meta property="og:site_name" content="{{ WAZIMAP.name }}" />
+    <meta property="og:url" content="{{ WAZIMAP.url }}{{ request.path }}" />
+    <meta property="og:description" content="Population data from {{ geography.this.short_name}}, broken down by category." />
+    <meta property="og:type" content="article" />
+{% endblock %}
+
+{% block head_css_extra %}
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+<![endif]-->
+<link href='{{STATIC_URL}}css/vendor/leaflet.label.css' rel='stylesheet' />
+{% endblock %}
+{% block body_id %}profile{% endblock %}
+
+{% block header_content %}
+<div id="cover-map" class="clearfix">
+    <div id="slippy-map"></div>
+    <div id="cover-profile" class="wrapper">
+        <article class="clearfix column-half">
+            <header id="header-box" class="column-full">
+                <h1 class="title">{{ geography.this.short_name }}</h1>
+                <p class="caption">
+                  {{ geography.this.geo_level|capfirst }}
+                  {% if geography.parents %}
+                      in
+                      {% for level, g in geography.parents.items %}
+                        <a href="/profiles/{{ g.full_geoid }}-{{ g.short_name|slugify }}/">{{ g.short_name }}</a>{% if not forloop.last %},{%endif%}
+                      {% endfor %}
+                  {% endif %}
+                </p>
+            </header>
+            <div class="column-half">
+                <div class="stat">
+                    <span class="primary">
+                        <span class="value">{{ demographics.total_population.values.this|floatformat:"0" }}</span>
+                        <span class="name">Population</span>
+                    </span>
+                </div>
+            </div>
+            {% if geography.this.square_kms %}
+            <div class="column-half">
+                <div class="stat">
+                    <span class="secondary">
+                        <span class="value">{% if geography.this.square_kms < 1.0 %}{{ geography.this.square_kms|floatformat:"3" }}{% else %}{{ geography.this.square_kms|floatformat:"1" }}{% endif %}</span>
+                        <span class="name"> square kilometres</span>
+                    </span>
+                    {% if demographics.population_density.values.this %}
+                    <span class="secondary">
+                        <span class="value">{{ demographics.population_density.values.this|floatformat:"1" }}</span>
+                        <span class="name"> people per square kilometre</span>
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if geography.this.show_extra_links %}
+                {% include "profile/_blocks/_header_extra_links.html" %}
+            {% endif %}
+
+            {% block profile_header_tail %}{% endblock %}
+        </article>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% comment %}
+<section class="clearfix" id="query-topic-picker">
+    <h2>Find data for this place</h2>
+    <div class="typeahead-container">
+        <input name="topic_select" id="topic-select" type="text" placeholder="Search by table or column name..." autocomplete="off">
+    </div>
+</section>
+{% endcomment %}
+
+{% block profile_preamble %}
+<section class="clearfix" id="compare-place-picker">
+    <h2>Compare this place with another</h2>
+    <div class="typeahead-container">
+        <input name="place_select" id="compare-place-select" type="text" placeholder="Start typing a place name or address to compare with..." autocomplete="off">
+    </div>
+</section>
+
+<p class="explain">Interact with charts and statistics for additional information.</p>
+{% endblock %}
+
+
+{% block profile_detail %}
+<article id="example" class="clearfix">
+    <header class="section-contents">
+        <h1>Example</h1>
+    </header>
+    <div class="section-container">
+
+        <section class="clearfix stat-row">
+            <h2 class="header-for-columns"><a class="permalink" href="#here" id="here">Your stats go here <i class="fa fa-link"></i></a></h2>
+        </section>
+
+    </div>
+</article>
+{% endblock profile_detail %}
+
+{% endblock content %}
+
+
+{% block body_javascript_extra %}{{ block.super }}
+<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+<script src="{% static 'js/vendor/topojson.v1.min.js' %}"></script>
+<script src="{% static 'js/vendor/leaflet.label.js' %}"></script>
+<script src="{% static 'js/charts.js' %}"></script>
+<script src="{% static 'js/head2head.js' %}"></script>
+<script type="text/javascript">
+
+var drawMaps = function() {
+    var geo = profileData.geography;
+    var geo_level = geo.this.geo_level;
+    var geo_code = geo.this.geo_code;
+    var osm_area_id = geo.this.osm_area_id;
+
+    // draw a map
+    var allowMapDrag = (browserWidth > 480) ? true : false;
+    var map = L.map('slippy-map', {
+        scrollWheelZoom: false,
+        zoomControl: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        dragging: allowMapDrag,
+        touchZoom: allowMapDrag
+    });
+
+    if (allowMapDrag) {
+        map.addControl(new L.Control.Zoom({
+            position: 'topright'
+        }));
+    }
+
+    // add imagery
+    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+      subdomains: 'abc',
+      maxZoom: 17
+    }).addTo(map);
+
+    // load all county map shapes
+    d3.json('{% static 'geo/county.topojson' %}', function(error, topo) {
+        if (error) return console.warn(error);
+
+        var features = topojson.feature(topo, topo.objects.county);
+
+        var county = null;
+        if (geo_level == 'county') {
+            for (var i = 0; i < features.features.length; i++) {
+                if (features.features[i].properties.code == geo_code) {
+                    county = features.features[i];
+                    break;
+                }
+            }
+
+            // draw the current county
+            if (county) {
+                var featureLayer = L.geoJson([county], {
+                    style: {
+                        "fillColor": "#66c2a5",
+                        "color": "#777",
+                        "weight": 2,
+                        "opacity": 0.3,
+                        "fillOpacity": 0.5,
+                        "clickable": false
+                    }
+                });
+                map.addLayer(featureLayer);
+                var objBounds = featureLayer.getBounds();
+
+                if (browserWidth > 768) {
+                    var z;
+                    for(z = 16; z > 2; z--) {
+                        var swPix = map.project(objBounds.getSouthWest(), z),
+                            nePix = map.project(objBounds.getNorthEast(), z),
+                            pixWidth = Math.abs(nePix.x - swPix.x),
+                            pixHeight = Math.abs(nePix.y - swPix.y);
+                        if (pixWidth <  500 && pixHeight < 400) {
+                            break;
+                        }
+                    }
+
+                    map.setView(featureLayer.getBounds().getCenter(), z);
+                    map.panBy([-270, 0], {animate: false});
+                } else {
+                    map.fitBounds(featureLayer.getBounds());
+                }
+            }
+        }
+
+        // center map
+        if (!county) {
+            map.setView({lat: 0.220815, lng: 31.001832}, 6);
+        }
+
+        // draw all others
+        var featureLayer = L.geoJson(features, {
+            style: {
+                "clickable": true,
+                "color": "#00d",
+                "fillColor": "#ccc",
+                "weight": 1.0,
+                "opacity": 0.3,
+                "fillOpacity": 0.3,
+            },
+            filter: function(feature, layer) {
+                // don't include the current geo, we already have a shape for that
+                return feature.properties.code != geo_code;
+            },
+            onEachFeature: function(feature, layer) {
+                var name = feature.properties.name;
+                layer.bindLabel(name, {direction: 'auto'});
+
+                layer.on('mouseover', function() {
+                    layer.setStyle({
+                        "fillColor": "#66c2a5",
+                        "fillOpacity": 0.7,
+                    });
+                });
+                layer.on('mouseout', function() {
+                    layer.setStyle({
+                        "fillColor": "#ccc",
+                        "fillOpacity": 0.3,
+                    });
+                });
+                layer.on('click', function() {
+                    window.location = '/profiles/county-' + feature.properties.code + '-' + slugify(feature.properties.name) + '/';
+                });
+            },
+        });
+        map.addLayer(featureLayer);
+    });
+};
+
+// Create all the charts
+var Charts = {},
+    chartContainers = $('[id^=chart-]'),
+    defaultDataRelease = '{{ geography.census_release }}',
+    profileData = {{ profile_data_json }};
+
+var gracefulType = function(chartType) {
+    // convert certain chart types to more readable versions at narrow widths
+    if (browserWidth <= 640) {
+        if (chartType == 'column' || chartType == 'histogram') {
+            return 'bar'
+        } else if (chartType == 'grouped_column') {
+            return 'grouped_bar'
+        }
+    }
+    return chartType
+}
+
+var makeCharts = function() {
+    $.each(chartContainers, function(i, obj) {
+        $(obj).empty();
+        var chartID = $(this).prop('id'),
+            chartDataKey = chartID.replace('chart-','').replace('alt-',''),
+            chartDataID = chartDataKey.split('-'),
+            chartType = gracefulType(chartDataID[0]),
+            chartData = profileData[chartDataID[1]],
+            chartChartTitle = $(this).data('chart-title'),
+            chartChartShowYAxis = $(this).data('chart-show-y-axis'),
+            chartInitialSort = $(this).data('initial-sort'),
+            chartStatType = $(this).data('stat-type'),
+            chartQualifier = $(this).data('qualifier') || null,
+            geographyData = profileData['geography'];
+
+        // allow arbitrary nesting in API data structure
+        var drilldown = chartDataID.length - 1;
+        if (drilldown >= 2) {
+            for (var n = 2; n <= drilldown; n++) {
+                chartData = chartData[chartDataID[n]]
+            }
+        }
+
+        // determine whether data point is from anything other
+        // than the primary ACS release for this page
+        for (var key in chartData) if (chartData.hasOwnProperty(key)) break;
+        var thisRelease = chartData[key]['acs_release'],
+            noteRelease = (thisRelease != defaultDataRelease) ? thisRelease + ' data' : null;
+
+        /*chartQualifier = (chartQualifier && noteRelease) ? Array(chartQualifier, noteRelease)
+            .filter(function(n) { return n }).join('; ') : null;*/
+
+        var chartstuff = {
+            chartContainer: chartID,
+            chartDataKey: chartDataKey,
+            chartType: chartType,
+            chartHeight: 160,
+            chartData: chartData,
+            chartQualifier: chartQualifier,
+            chartChartTitle: chartChartTitle,
+            chartInitialSort: chartInitialSort,
+            chartStatType: chartStatType,
+            geographyData: geographyData
+        }
+        try {
+            Charts[i] = Chart(chartstuff);
+        } catch(e) {
+            console.log("Error making chart " + chartID)
+            console.log(chartstuff);
+        }
+    });
+}
+drawMaps();
+makeCharts();
+
+// listen for resize, redraw charts to new dimensions
+var lazyRedrawCharts = _.debounce(function() {
+    window.browserWidth = document.documentElement.clientWidth;
+    window.browserHeight = document.documentElement.clientHeight;
+    makeCharts();
+}, 50);
+$(window).resize(lazyRedrawCharts);
+
+// for touch devices, still allow context toggle
+$('.stat-row').on('click', '.stat', function() {
+    $(this).find('.context').toggle();
+});
+
+var parentLinkContainer = null;
+if (!!parentLinkContainer) {
+    // set up the listener for trigger to reveal hidden groups
+    $('#header-box').on('click', '.link-reveal', function() {
+        $(this).hide().next('.hidden').show();
+        return false;
+    });
+
+    // hit the /parents API endpoint
+    $.getJSON(parentGeoAPI)
+        .done(function(results) {
+            // filter out 'this' from the parents
+            var parents = _.reject(results['parents'], function(p) {
+                return p.relation === 'this';
+            });
+            // list of unique parent sumlev types, maintaining order
+            var parentRelations = _.uniq(_.pluck(parents, 'sumlevel'));
+            // collect parents into individual sumlev groups
+            var parentGroups = _.groupBy(parents, function(d) {
+                return d.sumlevel;
+            });
+            // for each parent sumlev type ...
+            var parentLinkSets = _.map(parentRelations, function(r) {
+                // ... compile a set of links to individual profile pages
+                var parentLinkSet = _.map(parentGroups[r], function(v, k) {
+                    return '<a href="/profiles/' + v.geoid + '-' + slugify(v.display_name) + '/">' + v.display_name + '</a>';
+                });
+                var numParents = parentLinkSet.length;
+                // if more than one of a sumlev type, group behind reveal link
+                if (numParents > 1) {
+                    return '<a href="#" class="link-reveal">'+numParents+' '+ sumlevMap[r]['plural'] +'</a><span class="hidden">'+parentLinkSet.join(', ')+'</span>';
+                } else {
+                    // just one of this sumlev type, so add it to list
+                    return parentLinkSet;
+                }
+            })
+            // push the whole thing into the header box ... thingy
+            parentLinkContainer.html(parentLinksPrefix + parentLinkSets.join(', '));
+            $('body').trigger('glossaryUpdate', parentLinkContainer);
+        });
+}
+
+</script>
+{% endblock %}
