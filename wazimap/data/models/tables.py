@@ -113,9 +113,9 @@ class SimpleTable(object):
         data = {}
 
         # group by geo level
-        geos = sorted(geos, key=lambda g: g.level)
-        for geo_level, geos in groupby(geos, lambda g: g.level):
-            geo_codes = [g.code for g in geos]
+        geos = sorted(geos, key=lambda g: g.geo_level)
+        for geo_level, geos in groupby(geos, lambda g: g.geo_level):
+            geo_codes = [g.geo_code for g in geos]
 
             # initial values
             for geo_code in geo_codes:
@@ -422,10 +422,10 @@ class FieldTable(SimpleTable):
         data = {}
 
         # group by geo level
-        geos = sorted(geos, key=lambda g: g.level)
-        for geo_level, geos in groupby(geos, lambda g: g.level):
+        geos = sorted(geos, key=lambda g: g.geo_level)
+        for geo_level, geos in groupby(geos, lambda g: g.geo_level):
             model = self.get_model(geo_level)
-            geo_codes = [g.code for g in geos]
+            geo_codes = [g.geo_code for g in geos]
 
             if self.table_per_level:
                 code = '%s_code' % geo_level

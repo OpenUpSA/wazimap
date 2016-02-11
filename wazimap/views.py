@@ -4,28 +4,28 @@ import json
 
 from django.conf import settings
 from django.utils.safestring import SafeString
+from django.utils.module_loading import import_string
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.views.generic import View, TemplateView
+from django.shortcuts import redirect
 
 from census.views import GeographyDetailView as BaseGeographyDetailView, LocateView as BaseLocateView, render_json_to_response
 from census.utils import LazyEncoder
-from census.profile import enhance_api_data
 
-from wazimap.geo import get_geography, get_locations, get_locations_from_coords
+from wazimap.geo import geo_data
+from wazimap.profiles import enhance_api_data
 # TODO: XXX
 # TODO: move all this into wazimap.data.{utils, geo, tables, etc.}
 from wazimap.data.models.tables import get_datatable, DATA_TABLES
 from wazimap.data.utils import LocationNotFound
 from wazimap.data.download import generate_download_bundle, supported_formats
-from wazimap.utils import import_string
 
 
 def render_json_error(message, status_code=400):
-    '''
-    Utility method for rendering a view's data to JSON response.
-    '''
+    """ Utility method for rendering a view's data to JSON response.
+    """
     result = json.dumps({'error': message}, indent=4)
-    response = HttpResponse(result, mimetype='application/javascript')
+    response = HttpResponse(result, content_type='application/javascript')
     response.status_code = status_code
     return response
 
@@ -33,19 +33,25 @@ def render_json_error(message, status_code=400):
 class GeographyDetailView(BaseGeographyDetailView):
     def dispatch(self, *args, **kwargs):
         self.geo_id = self.kwargs.get('geography_id', None)
+
+        try:
+            self.geo_level, self.geo_code = self.geo_id.split('-', 1)
+            self.geo = geo_data.get_geography(self.geo_code, self.geo_level)
+        except (ValueError, LocationNotFound):
+            raise Http404
+
+        # check slug
+        if kwargs.get('slug') or self.geo.slug:
+            if kwargs['slug'] != self.geo.slug:
+                kwargs['slug'] = self.geo.slug
+                url = '/profiles/%s-%s-%s' % (self.geo_level, self.geo_code, self.geo.slug)
+                return redirect(url, permanent=True)
+
         # Skip the parent class's logic completely and go back to basics
         return TemplateView.dispatch(self, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
-        geography_id = self.geo_id
         page_context = {}
-
-        try:
-            geo_level, geo_code = geography_id.split('-', 1)
-
-            geo = get_geography(geo_code, geo_level)
-        except (ValueError, LocationNotFound):
-            raise Http404
 
         # load the profile
         profile_method = settings.WAZIMAP.get('profile_builder', None)
@@ -54,9 +60,9 @@ class GeographyDetailView(BaseGeographyDetailView):
         if not profile_method:
             raise ValueError("You must define WAZIMAP.profile_builder in settings.py")
         profile_method = import_string(profile_method)
-        profile_data = profile_method(geo_code, geo_level, profile_name)
+        profile_data = profile_method(self.geo_code, self.geo_level, profile_name)
 
-        profile_data['geography'] = geo.as_dict_deep()
+        profile_data['geography'] = self.geo.as_dict_deep()
 
         profile_data = enhance_api_data(profile_data)
         page_context.update(profile_data)
@@ -90,7 +96,7 @@ class PlaceSearchJson(View):
             search_term = request.GET['q']
             geo_levels = request.GET.get('geolevels', None)
             return render_json_to_response(
-                {'results': get_locations(search_term, geo_levels)}
+                {'results': geo_data.get_locations(search_term, geo_levels)}
             )
 
         return HttpResponseBadRequest('"q" parameter is required')
@@ -126,7 +132,7 @@ class LocateView(BaseLocateView):
         lon = self.request.GET.get('lon', None)
 
         if lat and lon:
-            places = get_locations_from_coords(latitude=lat, longitude=lon)
+            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon)
             page_context.update({
                 'location': {
                     'lat': lat,
@@ -150,7 +156,7 @@ class DataAPIView(View):
 
     def get(self, request, *args, **kwargs):
         try:
-            self.geo_ids = request.GET.get('geo_ids', 'country-ZA').split(',')
+            self.geo_ids = request.GET.get('geo_ids', '').split(',')
             self.data_geos, self.info_geos = self.get_geos(self.geo_ids)
         except LocationNotFound as e:
             return render_json_error(e.message, 404)
@@ -179,7 +185,7 @@ class DataAPIView(View):
             },
             'tables': dict((t.id.upper(), t.as_dict()) for t in self.tables),
             'data': data,
-            'geography': dict((g.full_geoid, g.as_dict()) for g in chain(self.data_geos, self.info_geos)),
+            'geography': dict((g.geoid, g.as_dict()) for g in chain(self.data_geos, self.info_geos)),
         })
 
     def download(self, request):
@@ -218,7 +224,7 @@ class DataAPIView(View):
             if '|' in level:
                 # break geo down further
                 split_level, level = level.split('|', 1)
-                geo = get_geography(code, level)
+                geo = geo_data.get_geography(code, level)
                 info_geos.append(geo)
                 try:
                     data_geos.extend(geo.split_into(split_level))
@@ -227,7 +233,7 @@ class DataAPIView(View):
 
             else:
                 # normal geo
-                data_geos.append(get_geography(code, level))
+                data_geos.append(geo_data.get_geography(code, level))
 
         return data_geos, info_geos
 
@@ -265,10 +271,10 @@ class GeographyCompareView(TemplateView):
 
         try:
             level, code = geo_id1.split('-', 1)
-            page_context['geo1'] = get_geography(code, level)
+            page_context['geo1'] = geo_data.get_geography(code, level)
 
             level, code = geo_id2.split('-', 1)
-            page_context['geo2'] = get_geography(code, level)
+            page_context['geo2'] = geo_data.get_geography(code, level)
         except (ValueError, LocationNotFound):
             raise Http404
 

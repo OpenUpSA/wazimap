@@ -1,160 +1,97 @@
-from data.models import Ward, Municipality, District, Province
-from sqlalchemy.sql.expression import or_
+import json
 
-from .models import Country, geo_levels, get_geo_model
-from .utils import get_session, ward_search_api, LocationNotFound
+from django.conf import settings
+from django.utils.module_loading import import_string
+from django.db.models import Q
+
+from wazimap.data.utils import LocationNotFound
+from wazimap.models import Geography
 
 
-def get_geography(geo_code, geo_level):
+class GeoData(object):
+    """ General Wazimap geography helper object.
     """
-    Get a geography model (Ward, Province, etc.) for this geography, or
-    raise LocationNotFound if it doesn't exist.
-    """
-    session = get_session()
+    def __init__(self):
+        self.geo_model = Geography
+        self.setup_levels()
 
-    try:
-        try:
-            model = get_geo_model(geo_level)
-        except KeyError:
-            raise LocationNotFound('Invalid level: %s' % geo_level)
+    def setup_levels(self):
+        self.comparative_levels = ['this'] + settings.WAZIMAP['comparative_levels']
+        self.geo_levels = settings.WAZIMAP['levels']
 
-        geo = session.query(model).get(geo_code)
+        ancestors = {}
+        for code, level in self.geo_levels.iteritems():
+            level.setdefault('name', code)
+            level.setdefault('plural', code + 's')
+            level.setdefault('children', [])
+
+            for kid in level['children']:
+                ancestors.setdefault(kid, []).append(code)
+
+        # fold in the ancestors
+        for code, items in ancestors.iteritems():
+            self.geo_levels[code]['ancestors'] = items
+
+    def geo_levels_as_json(self):
+        return json.dumps(self.geo_levels)
+
+    def get_geography(self, geo_code, geo_level):
+        """
+        Get a geography object for this geography, or
+        raise LocationNotFound if it doesn't exist.
+        """
+        geo = self.geo_model.objects.filter(geo_level=geo_level, geo_code=geo_code).first()
         if not geo:
             raise LocationNotFound('Invalid level and code: %s-%s' % (geo_level, geo_code))
-
         return geo
-    finally:
-        session.close()
 
+    def get_locations(self, search_term, levels=None, year=None):
+        """
+        Try to find locations based on a search term, possibly limited
+        to +levels+.
 
-def get_locations(search_term, levels=None, year='2011'):
-    if levels:
-        levels = levels.split(',')
-        for level in levels:
-            if level not in geo_levels:
-                raise ValueError('Invalid geolevel: %s' % level)
-    else:
-        levels = ['country', 'province', 'municipality', 'ward', 'subplace']
+        Returns an ordered list of geo models.
+        """
+        if levels:
+            levels = [lev.strip() for lev in levels.split(',')]
+            levels = [lev for lev in levels if lev]
 
-    search_term = search_term.strip()
-    session = get_session()
-    try:
-        objects = set()
+        search_term = search_term.strip()
 
-        # search at each level
-        for level in levels:
-            # already checked that geo_level is valid
-            model = get_geo_model(level)
+        query = self.geo_model.objects\
+            .filter(Q(name__istartswith=search_term) |
+                    Q(geo_code=search_term.upper()))\
 
-            if level == 'subplace':
-                # check mainplace and subplace names
-                objects.update(
-                    session
-                    .query(Ward)
-                    .join(model)
-                    .filter(model.year == year)
-                    .filter(or_(model.subplace_name.ilike(search_term + '%'),
-                                model.subplace_name.ilike('City of %s' % search_term + '%'),
-                                model.mainplace_name.ilike(search_term + '%'),
-                                model.code == search_term))
-                    .limit(10)
-                )
-            elif level == 'ward':
-                st = search_term.lower().strip('ward').strip()
+        if levels:
+            query = query.filter(geo_level__in=levels)
 
-                filters = [model.code.like(st + '%')]
-                try:
-                    filters.append(model.ward_no == int(st))
-                except ValueError:
-                    pass
+        if year is not None:
+            query = query.filter(year=year)
 
-                objects.update(
-                    session
-                    .query(model)
-                    .filter(model.year == year)
-                    .filter(or_(*filters))
-                    .limit(10)
-                )
-            else:
-                objects.update(
-                    session
-                    .query(model)
-                    .filter(model.year == year)
-                    .filter(or_(model.name.ilike(search_term + '%'),
-                                model.name.ilike('City of %s' % search_term + '%'),
-                                model.code == search_term.upper()))
-                    .limit(10)
-                )
+        # TODO: order by level?
+        objects = sorted(query[:10], key=lambda o: [o.geo_level, o.name, o.geo_code])
 
-        order_map = {Country: 4, Ward: 3, Municipality: 2, Province: 1}
-        objects = sorted(objects, key=lambda o: [order_map[o.__class__], getattr(o, 'name', getattr(o, 'code'))])
+        return [o.as_dict() for o in objects]
 
-        return serialize_demarcations(objects[0:10])
-    finally:
-        session.close()
-
-
-def get_locations_from_coords(longitude, latitude):
-    '''
-    Calls the Wards API to get a single ward containing the coordinates.
-    Returns the serialized ward, municipality and province.
-    '''
-    location = ward_search_api.search("%s,%s" % (latitude, longitude))
-    if len(location) == 0:
+    def get_locations_from_coords(self, longitude, latitude):
+        """
+        Finds the place containing this point. Returns
+        County and Country model instances.
+        """
+        # TODO: XXX
         return []
-    # there should only be 1 ward since wards don't overlap
-    location = location[0]
 
-    session = get_session()
-    try:
-        ward = session.query(Ward).get(location.ward_code)
-        if ward is None:
-            return []
+    def get_summary_geo_info(self, geo_code=None, geo_level=None):
+        """ Get a list of (level, code) tuples of geographies that
+        this geography should be compared against.
 
-        # this is the reverse order of a normal search - the
-        # narrowest location match comes first.
-        objects = [ward, ward.municipality, ward.province, ward.country]
-        objects = filter(lambda o: bool(o), objects)  # remove None
+        This is the intersection of +comparative_levels+ and the
+        ancestors of the geography.
+        """
+        geo = self.get_geography(geo_code, geo_level)
+        ancestors = {g.geo_level: g for g in geo.ancestors()}
 
-        return serialize_demarcations(objects)
-
-    finally:
-        session.close()
+        return [(lev, ancestors[lev].geo_code) for lev in self.comparative_levels if lev in ancestors]
 
 
-def serialize_demarcations(objects):
-    return [{
-            'full_name': obj.long_name,
-            'full_geoid': '%s-%s' % (obj.level, obj.code),
-            'geo_level': obj.level,
-            'geo_code': obj.code,
-            } for obj in objects]
-
-
-def get_summary_geo_info(geo_code=None, geo_level=None, session=None,
-                         geo_object=None):
-    if geo_object is not None:
-        geo_level = geo_object.level
-
-    if geo_level in set(['ward', 'municipality', 'district']):
-        if geo_object is None:
-            geo_object = get_geo_object(geo_code, geo_level, session)
-        return zip(('country', 'province'), ('ZA', geo_object.province_code))
-    elif geo_level == 'province':
-        return zip(('country', ), ('ZA', ))
-    else:
-        return tuple()
-
-
-def get_geo_object(geo_code, geo_level, session):
-    model = {
-        'ward': Ward,
-        'district': District,
-        'municipality': Municipality,
-        'province': Province,
-        'country': None,
-    }[geo_level]
-
-    if model is None:
-        return None
-    return session.query(model).get(geo_code)
+geo_data = import_string(settings.WAZIMAP['geodata'])()

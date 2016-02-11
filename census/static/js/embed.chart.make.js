@@ -1,5 +1,3 @@
-var EMBED_URL = 'http://embed.wazimap.co.za';
-
 function makeCensusEmbeds() {
     var embed = {
         embeds: {}

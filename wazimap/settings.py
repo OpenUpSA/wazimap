@@ -1,5 +1,6 @@
 # Django settings for Wazimap
 import os
+import dj_database_url
 
 dirname = os.path.dirname
 # TODO: XXX?
@@ -14,14 +15,16 @@ WSGI_APPLICATION = 'wazimap.wsgi.application'
 ADMINS = (('Greg Kempe', 'greg@code4sa.org'),)
 MANAGERS = ADMINS
 
-# TODO: XXX: sqlalchemy url?
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://wazimap:wazimap@localhost/wazimap')
 DATABASES = {
-    'default': {
+    'default': dj_database_url.parse(DATABASE_URL),
+    # this is the old censusreporter database and can be removed at some point
+    'census': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': '%s/census_app_db' % PROJECT_ROOT,
     },
 }
+DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 INSTALLED_APPS = [
     'django.contrib.auth',
@@ -32,8 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
-    'pipeline',
-    'wazimap',
+    'wazimap.apps.WazimapConfig',
     'census',
 ]
 
@@ -68,7 +70,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
-STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineCachedStorage'
+#STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineCachedStorage'
 
 
 # Templates
@@ -150,12 +152,44 @@ LOGGING = {
 WAZIMAP = {
     # The full name of the website
     'name': 'Wazimap',
+
+    # The site's base URL, including scheme
+    'url': 'http://wazimap.example',
+
     # Twitter handle
     'twitter': '@Wazimap',
+
     # Google Analytics tracking id (ua-xxxxx-x)
     'ga_tracking_id': '',
+
     # How many seconds should cacheable Wazimap pages be cached for?
     'cache_secs': 60 * 60,
+
+    # the dotted-path of the class to use for geo data helper routines
+    'geodata': 'wazimap.geo.GeoData',
+
+    # Geography levels. This must be a dict similar to the following:
+    #
+    # {
+    #   'country': {
+    #     'name': 'country',      # optional, defaults to the level code
+    #     'plural': 'countries',  # plural version of the name
+    #     'children': ['province'],
+    #   },
+    #   ...
+    # }
+    'levels': {
+        'country': {
+            'plural': 'countries',
+            'children': [],
+        }
+    },
+
+    # ordered list of levels to compare a place to; should generally be 2-3 levels only.
+    'comparative_levels': [],
+
+    # URL where embeds are hosted, default is the site URL
+    'embed_url': None,
 }
 
 # XXX TODO remove this
