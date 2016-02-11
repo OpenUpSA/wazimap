@@ -60,11 +60,6 @@ class GeoMixin(object):
         return ', '.join(names)
 
     @property
-    def country(self):
-        # TODO
-        return None
-
-    @property
     def geoid(self):
         return '-'.join([self.geo_level, self.geo_code])
 
