@@ -22,11 +22,10 @@ from wazimap.data.download import generate_download_bundle, supported_formats
 
 
 def render_json_error(message, status_code=400):
-    '''
-    Utility method for rendering a view's data to JSON response.
-    '''
+    """ Utility method for rendering a view's data to JSON response.
+    """
     result = json.dumps({'error': message}, indent=4)
-    response = HttpResponse(result, mimetype='application/javascript')
+    response = HttpResponse(result, content_type='application/javascript')
     response.status_code = status_code
     return response
 
@@ -157,7 +156,7 @@ class DataAPIView(View):
 
     def get(self, request, *args, **kwargs):
         try:
-            self.geo_ids = request.GET.get('geo_ids', 'country-ZA').split(',')
+            self.geo_ids = request.GET.get('geo_ids', '').split(',')
             self.data_geos, self.info_geos = self.get_geos(self.geo_ids)
         except LocationNotFound as e:
             return render_json_error(e.message, 404)
@@ -186,7 +185,7 @@ class DataAPIView(View):
             },
             'tables': dict((t.id.upper(), t.as_dict()) for t in self.tables),
             'data': data,
-            'geography': dict((g.full_geoid, g.as_dict()) for g in chain(self.data_geos, self.info_geos)),
+            'geography': dict((g.geoid, g.as_dict()) for g in chain(self.data_geos, self.info_geos)),
         })
 
     def download(self, request):

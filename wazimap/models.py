@@ -12,7 +12,8 @@ class GeoMixin(object):
     def as_dict(self):
         return {
             'full_geoid': self.geoid,
-            'full_name': self.long_name,
+            'full_name': self.long_name,  # profile views use this as a name
+            'name': self.long_name,  # API views use this as a name
             'short_name': self.name,
             'geo_level': self.geo_level,
             'geo_code': self.geo_code,
