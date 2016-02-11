@@ -30,6 +30,15 @@ def render_json_error(message, status_code=400):
     return response
 
 
+class HomepageView(TemplateView):
+    template_name = 'homepage.html'
+
+    def get_context_data(self, *args, **kwargs):
+        return {
+            'root_geo': geo_data.root_geography(),
+        }
+
+
 class GeographyDetailView(BaseGeographyDetailView):
     def dispatch(self, *args, **kwargs):
         self.geo_id = self.kwargs.get('geography_id', None)

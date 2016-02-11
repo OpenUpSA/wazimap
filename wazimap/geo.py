@@ -36,6 +36,10 @@ class GeoData(object):
     def geo_levels_as_json(self):
         return json.dumps(self.geo_levels)
 
+    def root_geography(self):
+        """ First geography with no parents. """
+        return self.geo_model.objects.filter(parent_level=None, parent_code=None).first()
+
     def get_geography(self, geo_code, geo_level):
         """
         Get a geography object for this geography, or

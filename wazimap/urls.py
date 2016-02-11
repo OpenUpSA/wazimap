@@ -6,9 +6,9 @@ from django.http import HttpResponse
 from django.views.decorators.cache import cache_page
 from django.views.generic.base import RedirectView
 
-from census.views import HomepageView, HealthcheckView, DataView, ExampleView
+from census.views import HealthcheckView, DataView, ExampleView
 
-from wazimap.views import (GeographyDetailView, GeographyJsonView, WardSearchProxy, PlaceSearchJson,
+from wazimap.views import (HomepageView, GeographyDetailView, GeographyJsonView, WardSearchProxy, PlaceSearchJson,
                            LocateView, DataAPIView, TableAPIView, AboutView, GeographyCompareView)
 
 
