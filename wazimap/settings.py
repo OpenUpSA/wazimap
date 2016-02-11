@@ -2,9 +2,6 @@
 import os
 import dj_database_url
 
-dirname = os.path.dirname
-# TODO: XXX?
-PROJECT_ROOT = os.path.abspath(os.path.join(dirname(__file__), "..", ".."))
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true') == 'true'
 TEMPLATE_DEBUG = DEBUG
@@ -18,11 +15,6 @@ MANAGERS = ADMINS
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://wazimap:wazimap@localhost/wazimap')
 DATABASES = {
     'default': dj_database_url.parse(DATABASE_URL),
-    # this is the old censusreporter database and can be removed at some point
-    'census': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '%s/census_app_db' % PROJECT_ROOT,
-    },
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
@@ -63,14 +55,14 @@ API_URL = None
 MEDIA_ROOT = ''
 MEDIA_URL = ''
 
-STATIC_ROOT = PROJECT_ROOT + '/static/'
+STATIC_ROOT = 'static'
 STATIC_URL = '/static/'
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
-#STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineCachedStorage'
+# STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineCachedStorage'
 
 
 # Templates
