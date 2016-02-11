@@ -21,6 +21,8 @@ class Migration(migrations.Migration):
                 ('year', models.IntegerField(null=True, db_index=True)),
                 ('osm_area_id', models.IntegerField(null=True, db_index=True)),
                 ('square_kms', models.FloatField(null=True)),
+                ('parent_level', models.CharField(max_length=15, null=True)),
+                ('parent_code', models.CharField(max_length=10, null=True)),
             ],
             bases=(models.Model, wazimap.models.GeoMixin),
         ),

@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.db import models
 from django.utils.text import slugify
 
@@ -15,18 +17,14 @@ class GeoMixin(object):
             'geo_level': self.geo_level,
             'geo_code': self.geo_code,
             'child_level': self.child_level,
-            'parent_geoid': self.parent.geoid if self.parent else None,
+            'parent_geoid': self.parent_geoid,
             'square_kms': self.square_kms,
         }
 
     def as_dict_deep(self):
-        parents = dict((p.level, p.as_dict()) for p in self.parents())
-        parents_ordering = [p.level for p in self.parents()]
-
         return {
             'this': self.as_dict(),
-            'parents': parents,
-            'parents_ordering': parents_ordering,
+            'parents': OrderedDict((p.geo_level, p.as_dict()) for p in self.ancestors()),
         }
 
     def children(self):
@@ -59,22 +57,8 @@ class GeoMixin(object):
             return self.full_name
 
         names = [self.name]
-        names += [p.name for p in self.parents()]
+        names += [a.name for a in self.ancestors()]
         return ', '.join(names)
-
-    @property
-    def parent(self):
-        # allow parent to be overriden
-        if not hasattr(self, '_parent'):
-            p = self.parents()
-            p = p[0] if p else None
-            self._parent = p
-
-        return self._parent
-
-    @parent.setter
-    def parent(self, value):
-        self._parent = value
 
     @property
     def country(self):
@@ -85,9 +69,11 @@ class GeoMixin(object):
     def geoid(self):
         return '-'.join([self.geo_level, self.geo_code])
 
-    def parents(self):
-        # XXX
-        return []
+    @property
+    def parent_geoid(self):
+        if self.parent_level and self.parent_code:
+            return '%s-%s' % (self.parent_level, self.parent_code)
+        return None
 
     @property
     def slug(self):
@@ -110,5 +96,27 @@ class Geography(models.Model, GeoMixin):
     # area in square km
     square_kms = models.FloatField(null=True)
 
+    # hierarchy
+    parent_level = models.CharField(max_length=15, null=True)
+    parent_code = models.CharField(max_length=10, null=True)
+
     class Meta:
         unique_together = ('geo_level', 'geo_code')
+
+    @property
+    def parent(self):
+        if not hasattr(self, '_parent'):
+            if self.parent_level and self.parent_code:
+                self._parent = self.__class__.objects.filter(geo_level=self.parent_level, geo_code=self.parent_code).first()
+            else:
+                self._parent = None
+
+        return self._parent
+
+    def ancestors(self):
+        ancestors = []
+        g = self.parent
+        while g:
+            ancestors.append(g)
+            g = g.parent
+        return ancestors
