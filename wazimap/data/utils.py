@@ -1,8 +1,6 @@
 from __future__ import division
 from collections import OrderedDict
 
-import requests
-
 from sqlalchemy import create_engine, MetaData, Table, func
 from sqlalchemy.orm import sessionmaker, class_mapper
 from django.conf import settings
@@ -11,18 +9,6 @@ from django.conf import settings
 _engine = create_engine(settings.DATABASE_URL)
 _metadata = MetaData()
 _Session = sessionmaker(bind=_engine)
-
-province_codes = {
-    'kwazulu-natal': 'KZN',
-    'free state': 'FS',
-    'eastern cape': 'EC',
-    'gauteng': 'GT',
-    'mpumalanga': 'MP',
-    'northern cape': 'NC',
-    'limpopo': 'LIM',
-    'north west': 'NW',
-    'western cape': 'WC',
-}
 
 
 def get_session():
@@ -62,51 +48,6 @@ class Location(object):
                % (self.address, self.ward_code, self.municipality,
                   self.province_code, self.latitude, self.longitude,
                   self.ward_no)
-
-
-class WardSearchException(Exception):
-    pass
-
-
-class WardSearchAPI(object):
-
-    def __init__(self, endpoint_url):
-        self.endpoint_url = endpoint_url
-
-    def search(self, term):
-        resp = requests.get(self.endpoint_url,
-                            params={'address': term,
-                                    'database': 'wards_2011'})
-        if resp.status_code != 200:
-            raise WardSearchException('%s response code' % resp.status_code)
-        # if the request is invalid it returns the landing page html
-        elif resp.headers['content-type'] not in ('application/json', 'text/javascript'):
-            raise WardSearchException('Invalid request')
-
-        data = resp.json()
-        # this is not actually an error condition, just not found
-        if isinstance(data, dict) and 'error' in data:
-            return []
-
-        return [Location(obj['address'], self.clean_province(obj['province']),
-                         obj['ward'], obj['wards_no'], obj['municipality'],
-                         obj['coords'])
-                for obj in data]
-
-    def clean_province(self, value):
-        if 2 <= len(value) <= 3:
-            # pre-2011 data provides province code in the 'province' field
-            return value
-        else:
-            # 2011 data provides province name in the 'province' field
-            # convert it to province code if possible
-            try:
-                return province_codes[value.lower()]
-            except KeyError:
-                pass
-
-
-ward_search_api = WardSearchAPI(settings.WARD_SEARCH_ENDPOINT)
 
 
 def capitalize(s):

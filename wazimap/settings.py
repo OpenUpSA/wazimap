@@ -188,6 +188,3 @@ WAZIMAP = {
     # URL where embeds are hosted, default is the site URL
     'embed_url': None,
 }
-
-# XXX TODO remove this
-WARD_SEARCH_ENDPOINT = 'http://wards.code4sa.org/'
