@@ -40,7 +40,7 @@ def generate_download_bundle(tables, geos, geo_ids, data, fmt):
                 tables[0].id.upper(),
                 # The gdal KML driver doesn't like certain chars in its layer names.
                 # It will replace them for you, but then subsequent calls hang.
-                bad_layer_chars.sub('_', geos[0].short_name))
+                bad_layer_chars.sub('_', geos[0].name))
 
         # where the files go, what we'll eventually zip up
         inner_path = os.path.join(temp_path, file_ident)
@@ -66,7 +66,7 @@ def generate_download_bundle(tables, geos, geo_ids, data, fmt):
                 out_layer.CreateField(ogr.FieldDefn(str(column_id), ogr.OFTReal))
 
         for geo in geos:
-            geoid = geo.full_geoid
+            geoid = geo.geoid
 
             out_feat = ogr.Feature(out_layer.GetLayerDefn())
 
@@ -74,10 +74,10 @@ def generate_download_bundle(tables, geos, geo_ids, data, fmt):
                 geom = geometries[geoid]
                 out_feat.SetGeometry(geom.GetGeometryRef())
 
-            out_feat.SetField2('geo_level', geo.level)
-            out_feat.SetField2('geo_code', geo.code)
+            out_feat.SetField2('geo_level', geo.geo_level)
+            out_feat.SetField2('geo_code', geo.geo_code)
             out_feat.SetField2('geoid', geoid)
-            out_feat.SetField2('name', geo.short_name.encode('utf-8'))
+            out_feat.SetField2('name', geo.name.encode('utf-8'))
 
             for table in tables:
                 table_estimates = data[geoid][table.id.upper()]['estimate']
