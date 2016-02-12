@@ -15,7 +15,7 @@ from wazimap.geo import geo_data
 from wazimap.profiles import enhance_api_data
 from wazimap.data.tables import get_datatable, DATA_TABLES
 from wazimap.data.utils import LocationNotFound
-from wazimap.data.download import generate_download_bundle, supported_formats
+from wazimap.data.download import DownloadManager
 
 
 def render_json_error(message, status_code=400):
@@ -172,15 +172,17 @@ class DataAPIView(View):
         })
 
     def download(self, request):
+        mgr = DownloadManager()
+
         fmt = request.GET.get('format', 'csv')
-        if fmt not in supported_formats:
-            response = HttpResponse('Unspported format %s. Supported formats: %s' % (fmt, ', '.join(supported_formats.keys())))
+        if fmt not in mgr.DOWNLOAD_FORMATS:
+            response = HttpResponse('Unspported format %s. Supported formats: %s' % (fmt, ', '.join(mgr.DOWNLOAD_FORMATS.keys())))
             response.status_code = 400
             return response
 
         data = self.get_data(self.data_geos, self.tables)
 
-        content, fname, mime_type = generate_download_bundle(self.tables, self.data_geos, self.geo_ids, data, fmt)
+        content, fname, mime_type = mgr.generate_download_bundle(self.tables, self.data_geos, self.geo_ids, data, fmt)
 
         response = HttpResponse(content, content_type=mime_type)
         response['Content-Disposition'] = 'attachment; filename="%s"' % fname
