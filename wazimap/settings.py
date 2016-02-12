@@ -133,6 +133,9 @@ LOGGING = {
         'django': {
             'level': 'DEBUG' if DEBUG else 'INFO',
         },
+        'django.template': {
+            'level': 'ERROR',
+        },
         'wazimap': {
             'level': 'DEBUG' if DEBUG else 'INFO',
         },
