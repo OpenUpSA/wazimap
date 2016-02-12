@@ -10,8 +10,8 @@ class GeoMixin(object):
     def as_dict(self):
         return {
             'full_geoid': self.geoid,
-            'full_name': self.long_name,  # profile views use this as a name
-            'name': self.long_name,  # API views use this as a name
+            'full_name': self.full_name,  # profile views use this as a name
+            'name': self.full_name,  # API views use this as a name
             'short_name': self.name,
             'geo_level': self.geo_level,
             'geo_code': self.geo_code,
@@ -48,9 +48,9 @@ class GeoMixin(object):
         return []
 
     @property
-    def long_name(self):
-        if hasattr(self, 'full_name'):
-            return self.full_name
+    def full_name(self):
+        if hasattr(self, 'long_name'):
+            return self.long_name
 
         names = [self.name]
         names += [a.name for a in self.ancestors()]
@@ -75,11 +75,10 @@ class GeoMixin(object):
         # official child level
         from wazimap.geo import geo_data
         kids = geo_data.geo_levels[self.geo_level]['children']
-        print kids
         return kids[0] if kids else None
 
     def __unicode__(self):
-        return self.long_name
+        return self.full_name
 
 
 class Geography(models.Model, GeoMixin):
