@@ -137,6 +137,13 @@ class GeoData(object):
             raise LocationNotFound('Invalid level and code: %s-%s' % (geo_level, geo_code))
         return geo
 
+    def get_geometry(self, geo_level, geo_code):
+        """ Get the geometry description for a geography. This is a dict
+        with two keys, 'properties' which is a dict of properties,
+        and 'shape' which is a shapely shape (may be None).
+        """
+        return self.geometry.get(geo_level, {}).get(geo_code)
+
     def get_locations(self, search_term, levels=None, year=None):
         """
         Try to find locations based on a search term, possibly limited
