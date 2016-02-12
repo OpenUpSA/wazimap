@@ -180,7 +180,18 @@ WAZIMAP = {
     # ordered list of levels to compare a place to; should generally be 2-3 levels only.
     'comparative_levels': [],
 
-    # map from geometry names to local static files with geometry data
+    # Map from geometry names to local static files with geometry data. This is used
+    # to both draw maps in webpages and for geolocation.
+    # Wazimap uses Django's static files finder to find these files, so the
+    # files must be stored in your application's `static` directory.
+    #
+    # For maps, topojson is preferred because it's smaller. But for geolocation,
+    # because it's done server side, it requires geojson (shapely doesn't understand
+    # topojson). Ideally you should have both `.geojson` and `.topojson` files
+    # and specify the `.topojson` version here. Wazimap will look for geojson equivalents
+    # of topojson files.
+    #
+    # If a level isn't specified here, Wazimap will try to find a file under the key `''`.
     'geometry_data': {
         '': 'geo/all.geojson',
     },
