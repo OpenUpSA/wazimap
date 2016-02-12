@@ -8,7 +8,7 @@ from django.views.generic.base import RedirectView
 
 from census.views import HealthcheckView, DataView, ExampleView
 
-from wazimap.views import (HomepageView, GeographyDetailView, GeographyJsonView, WardSearchProxy, PlaceSearchJson,
+from wazimap.views import (HomepageView, GeographyDetailView, GeographyJsonView, PlaceSearchJson,
                            LocateView, DataAPIView, TableAPIView, AboutView, GeographyCompareView)
 
 
@@ -194,13 +194,6 @@ urlpatterns = patterns('',
         view    = PlaceSearchJson.as_view(),
         kwargs  = {},
         name    = 'place_search_json',
-    ),
-
-    url(
-        regex   = '^ward-search/json/$',
-        view    = WardSearchProxy.as_view(),
-        kwargs  = {},
-        name    = 'ward_search_json',
     ),
 
     # LOCAL DEV VERSION OF API ##

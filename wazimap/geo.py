@@ -1,21 +1,40 @@
+import os.path
 import json
+import logging
 
 from django.conf import settings
 from django.utils.module_loading import import_string
 from django.db.models import Q
+from django.contrib.staticfiles.storage import staticfiles_storage
+from shapely.geometry import asShape, Point
 
 from wazimap.data.utils import LocationNotFound
 from wazimap.models import Geography
 
+log = logging.getLogger(__name__)
+
 
 class GeoData(object):
     """ General Wazimap geography helper object.
+
+    This object helps Wazimap load geographies, navigate geo level hierarchies,
+    find locations, etc. It's a good place to override this functionality
+    if you want to use a different geometry setup.
+
+    To override behaviour, implement your own GeoData object (probably inheriting
+    from this one), then set the `WAZIMAP['geodata']` to the dotted path of your
+    new class in your `settings.py`. Wazimap will then load that class and make
+    it available as `wazimap.geo.geo_data`.
     """
     def __init__(self):
         self.geo_model = Geography
         self.setup_levels()
+        self.setup_geometry()
 
     def setup_levels(self):
+        """ Setup the summary level hierarchy from the `WAZIMAP['levels']` and
+        `WAZIMAP['comparative_levels']` settings.
+        """
         self.comparative_levels = ['this'] + settings.WAZIMAP['comparative_levels']
         self.geo_levels = settings.WAZIMAP['levels']
 
@@ -33,8 +52,76 @@ class GeoData(object):
         for code, items in ancestors.iteritems():
             self.geo_levels[code]['ancestors'] = items
 
-    def geo_levels_as_json(self):
-        return json.dumps(self.geo_levels)
+    def setup_geometry(self):
+        """ Load boundaries from geojson shape files.
+        """
+        # map from levels to a dict of geoid-keyed feature
+        # objects, including their geometry as shapely shapes
+        #
+        # eg.
+        #
+        # {
+        #    'province': {
+        #      'GT': {
+        #        'properties': { ... },
+        #        'shape': <shapely shape>
+        #      }
+        #    }
+        # }
+        #
+        self.geometry = {}
+        self.geometry_files = settings.WAZIMAP.get('geometry_data', {})
+
+        for level in self.geo_levels.iterkeys():
+            fname, js = self.load_geojson_for_level(level)
+            if not js:
+                continue
+
+            if js['type'] != 'FeatureCollection':
+                raise ValueError("GeoJSON files must contain a FeatureCollection. The file %s has type %s" % (fname, js['type']))
+
+            level_detail = self.geometry.setdefault(level, {})
+
+            for feature in js['features']:
+                props = feature['properties']
+                shape = None
+
+                if feature['geometry']:
+                    try:
+                        shape = asShape(feature['geometry'])
+                    except ValueError as e:
+                        log.error("Error parsing geometry for %s-%s from %s: %s. Feature: %s"
+                                  % (level, props['code'], fname, e.message, feature), exc_info=e)
+                        raise e
+
+                level_detail[props['code']] = {
+                    'properties': props,
+                    'shape': shape
+                }
+
+    def load_geojson_for_level(self, level):
+        fname = self.geometry_files.get(level, self.geometry_files.get(''))
+        if not fname:
+            return None, None
+
+        # we have to have geojson
+        name, ext = os.path.splitext(fname)
+        if ext != '.geojson':
+            fname = name + '.geojson'
+
+        fname = staticfiles_storage.path(fname)
+
+        # try load it
+        try:
+            with open(fname, 'r') as f:
+                return fname, json.load(f)
+        except IOError as e:
+            if e.errno == 2:
+                log.warn("Couldn't open geometry file %s -- no geometry will be available for level %s" % (fname, level))
+            else:
+                raise e
+
+        return None, None
 
     def root_geography(self):
         """ First geography with no parents. """
@@ -80,11 +167,18 @@ class GeoData(object):
 
     def get_locations_from_coords(self, longitude, latitude):
         """
-        Finds the place containing this point. Returns
-        County and Country model instances.
+        Returns a list of geographies containing this point.
         """
-        # TODO: XXX
-        return []
+        p = Point(float(longitude), float(latitude))
+        geos = []
+
+        for features in self.geometry.itervalues():
+            for feature in features.itervalues():
+                if feature['shape'] and feature['shape'].contains(p):
+                    geo = self.get_geography(feature['properties']['code'],
+                                             feature['properties']['level'])
+                    geos.append(geo)
+        return geos
 
     def get_summary_geo_info(self, geo_code=None, geo_level=None):
         """ Get a list of (level, code) tuples of geographies that

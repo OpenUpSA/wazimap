@@ -67,6 +67,7 @@ setup(
         'Django==1.9.2',
         'Fabric==1.8.3',
         'GDAL==1.11.0',
+        'Shapely>=1.5.13',
         'SQLAlchemy==0.9.4',
         'boto==2.27.0',
         'dj-database-url==0.4.0',
