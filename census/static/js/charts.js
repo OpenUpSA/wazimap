@@ -763,7 +763,7 @@ function Chart(options) {
         var querystring = $.param(embedParams);
         
         var embedCode = [
-            '<iframe id="'+embedID+'" class="census-reporter-embed" src="' + EMBED_URL + '/static/iframe.html?'+querystring+'" frameborder="0" width="100%" height="300" style="margin: 1em; max-width: '+embedWidth+'px;' + embedAlign + '"></iframe>',
+            '<iframe id="'+embedID+'" class="census-reporter-embed" src="' + EMBED_URL + '/embed/iframe.html?'+querystring+'" frameborder="0" width="100%" height="300" style="margin: 1em; max-width: '+embedWidth+'px;' + embedAlign + '"></iframe>',
             '\n<script src="' + EMBED_URL + '/static/js/embed.chart.make.js"></script>'
         ].join('');
         
@@ -816,11 +816,11 @@ function Chart(options) {
         d3.select('#embed-align-normal')
             .classed('option-selected', true);
 
-//        lightbox.append('p').append('a')
-//                .classed('display-type', true)
-//                .attr('href', '/examples/embed-charts/')
-//                .attr('target', '_blank')
-//                .html('Learn more about Wazi&rsquo;s embedded charts');
+        // lightbox.append('p').append('a')
+        //         .classed('display-type', true)
+        //         .attr('href', '/examples/embed-charts/')
+        //         .attr('target', '_blank')
+        //         .html('Learn more about ' + SITE_NAME + '&rsquo;s embedded charts');
                 
         chart.fillEmbedCode(textarea);
     }
