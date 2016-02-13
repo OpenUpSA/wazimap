@@ -37,6 +37,8 @@ class HomepageView(TemplateView):
 
 
 class GeographyDetailView(BaseGeographyDetailView):
+    adjust_slugs = False
+
     def dispatch(self, *args, **kwargs):
         self.geo_id = self.kwargs.get('geography_id', None)
 
@@ -47,7 +49,7 @@ class GeographyDetailView(BaseGeographyDetailView):
             raise Http404
 
         # check slug
-        if kwargs.get('slug') or self.geo.slug:
+        if self.adjust_slugs and (kwargs.get('slug') or self.geo.slug):
             if kwargs['slug'] != self.geo.slug:
                 kwargs['slug'] = self.geo.slug
                 url = '/profiles/%s-%s-%s' % (self.geo_level, self.geo_code, self.geo.slug)
@@ -91,9 +93,11 @@ class GeographyDetailView(BaseGeographyDetailView):
 
 class GeographyJsonView(GeographyDetailView):
     """ Return geo profile data as json. """
+    adjust_slugs = False
+
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        return HttpResponse(context['profile_data_json'], mimetype='application/javascript')
+        return HttpResponse(context['profile_data_json'], content_type='application/javascript')
 
 
 class PlaceSearchJson(View):

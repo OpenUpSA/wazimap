@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.views.decorators.cache import cache_page
-from django.views.generic.base import RedirectView
+from django.views.generic.base import RedirectView, TemplateView
 
 from census.views import HealthcheckView, DataView, ExampleView
 
@@ -16,6 +16,7 @@ admin.autodiscover()
 handler500 = 'census.views.server_error'
 
 STANDARD_CACHE_TIME = settings.WAZIMAP['cache_secs']
+EMBED_CACHE_TIME = settings.WAZIMAP.get('embed_cache_secs', STANDARD_CACHE_TIME)
 
 
 urlpatterns = patterns('',
@@ -41,9 +42,18 @@ urlpatterns = patterns('',
         name    = 'geography_detail',
     ),
 
+    # embeds - handles the legacy static/iframe.html URL to generate the page on the fly
+    #          so that settings can be injected
+    url(
+        regex   = '^embed/iframe.html$',
+        view    = cache_page(EMBED_CACHE_TIME)(TemplateView.as_view(template_name="embed/iframe.html")),
+        kwargs  = {},
+        name    = 'embed_iframe',
+    ),
+
     # e.g. /profiles/province-GT.json
     url(
-        regex   = '^(embed_data/)?profiles/(?P<geography_id>\w+-\w+)(-(?P<slug>[\w-]+))\.json$',
+        regex   = '^(embed_data/)?profiles/(?P<geography_id>\w+-\w+)(-(?P<slug>[\w-]+))?\.json$',
         view    = cache_page(STANDARD_CACHE_TIME)(GeographyJsonView.as_view()),
         kwargs  = {},
         name    = 'geography_json',

@@ -87,6 +87,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'wazimap.middleware.RewriteStaticEmbeds',
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
@@ -159,6 +160,9 @@ WAZIMAP = {
 
     # How many seconds should cacheable Wazimap pages be cached for?
     'cache_secs': 60 * 60,
+
+    # How many seconds should Wazimap embed pages be cached for?
+    'embed_cache_secs': 24 * 60 * 60,
 
     # the dotted-path of the class to use for geo data helper routines
     'geodata': 'wazimap.geo.GeoData',
