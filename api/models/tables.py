@@ -49,6 +49,12 @@ def get_datatable(id):
     return DATA_TABLES[id.lower()]
 
 
+class ZeroRow(object):
+    # object that acts as a SQLAlchemy row of zeros
+    def __getattribute__(self, attr):
+        return 0
+
+
 class SimpleTable(object):
     """ A Simple data table follows a normal spreadsheet format. Each row
     has one or more numeric values, one for each column. Each geography
@@ -138,7 +144,7 @@ class SimpleTable(object):
 
         return data
 
-    def get_stat_data(self, geo_level, geo_code, fields=None, order_by=None,
+    def get_stat_data(self, geo_level, geo_code, fields=None, key_order=None,
                       percent=True, total=None, recode=None):
         """ Get a data dictionary for a place from this table.
 
@@ -149,14 +155,14 @@ class SimpleTable(object):
         :param str geo_code: the geographical code
         :param str or list fields: the columns to fetch stats for. By default, all columns except
                                    geo-related and the total column (if any) are used.
-        :param str order_by: how to order the columns in the dictonary. Either 'key' or '-key' to
-                             order alphabetically based on (possibly re-coded) key, or 'value' or '-value'
-                             to order by the value for that column. Defaults to 'key'.
+        :param str key_order: explicit ordering of (recoded) keys, or None for the default order.
+                              Default order is the order in +fields+ if given, otherwise
+                              it's the natural column order from the DB.
         :param bool percent: should we calculate percentages, or just include raw values?
         :param int total: the total value to use for percentages, name of a
-                          field, or None to use the table's total column, or the sum of
-                          all fields if the table has no total column
-        :param dict recode: map from field names to strings to recode column names.
+                          field, or None to use the sum of all retrieved fields (default)
+        :param dict recode: map from field names to strings to recode column names. Many fields
+                            can be recoded to the same thing, their values will be summed.
 
         :return: (data-dictionary, total)
         """
@@ -168,7 +174,8 @@ class SimpleTable(object):
             if fields:
                 for f in fields:
                     if f not in self.columns:
-                        raise ValueError('Invalid field/column for %s: %s' % (self.id, f))
+                        raise ValueError("Invalid field/column '%s' for table '%s'. Valid columns are: %s" % (
+                            f, self.id, ', '.join(self.columns.keys())))
             else:
                 fields = self.columns.keys()
 
@@ -178,49 +185,62 @@ class SimpleTable(object):
                 if not isinstance(recode, dict):
                     recode = {f: recode(f) for f in fields}
 
-            if total is None:
-                total = self.total_column
+            # is the total column valid?
+            if isinstance(total, basestring) and total not in self.columns:
+                raise ValueError("Total column '%s' isn't one of the columns for table '%s'. Valid columns are: %s" % (
+                    total, self.id, ', '.join(self.columns.keys())))
 
             # table columns to fetch
-            if total is None:
-                # get everything, since we need to sum up to get a total
-                cols = self.columns.keys()
-            else:
-                cols = [self.model.columns[c] for c in fields]
-                if isinstance(total, basestring) and total not in cols:
-                    cols.append(total)
+            cols = [self.model.columns[c] for c in fields]
+            if total is not None and isinstance(total, basestring) and total not in cols:
+                cols.append(total)
 
-            # do the query
+            # do the query. If this returns no data, row is None
             row = session\
                 .query(*cols)\
                 .filter(self.model.c.geo_level == geo_level,
                         self.model.c.geo_code == geo_code)\
                 .first()
-            if not row:
-                raise ValueError("No data in %s for %s-%s" % (self.id, geo_level, geo_code))
 
-            if percent:
-                # what's our denominator?
-                if total is None:
-                    # sum of all columns
-                    total = sum(getattr(row, f) for f in fields)
-                elif isinstance(total, basestring):
-                    total = getattr(row, total)
+            if row is None:
+                row = ZeroRow()
 
-            # TODO: ordering
+            # what's our denominator?
+            if total is None:
+                # sum of all columns
+                total = sum(getattr(row, f) or 0 for f in fields)
+            elif isinstance(total, basestring):
+                total = getattr(row, total)
+
+            # Now build a data dictionary based on the columns in +row+.
+            # Multiple columns may be recoded into one, so we have to
+            # accumulate values as we go.
             results = OrderedDict()
-            for field in fields:
-                results[field] = {'name': recode.get(field, self.columns[field]['name'])}
-                val = getattr(row, field)
-                add_metadata(results[field], self)
+
+            key_order = key_order or fields  # default key order is just the list of fields
+
+            for field in key_order:
+                val = getattr(row, field) or 0
+
+                # recode the key for this field, default is to keep it the same
+                key = recode.get(field, field)
+
+                # set the recoded field name, noting that the key may already
+                # exist if another column recoded to it
+                field_info = results.setdefault(key, {'name': recode.get(field, self.columns[field]['name'])})
 
                 if percent:
-                    results[field]['values'] = {'this': p(val, total)}
-                    results[field]['numerators'] = {'this': val}
+                    # sum up existing values, if any
+                    val = val + field_info.get('numerators', {}).get('this', 0)
+                    field_info['values'] = {'this': p(val, total)}
+                    field_info['numerators'] = {'this': val}
                 else:
-                    results[field]['values'] = {'this': val}
+                    # sum up existing values, if any
+                    val = val + field_info.get('values', {}).get('this', 0)
+                    field_info['values'] = {'this': val}
 
-            return results
+            add_metadata(results, self)
+            return results, total
         finally:
             session.close()
 
