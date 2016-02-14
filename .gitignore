@@ -1,3 +1,5 @@
+build/
+*.egg-info/
 *.pyc
 *.csv
 node_modules/

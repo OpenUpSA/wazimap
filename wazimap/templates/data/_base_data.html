@@ -1,0 +1,7 @@
+{% extends 'data/_base_data.html' %}
+{% load staticfiles %}
+
+{% block body_javascript_extra %}
+<script src="{% static 'js/maps.js' %}"></script>
+{{ block.super }}
+{% endblock %}

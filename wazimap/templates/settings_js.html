@@ -1,0 +1,21 @@
+{% load jsonify staticfiles %}
+
+<script type="text/javascript">
+{% block settings_javascript %}
+
+var SITE_NAME = '{{ WAZIMAP.name }}';
+var SITE_URL = '{{ WAZIMAP.url }}';
+var EMBED_URL = '{{ WAZIMAP.embed_url|default:WAZIMAP.url }}';
+
+var GEOMETRY_URLS = {
+  {% for level, path in WAZIMAP.geometry_data.iteritems %}
+  '{{ level }}': '{% static path %}' {% if not forloop.last %},{% endif %}
+  {% endfor %}
+};
+
+// standard mapping of summary level code to summary level name
+var sumlevMap = {{ geo_data.geo_levels|jsonify|safe }};
+
+var releaseNames = {};
+{% endblock settings_javascript %}
+</script>
