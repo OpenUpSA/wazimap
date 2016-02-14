@@ -55,3 +55,7 @@ your Django application to load its settings from Wazimap.
       # Localise this instance of Wazimap
       WAZIMAP['name'] = 'Wazimap Example'
       WAZIMAP['url'] = 'http://wazimap.example.com'
+
+.. seealso::
+
+    See the :ref:`config` section for more details on configuration options.

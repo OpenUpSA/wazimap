@@ -33,7 +33,7 @@ Contents
    :maxdepth: 2
 
    started
-
+   config
 
 
 Indices and tables
