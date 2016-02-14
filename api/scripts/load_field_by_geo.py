@@ -5,6 +5,8 @@ import sys
 import csv
 import re
 
+sys.path.append(os.path.dirname(__file__) + "/../../")
+
 from api.models import get_model_from_fields, Base, Province
 from api.utils import get_session, _engine
 
