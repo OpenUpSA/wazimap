@@ -32,6 +32,8 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   started
+
 
 
 Indices and tables
