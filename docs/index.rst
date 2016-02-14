@@ -34,6 +34,8 @@ Contents
 
    started
    config
+   geos
+   data
 
 
 Indices and tables
