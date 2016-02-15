@@ -179,6 +179,8 @@ class SimpleTable(object):
                             f, self.id, ', '.join(self.columns.keys())))
             else:
                 fields = self.columns.keys()
+                if self.total_column:
+                    fields.remove(self.total_column)
 
             recode = recode or {}
             if recode:
@@ -193,6 +195,10 @@ class SimpleTable(object):
 
             # table columns to fetch
             cols = [self.model.columns[c] for c in fields]
+
+            if total is None and self.total_column:
+                cols.append(self.model.columns[self.total_column])
+
             if total is not None and isinstance(total, basestring) and total not in cols:
                 cols.append(total)
 
