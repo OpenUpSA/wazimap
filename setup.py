@@ -65,7 +65,7 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         'Django>=1.8.0',
-        'GDAL>=1.11.0',
+        'GDAL==1.11.0',
         'Shapely>=1.5.13',
         'SQLAlchemy>=0.9.4',
         'boto>=2.27.0',
