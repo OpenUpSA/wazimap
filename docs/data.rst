@@ -25,6 +25,25 @@ Simple Tables
 
 Both types of tables have some metadata linked to them, such as an id, year and a description of the population that it covers.
 
+Configuring Tables
+------------------
+
+All tables are configured in your project's ``tables.py`` file. Wazimap imports this automatically. Here's a short example: ::
+
+    from wazimap.data.tables import FieldTable
+
+    # Define our tables so the data API can discover them.
+    FieldTable(['rural or urban', 'sex', 'age in completed years'])
+    FieldTable(['employment activity status', 'sex'], universe='People aged 5 years and older')
+    FieldTable(['main source of water'], universe='Households')
+    SimpleTable(id='votes_national_2014', universe='Valid votes', total_column='total_votes',
+                description='2014 National Election votes', dataset='2014 National Elections', year='2014')
+
+This tells Wazimap that it has three Field Tables and one Simple Table. We describe these in more detail below.
+
+Once you have told Wazimap about your tables, it'll ensure that they exist in the database. You can then import
+the raw data from CSV.
+
 Field Tables
 ------------
 
@@ -63,7 +82,13 @@ province  GT       French    Female  779
 Adding a Field Table
 ....................
 
-TODO
+First, you must register your Field Table in your project's ``tables.py``. When Wazimap boots, it will create
+the underlying database table if it doesn't already exist.
+
+.. automethod:: wazimap.data.tables.FieldTable.__init__
+
+You must then import the data into the table. The easiest way of doing this is to look at the database to understand
+the columns in your new table, shape your data accordingly, and import it using psql's CSV import support.
 
 Simple Tables
 -------------
@@ -73,4 +98,10 @@ TODO
 Adding a Simple Table
 .....................
 
-TODO
+First, you must register your Simple Table in your project's ``tables.py``. When Wazimap boots, it will create
+the underlying database table if it doesn't already exist.
+
+.. automethod:: wazimap.data.tables.SimpleTable.__init__
+
+You must then import the data into the table. The easiest way of doing this is to look at the database to understand
+the columns in your new table, shape your data accordingly, and import it using psql's CSV import support.

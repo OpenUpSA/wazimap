@@ -74,6 +74,23 @@ class SimpleTable(object):
 
     def __init__(self, id, universe, description, model='auto', total_column='total',
                  year='2011', dataset='Census 2011'):
+        """
+        Describe a new simple table.
+
+        :param str id: table id, or None (default) to determine it based on `fields`
+        :param str universe: a description of the universe this table covers (default: "Population")
+        :param str description: a description of this table. If None, this is derived from
+                                `universe` and the `fields`.
+        :param str object model: the SQLAlchemy table model to use, or 'auto' to generate
+                                 one (recommended).
+        :param str total_column: the name of the column that represents the total value
+                                 of all the columns in the row. This allows Wazimap to express
+                                 column values as a percentage. If this is None, then
+                                 the table doesn't have the concept of a total and only
+                                 absolute values (not percentages) are used.
+        :param str year: the year the table belongs to
+        :param str dataset: the name of the dataset the table belongs to
+        """
         self.id = id
 
         if model == 'auto':
@@ -270,7 +287,7 @@ class FieldTable(SimpleTable):
     It shares functionality with a `SimpleTable` but handles the more complex
     column definitions and raw data extraction.
 
-    For example:
+    For example: ::
 
         geo_code  gender  age group   total
         ZA        female  < 18        100
@@ -279,7 +296,7 @@ class FieldTable(SimpleTable):
         ZA        male    > 18        20
 
     What are called +columns+ here are actually an abstraction used by the
-    data API. They are nested combinations of field values, such as:
+    data API. They are nested combinations of field values, such as: ::
 
         col0: total
         col1: female
