@@ -1,6 +1,12 @@
 Wazimap Change Log
 ==================
 
+0.1.2 (15 February 2016)
+------------------------
+
+* FIX: import tables modules in more robust way
+
+
 0.1.1 (15 February 2016)
 ------------------------
 
