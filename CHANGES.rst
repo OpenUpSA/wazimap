@@ -1,7 +1,7 @@
 Wazimap Change Log
 ==================
 
-0.2.3 (unreleased)
+0.2.3 (15 February 2016)
 ------------------
 
 * FEATURE: use Google place search to find places
