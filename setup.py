@@ -1,8 +1,9 @@
 from setuptools import setup, find_packages
 from codecs import open
-from os import path
+from os import path, environ
 
 here = path.abspath(path.dirname(__file__))
+on_rtd = environ.get('READTHEDOCS', None) == 'True'
 
 # Get the long description from the relevant file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
@@ -10,6 +11,30 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 with open(path.join(here, 'VERSION')) as f:
     version = f.read().strip()
+
+install_requires = [
+    'Django>=1.8.0',
+    'SQLAlchemy>=0.9.4',
+    'boto>=2.27.0',
+    'dj-database-url>=0.4.0',
+    'django-pipeline>=1.6.4',
+    'ecdsa>=0.11',
+    'futures>=3.0.4',
+    'paramiko>=1.12.3',
+    'requests>=1.2.0',
+    'unicodecsv>=0.9.4',
+    'whitenoise>=1.0.6',
+    'wsgiref>=0.1.2',
+]
+
+if not on_rtd:
+    # these aren't available when building docs for readthedocs.org
+    install_requires += [
+        'GDAL==1.11.0',
+        'Shapely>=1.5.13',
+        'numpy>=1.7.0',
+        'psycopg2>=2.5.2',
+    ]
 
 setup(
     name='wazimap',
@@ -63,24 +88,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=[
-        'Django>=1.8.0',
-        'GDAL==1.11.0',
-        'Shapely>=1.5.13',
-        'SQLAlchemy>=0.9.4',
-        'boto>=2.27.0',
-        'dj-database-url>=0.4.0',
-        'django-pipeline>=1.6.4',
-        'ecdsa>=0.11',
-        'futures>=3.0.4',
-        'numpy>=1.7.0',
-        'paramiko>=1.12.3',
-        'psycopg2>=2.5.2',
-        'requests>=1.2.0',
-        'unicodecsv>=0.9.4',
-        'whitenoise>=1.0.6',
-        'wsgiref>=0.1.2',
-    ],
+    install_requires=install_requires,
 
     setup_requires=[
         "setuptools_git >= 1.0",
