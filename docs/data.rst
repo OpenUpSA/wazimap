@@ -3,11 +3,6 @@
 Statistical Data
 ================
 
-TODO:
-
-* database tables and models
-* adding new data
-
 Wazimap presents **statistical data** about **geographies**, such as the number of English speakers in a city. You need to tell Wazimap
 what data is available and for which geographies.
 

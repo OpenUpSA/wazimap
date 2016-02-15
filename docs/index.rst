@@ -36,6 +36,7 @@ Contents
    config
    geos
    data
+   deploying
 
 
 Indices and tables
