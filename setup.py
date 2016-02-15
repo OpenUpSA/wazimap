@@ -21,6 +21,7 @@ install_requires = [
     'ecdsa>=0.11',
     'futures>=3.0.4',
     'paramiko>=1.12.3',
+    'psycopg2>=2.5.2',
     'requests>=1.2.0',
     'unicodecsv>=0.9.4',
     'whitenoise>=1.0.6',
@@ -33,7 +34,6 @@ if not on_rtd:
         'GDAL==1.11.0',
         'Shapely>=1.5.13',
         'numpy>=1.7.0',
-        'psycopg2>=2.5.2',
     ]
 
 setup(
