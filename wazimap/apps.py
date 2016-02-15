@@ -1,7 +1,6 @@
 from importlib import import_module
-import sys
+import os.path
 
-from django.utils import six
 from django.apps import AppConfig, apps as django_apps
 
 
@@ -18,8 +17,6 @@ class WazimapConfig(AppConfig):
         their tables.
         """
         for app in django_apps.get_app_configs():
-            try:
+            if (os.path.exists(os.path.join(app.path, 'tables.py')) or
+                    os.path.exists(os.path.join(app.path, 'tables/__init__.py'))):
                 import_module(app.name + '.tables')
-            except ImportError as e:
-                if e.message != 'No module named tables':
-                    six.reraise(ImportError, ImportError(e.message), sys.exc_info()[2])
