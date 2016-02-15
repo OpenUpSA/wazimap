@@ -37,7 +37,7 @@ class HomepageView(TemplateView):
 
 
 class GeographyDetailView(BaseGeographyDetailView):
-    adjust_slugs = False
+    adjust_slugs = True
 
     def dispatch(self, *args, **kwargs):
         self.geo_id = self.kwargs.get('geography_id', None)
