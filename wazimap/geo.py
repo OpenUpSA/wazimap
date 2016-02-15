@@ -169,8 +169,7 @@ class GeoData(object):
 
         # TODO: order by level?
         objects = sorted(query[:10], key=lambda o: [o.geo_level, o.name, o.geo_code])
-
-        return [o.as_dict() for o in objects]
+        return objects
 
     def get_locations_from_coords(self, longitude, latitude):
         """

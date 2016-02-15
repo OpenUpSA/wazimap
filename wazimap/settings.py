@@ -157,6 +157,12 @@ WAZIMAP = {
     # Google Analytics tracking id (ua-xxxxx-x)
     'ga_tracking_id': '',
 
+    # Two-letter country code for the country this site relates to
+    'country_code': '',
+
+    # Google Geocoding API key, if you want to use more than the free limit
+    'google_geocode_api_key': '',
+
     # How many seconds should cacheable Wazimap pages be cached for?
     'cache_secs': 60 * 60,
 

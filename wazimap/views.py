@@ -105,11 +105,24 @@ class PlaceSearchJson(View):
         if 'q' in request.GET:
             search_term = request.GET['q']
             geo_levels = request.GET.get('geolevels', None)
+            places = geo_data.get_locations(search_term, geo_levels)
             return render_json_to_response(
-                {'results': geo_data.get_locations(search_term, geo_levels)}
+                {'results': [p.as_dict() for p in places]}
             )
 
-        return HttpResponseBadRequest('"q" parameter is required')
+        elif 'coords' in request.GET and ',' in request.GET['coords']:
+            lat, lon = self.request.GET['coords'].split(',', 1)
+            try:
+                lat = float(lat)
+                lon = float(lon)
+            except ValueError as e:
+                return HttpResponseBadRequest('bad parameter: %s' % e.message)
+
+            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon)
+            return render_json_to_response({'results': [p.as_dict() for p in places]})
+
+        else:
+            return HttpResponseBadRequest('"q" or "coords" parameter is required')
 
 
 class LocateView(BaseLocateView):

@@ -19,6 +19,12 @@ always set in ``settings.py`` in the ``WAZIMAP`` dict.
 ``ga_tracking_id``
   Google Analytics tracking id.
 
+``country_code``
+  Two-letter country code for the country this site relates to.
+
+``google_geocode_api_key``
+  Google Geocoding API key, if you want to use more than the free limit.
+
 ``cache_secs``
   How many seconds should cacheable Wazimap pages be cached for? Default: ``60 * 60``
 
