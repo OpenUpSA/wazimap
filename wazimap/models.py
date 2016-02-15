@@ -86,7 +86,7 @@ class Geography(models.Model, GeoMixin):
     #: `geo_code`, makes up the unique geo id.
     geo_level = models.CharField(max_length=15, null=False)
     #: The code for this geography which must be unique for this level.
-    #: Together with `geo_code`, this makes up the unique geo id.
+    #: Together with `geo_level`, this makes up the unique geo id.
     geo_code = models.CharField(max_length=10, null=False)
 
     #: Name of this geography.
