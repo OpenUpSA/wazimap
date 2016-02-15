@@ -38,7 +38,6 @@ SITE_ID = 1
 USE_I18N = False
 USE_L10N = True
 USE_THOUSAND_SEPARATOR = True
-FORMAT_MODULE_PATH = 'formats'
 USE_TZ = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
