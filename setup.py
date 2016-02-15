@@ -82,6 +82,10 @@ setup(
         'wsgiref>=0.1.2',
     ],
 
+    setup_requires=[
+        "setuptools_git >= 1.0",
+    ],
+
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
