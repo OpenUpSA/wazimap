@@ -291,7 +291,7 @@ class FieldTable(SimpleTable):
 
     """
     def __init__(self, fields, id=None, universe='Population', description=None, denominator_key=None,
-                 table_per_level=True, **kwargs):
+                 table_per_level=False, **kwargs):
         """
         Describe a new field table.
 
@@ -309,7 +309,7 @@ class FieldTable(SimpleTable):
                                     This will be used as the total column once
                                     the id of the column has been calculated.
         :param bool table_per_level: is there a separate database table for each geo level,
-                                     or are all levels in one table (default: separate per level)
+                                     or are all levels in one table (default: False, one table)
         """
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
