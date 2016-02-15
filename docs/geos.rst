@@ -12,9 +12,26 @@ Some example geoids are:
 * ``ward-19100057``: ward 19100057 in Cape Town, South Africa
 * ``county-1``: the Mombasa county in Kenya
 
-TODO:
+Geographies are stored in the ``wazimap_geographies`` table using the ``Geography`` Django model.
 
-* database tables and models
-* what geographies need
-* levels and names
-* boundary information
+.. autoclass:: wazimap.models.Geography
+    :members: geo_level, geo_code, name, square_kms, parent_level, parent_code
+
+Adding Geographies
+------------------
+
+The geography database table looks something like the following. It's generally easiest to import this data using PostgreSQL's CSV import support.
+
+========= ======== ======= ==== ============ ===========
+geo_level geo_code name    year parent_level parent_code
+========= ======== ======= ==== ============ ===========
+country   KE       Kenya   2009
+county    1        Mombasa 2009 country      KE
+county    2        Kwale   2009 country      KE
+county    3        Kilifi  2009 country      KE
+========= ======== ======= ==== ============ ===========
+
+Maps and boundary data
+----------------------
+
+TODO:

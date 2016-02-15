@@ -82,20 +82,30 @@ class GeoMixin(object):
 
 
 class Geography(models.Model, GeoMixin):
+    #: The level for this geography (eg. `country`) which, together with
+    #: `geo_code`, makes up the unique geo id.
     geo_level = models.CharField(max_length=15, null=False)
+    #: The code for this geography which must be unique for this level.
+    #: Together with `geo_code`, this makes up the unique geo id.
     geo_code = models.CharField(max_length=10, null=False)
 
+    #: Name of this geography.
     name = models.CharField(max_length=20, null=False, db_index=True)
+    #: Year when this geography was defined. (advanced).
     year = models.IntegerField(db_index=True, null=True)
     # this place's id from Open Street Map (OSM), useful when using
     # OSM for geolocation
     osm_area_id = models.IntegerField(db_index=True, null=True)
 
-    # area in square km
+    #: Area in square kilometers. Optional.
     square_kms = models.FloatField(null=True)
 
     # hierarchy
+    #: The level of this geography's parent, or `None` if this is the root
+    #: geography that has no parent.
     parent_level = models.CharField(max_length=15, null=True)
+    #: The code of this geography's parent, or `None` if this is the root
+    #: geography that has no parent.
     parent_code = models.CharField(max_length=10, null=True)
 
     class Meta:
@@ -103,6 +113,9 @@ class Geography(models.Model, GeoMixin):
 
     @property
     def parent(self):
+        """ The parent of this geograhy, or `None` if this is the root of
+        the hierarchy.
+        """
         if not hasattr(self, '_parent'):
             if self.parent_level and self.parent_code:
                 self._parent = self.__class__.objects.filter(geo_level=self.parent_level, geo_code=self.parent_code).first()
@@ -112,6 +125,9 @@ class Geography(models.Model, GeoMixin):
         return self._parent
 
     def ancestors(self):
+        """ A list of the ancestors of this geography, all the way up to the root.
+        This is an empty list if this geography is the root of the hierarchy.
+        """
         ancestors = []
         g = self.parent
         while g:
