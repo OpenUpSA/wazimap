@@ -1,8 +1,13 @@
 Wazimap Change Log
 ==================
 
-0.2.3 (15 February 2016)
+0.2.4 (unreleased)
 ------------------
+
+* FIX: content_type for robots.txt
+
+0.2.3 (15 February 2016)
+------------------------
 
 * FEATURE: use Google place search to find places
 * FEATURE: new ``country_code`` config setting
