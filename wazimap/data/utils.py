@@ -285,18 +285,19 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     This is our primary helper routine for building a dictionary suitable for
     a place's profile page, based on a statistic.
 
-    It sums over the data for +fields+ in the database for the place identified by
-    +geo_level+ and +geo_code+ and calculates numerators and values. If multiple
+    It sums over the data for ``fields`` in the database for the place identified by
+    ``geo_level`` and ``geo_code`` and calculates numerators and values. If multiple
     fields are given, it creates nested result dictionaries.
 
-    Control the rows that are included or ignored using +only+, +exclude+ and +exclude_zero+.
+    Control the rows that are included or ignored using ``only``, ``exclude`` and ``exclude_zero``.
 
-    The field values can be recoded using +recode+ and and re-ordered using +key_order+.
+    The field values can be recoded using ``recode`` and and re-ordered using ``key_order``.
 
-    :param str or list fields: the census field to build stats for. Specify a list of fields to build
-                               nested statistics. If multiple fields are specified, then the values
-                               of parameters such as +only+, +exclude+ and +recode+ will change.
-                               These must be fields in `api.models.census.census_fields`, e.g. 'highest educational level'
+    :param fields: the census field to build stats for. Specify a list of fields to build
+                   nested statistics. If multiple fields are specified, then the values
+                   of parameters such as ``only``, ``exclude`` and ``recode`` will change.
+                   These must be fields in `api.models.census.census_fields`, e.g. 'highest educational level'
+    :type fields: str or list
     :param str geo_level: the geographical level
     :param str geo_code: the geographical code
     :param dbsession session: sqlalchemy session
@@ -305,20 +306,24 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     :param list table_fields: list of fields to use to find the table, defaults to `fields`
     :param int total: the total value to use for percentages, or None to total columns automatically
     :param str table_name: override the table name, otherwise it's calculated from the fields and geo_level
-    :param dict or list only: only include these field values. If +fields+ has many items, this must be a dict
-                              mapping field names to a list of strings.
-    :param dict or list exclude: ignore these field values. If +fields+ has many items, this must be a dict
-                                 mapping field names to a list of strings. Field names are checked
-                                 before any recoding.
+    :param list only: only include these field values. If ``fields`` has many items, this must be a dict
+                      mapping field names to a list of strings.
+    :type only: dict or list
+    :param exclude: ignore these field values. If ``fields`` has many items, this must be a dict
+                    mapping field names to a list of strings. Field names are checked
+                    before any recoding.
+    :type exclude: dict or list
     :param bool exclude_zero: ignore fields that have a zero total
-    :param dict or lambda: function or dict to recode values of +key_field+. If +fields+ is a singleton,
-                           then the keys of this dict must be the values to recode from, otherwise
-                           they must be the field names and then the values. If this is a lambda,
-                           it is called with the field name and its value as arguments.
-    :param dict or list key_order: ordering for keys in result dictionary. If +fields+ has many items,
-                                   this must be a dict from field names to orderings.
-                                   The default ordering is determined by +order+.
-    :param str table_dataset: dataset used to help find the table if +table_name+ isn't given.
+    :param recode: function or dict to recode values of ``key_field``. If ``fields`` is a singleton,
+                   then the keys of this dict must be the values to recode from, otherwise
+                   they must be the field names and then the values. If this is a lambda,
+                   it is called with the field name and its value as arguments.
+    :type recode: dict or lambda
+    :param key_order: ordering for keys in result dictionary. If ``fields`` has many items,
+                      this must be a dict from field names to orderings.
+                      The default ordering is determined by ``order``.
+    :type key_order: dict or list
+    :param str table_dataset: dataset used to help find the table if ``table_name`` isn't given.
 
     :return: (data-dictionary, total)
     """

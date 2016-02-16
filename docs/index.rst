@@ -36,6 +36,8 @@ Contents
    config
    geos
    data
+   profiles
+   customising
    deploying
 
 
