@@ -5,6 +5,7 @@ Wazimap Change Log
 ------------------
 
 * FIX: content_type for robots.txt
+* Remove numpy as a dependency
 
 0.2.3 (15 February 2016)
 ------------------------
