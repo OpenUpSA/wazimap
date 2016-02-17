@@ -33,7 +33,6 @@ if not on_rtd:
     install_requires += [
         'GDAL==1.11.0',
         'Shapely>=1.5.13',
-        'numpy>=1.7.0',
     ]
 
 setup(
