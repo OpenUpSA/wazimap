@@ -1,6 +1,5 @@
 from __future__ import division
 from collections import OrderedDict, defaultdict
-from numpy import median
 from urllib import urlencode
 from urllib2 import unquote
 import cStringIO
