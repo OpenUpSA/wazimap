@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 
 class DownloadManager(object):
-    BAD_LAYER_CHARS = re.compile('[ #-]')
+    BAD_LAYER_CHARS = re.compile('[ /#-]')
 
     DOWNLOAD_FORMATS = {
         'kml': {"driver": "KML", 'geometry': True, 'mime': 'application/vnd.google-earth.kml+xml'},
