@@ -91,7 +91,7 @@ class GeographyDetailView(BaseGeographyDetailView):
         pass
 
     def get_template_names(self):
-        return ['profile/profile_detail_%s' % self.profile_name, 'profile/profile_detail.html']
+        return ['profile/profile_detail_%s.html' % self.profile_name, 'profile/profile_detail.html']
 
 
 class GeographyJsonView(GeographyDetailView):
