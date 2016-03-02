@@ -49,11 +49,13 @@ class GeoMixin(object):
 
     @property
     def full_name(self):
+        from wazimap.geo import geo_data
+
         if hasattr(self, 'long_name'):
             return self.long_name
 
         names = [self.name]
-        names += [a.name for a in self.ancestors()]
+        names += [a.name for a in self.ancestors() if a.geo_level != geo_data.root_level]
         return ', '.join(names)
 
     @property
