@@ -6,6 +6,10 @@ Wazimap Change Log
 
 * FIX: content_type for robots.txt
 * Remove numpy as a dependency
+* Remove unused osm_area_id from geo models
+* Add root_level to geo_data
+* Don't include root level geography when computing geography full names
+* Add optional long_name attribute to geo model
 
 0.2.3 (15 February 2016)
 ------------------------
