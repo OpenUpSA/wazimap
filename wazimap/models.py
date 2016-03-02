@@ -92,7 +92,7 @@ class Geography(models.Model, GeoMixin):
     geo_code = models.CharField(max_length=10, null=False)
 
     #: Name of this geography.
-    name = models.CharField(max_length=20, null=False, db_index=True)
+    name = models.CharField(max_length=100, null=False, db_index=True)
     #: Long name of this geography, giving it context (such as a city or province)
     #: If this is null, it is computed based on the place's ancestors.
     long_name = models.CharField(max_length=100, null=True, db_index=True)
