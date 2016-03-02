@@ -49,10 +49,10 @@ class GeoMixin(object):
 
     @property
     def full_name(self):
-        from wazimap.geo import geo_data
-
-        if hasattr(self, 'long_name'):
+        if self.long_name:
             return self.long_name
+
+        from wazimap.geo import geo_data
 
         names = [self.name]
         names += [a.name for a in self.ancestors() if a.geo_level != geo_data.root_level]
@@ -93,6 +93,9 @@ class Geography(models.Model, GeoMixin):
 
     #: Name of this geography.
     name = models.CharField(max_length=20, null=False, db_index=True)
+    #: Long name of this geography, giving it context (such as a city or province)
+    #: If this is null, it is computed based on the place's ancestors.
+    long_name = models.CharField(max_length=100, null=True, db_index=True)
     #: Year when this geography was defined. (advanced).
     year = models.IntegerField(db_index=True, null=True)
     # this place's id from Open Street Map (OSM), useful when using
