@@ -98,9 +98,6 @@ class Geography(models.Model, GeoMixin):
     long_name = models.CharField(max_length=100, null=True, db_index=True)
     #: Year when this geography was defined. (advanced).
     year = models.IntegerField(db_index=True, null=True)
-    # this place's id from Open Street Map (OSM), useful when using
-    # OSM for geolocation
-    osm_area_id = models.IntegerField(db_index=True, null=True)
 
     #: Area in square kilometers. Optional.
     square_kms = models.FloatField(null=True)
