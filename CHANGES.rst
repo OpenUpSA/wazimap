@@ -10,6 +10,7 @@ Wazimap Change Log
 * Add root_level to geo_data
 * Don't include root level geography when computing geography full names
 * Add optional long_name attribute to geo model
+* Change profile maps JS to make it easy to override
 
 0.2.3 (15 February 2016)
 ------------------------

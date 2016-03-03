@@ -25,14 +25,15 @@ var ProfileMaps = function() {
     };
 
     this.drawMapsForProfile = function(geo) {
-        var geo_level = geo.this.geo_level;
-        var geo_code = geo.this.geo_code;
-        var osm_area_id = geo.this.osm_area_id;
-        var child_level = geo.this.child_level;
+        this.geo = geo;
+        this.createMap();
+        this.addImagery();
+        this.drawAllFeatures();
+    };
 
+    this.createMap = function() {
         var allowMapDrag = (browserWidth > 480) ? true : false;
 
-        // draw a map
         this.map = L.map('slippy-map', {
             scrollWheelZoom: false,
             zoomControl: false,
@@ -48,15 +49,24 @@ var ProfileMaps = function() {
                 position: 'topright'
             }));
         }
+    };
 
+    this.addImagery = function() {
         // add imagery
         L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
           subdomains: 'abc',
           maxZoom: 17
         }).addTo(this.map);
+    };
 
-        // load all map shaps for this level
+    this.drawAllFeatures = function() {
+        var geo_level = this.geo.this.geo_level;
+        var geo_code = this.geo.this.geo_code;
+        var osm_area_id = this.geo.this.osm_area_id;
+        var child_level = this.geo.this.child_level;
+
+        // load all map shapes for this level
         GeometryLoader.loadGeometryForLevel(geo_level, function(features) {
             // split into this geo, and everything else
             var groups = _.partition(features.features, function(f) {
