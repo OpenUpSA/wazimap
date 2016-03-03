@@ -63,12 +63,12 @@ class GeographyDetailView(BaseGeographyDetailView):
 
         # load the profile
         profile_method = settings.WAZIMAP.get('profile_builder', None)
-        profile_name = settings.WAZIMAP.get('default_profile', 'default')
+        self.profile_name = settings.WAZIMAP.get('default_profile', 'default')
 
         if not profile_method:
             raise ValueError("You must define WAZIMAP.profile_builder in settings.py")
         profile_method = import_string(profile_method)
-        profile_data = profile_method(self.geo_code, self.geo_level, profile_name)
+        profile_data = profile_method(self.geo_code, self.geo_level, self.profile_name)
 
         profile_data['geography'] = self.geo.as_dict_deep()
 
@@ -89,6 +89,9 @@ class GeographyDetailView(BaseGeographyDetailView):
     def get_geography(self, geo_id):
         # stub this out to prevent the subclass for calling out to CR
         pass
+
+    def get_template_names(self):
+        return ['profile/profile_detail_%s.html' % self.profile_name, 'profile/profile_detail.html']
 
 
 class GeographyJsonView(GeographyDetailView):

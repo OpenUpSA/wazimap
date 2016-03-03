@@ -52,6 +52,12 @@ class GeoData(object):
         for code, items in ancestors.iteritems():
             self.geo_levels[code]['ancestors'] = items
 
+        # root level
+        roots = [key for key, lev in self.geo_levels.iteritems() if not lev.get('ancestors')]
+        if not roots or len(roots) > 1:
+            raise ValueError("geo_levels must have a single root item, but we found: %s" % roots)
+        self.root_level = roots[0]
+
     def setup_geometry(self):
         """ Load boundaries from geojson shape files.
         """
@@ -125,7 +131,7 @@ class GeoData(object):
 
     def root_geography(self):
         """ First geography with no parents. """
-        return self.geo_model.objects.filter(parent_level=None, parent_code=None).first()
+        return self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level).first()
 
     def get_geography(self, geo_code, geo_level):
         """

@@ -10,3 +10,4 @@ censusreporter/config/dev/local.py
 censusreporter/embed_data/profiles/*
 debug
 .vagrant
+.eggs/
