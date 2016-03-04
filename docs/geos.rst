@@ -81,3 +81,16 @@ either have one big file, or one file for each geo level.
        the GeoJSON format when loading the boundary information for use on the server,
        such as for geolocation. This is necessary because Python doesn't have a good
        TopoJSON library.
+
+Geo Data API
+------------
+
+Wazimap makes geography data available through the ``wazimap.geo.geo_data`` object, which is
+detailed below.
+
+The class used for this object :ref:`can be configured <config>` using the ``geodata`` setting.
+This allows you to change this behaviour if you need to.
+
+
+.. autoclass:: wazimap.geo.GeoData
+    :members:
