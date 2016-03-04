@@ -77,7 +77,7 @@ province  GT       French    Female  779
 Adding a Field Table
 ....................
 
-First, you must register your Field Table in your project's ``tables.py``. When Wazimap boots, it will create
+First, you must register your Field Table in your project's ``tables.py``. When Wazimap starts, it will create
 the underlying database table if it doesn't already exist.
 
 .. automethod:: wazimap.data.tables.FieldTable.__init__
@@ -88,12 +88,40 @@ the columns in your new table, shape your data accordingly, and import it using 
 Simple Tables
 -------------
 
-TODO
+A Simple Table looks a lot like a spreadsheet. It contains statistics for many places, one geography per row. Each column has
+a name and the cell values are the numerical statistics for that row's geography. Each Simple Table is stored in a physical PostgreSQL database table.
+
+For example, here is a field table with two columns, ``votes_cast`` and ``registered_voters``.
+
+========= ======== ========== =================
+geo_level geo_code votes_cast registered_voters
+========= ======== ========== =================
+province  WC       829        1024
+province  GT       773        990
+========= ======== ========== =================
+
+You can see that in contrast with a Field Table, a Simple Table can have multiple statistics per geography.
+
+A Simple Tables usually has a column which represents a **total value**, usually (but not always) called ``total``.
+It is used to calculate percentages for other columns in the table. In the
+example above, the ``registered_voters`` column is the **total column**,
+because we can express ``votes_cast`` as a percentage of the registered voters
+in each province.
+
+Wazimap uses this to allow the user to switch between absolute values and percentages when viewing data
+for the table. You can also tell Wazimap that a table doesn't have a total column, in which case it always
+shows absolute values.
+
+.. note::
+
+    If your table has a total column, it's important that all the statistics in it are related.
+    If it doesn't make sense to express a column as a percentage, put it in another table
+    that doesn't have a total column.
 
 Adding a Simple Table
 .....................
 
-First, you must register your Simple Table in your project's ``tables.py``. When Wazimap boots, it will create
+First, you must register your Simple Table in your project's ``tables.py``. When Wazimap starts, it will create
 the underlying database table if it doesn't already exist.
 
 .. automethod:: wazimap.data.tables.SimpleTable.__init__
