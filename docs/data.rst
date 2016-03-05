@@ -91,7 +91,7 @@ Simple Tables
 A Simple Table looks a lot like a spreadsheet. It contains statistics for many places, one geography per row. Each column has
 a name and the cell values are the numerical statistics for that row's geography. Each Simple Table is stored in a physical PostgreSQL database table.
 
-For example, here is a field table with two columns, ``votes_cast`` and ``registered_voters``.
+For example, here is a Simple Table with two columns, ``votes_cast`` and ``registered_voters``.
 
 ========= ======== ========== =================
 geo_level geo_code votes_cast registered_voters
