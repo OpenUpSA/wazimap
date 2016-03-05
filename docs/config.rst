@@ -33,6 +33,7 @@ always set in ``settings.py`` in the ``WAZIMAP`` dict.
 
 ``geodata``
   The dotted-path of the class to use for geo data helper routines.
+  See :ref:`geos` for more info.
   Default: ``wazimap.geo.GeoData``
 
 ``levels``
