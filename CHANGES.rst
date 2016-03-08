@@ -4,6 +4,8 @@ Wazimap Change Log
 0.2.4 (8 March 2016)
 --------------------
 
+Django models have changed in this release. You will need to run migrations with ``python manage.py migrate``.
+
 * FIX: content_type for robots.txt
 * Remove numpy as a dependency
 * Remove unused osm_area_id from geo models
