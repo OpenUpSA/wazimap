@@ -38,7 +38,7 @@ always set in ``settings.py`` in the ``WAZIMAP`` dict.
 
 ``levels``
   Geography levels. This must be a dict similar to the following: ::
-   
+
       {
         'country': {
           'name': 'country',      # optional, defaults to the level code
@@ -64,13 +64,13 @@ always set in ``settings.py`` in the ``WAZIMAP`` dict.
   to both draw maps in webpages and for geolocation.
   Wazimap uses Django's static files finder to find these files, so the
   files must be stored in your application's `static` directory.
-  
+
   For maps, topojson is preferred because it's smaller. But for geolocation,
   because it's done server side, it requires geojson (shapely doesn't understand
   topojson). Ideally you should have both `.geojson` and `.topojson` files
   and specify the `.topojson` version here. Wazimap will look for geojson equivalents
   of topojson files.
- 
+
   If a level isn't specified here, Wazimap will try to find a file under the key ``''``.
 
   Default: ::
@@ -82,3 +82,7 @@ always set in ``settings.py`` in the ``WAZIMAP`` dict.
 ``embed_url``
   The full url, including scheme (but no ending slash) where embeds are hosted.
   This is generally not sude. The default is the same as ``url``.
+
+``na_label``
+  The label to display for stats which have no data available.
+  The default is N/A.
