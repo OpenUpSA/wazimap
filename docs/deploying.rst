@@ -43,4 +43,6 @@ Then create a file ``.buildpacks`` in your project's root directory: ::
 That tells Heroku and Dokku to load the geo dependencies (including GDAL and GEOS) and then
 build python as usual.
 
+Ensure django is included in your requirements.txt.
+
 Finally, just use ``git push heroku`` or ``git push dokku`` to deploy as you usually would.
