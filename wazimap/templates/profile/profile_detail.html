@@ -160,6 +160,7 @@ var makeCharts = function() {
             chartChartShowYAxis = $(this).data('chart-show-y-axis'),
             chartInitialSort = $(this).data('initial-sort'),
             chartStatType = $(this).data('stat-type'),
+            chartDecimalPlaces = $(this).data('decimal-places'),
             chartQualifier = $(this).data('qualifier') || null,
             geographyData = profileData['geography'];
 
@@ -190,6 +191,7 @@ var makeCharts = function() {
             chartChartTitle: chartChartTitle,
             chartInitialSort: chartInitialSort,
             chartStatType: chartStatType,
+            chartDecimalPlaces: chartDecimalPlaces,
             geographyData: geographyData
         }
         try {

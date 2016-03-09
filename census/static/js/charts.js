@@ -13,13 +13,13 @@ Chart({
 
 function Chart(options) {
     var chart = {};
-    
+
     chart.init = function(options) {
         // establish our base vars
         chart.chartContainer = d3.select('#'+options.chartContainer)
             .append("div")
                 .style("position", "relative");
-        
+
         chart.screenPosition = chart.chartContainer.node().getBoundingClientRect();
         chart.parentHeight = chart.getParentHeight();
         chart.chartType = options.chartType;
@@ -28,6 +28,7 @@ function Chart(options) {
         chart.chartQualifier = options.chartQualifier || null;
         chart.chartInitialSort = options.chartInitialSort || null;
         chart.chartStatType = options.chartStatType || 'number';
+        chart.decimalPlaces = parseInt(options.chartDecimalPlaces) || 0;
         chart.chartChartShowYAxis = options.chartChartShowYAxis || (chart.chartStatType == "percentage" ? true : false);
         chart.chartHeight = options.chartHeight || (chart.parentHeight < 180 ? 180 : chart.parentHeight);
         chart.chartColorScale = options.chartColorScale || 'Set2S';
@@ -49,7 +50,7 @@ function Chart(options) {
             'province': (!!geographyParents.province) ? 'in ' + geographyParents.province.short_name : 'province-wide',
             'country': (!!geographyParents.country) ? 'in ' + geographyParents.country.short_name : 'country-wide'
         }
-        
+
         chart.primaryGeoID = geographyThis.full_geoid;
         chart.geoIDs = [geographyThis.full_geoid];
         d3.values(geographyParents).forEach(function(g) {
@@ -58,7 +59,7 @@ function Chart(options) {
 
         var dataObj,
             metadataFields = ['metadata', 'acs_release'];
-        
+
         // filter out metadata objects before we prep data for chart
         chart.chartDataValues = d3.map(options.chartData);
         metadataFields.forEach(function(v) {
@@ -74,7 +75,7 @@ function Chart(options) {
         if (chart.tableID) chart.tableID = chart.capitalize(chart.tableID);
 
         chart.generateURLs();
-        
+
         chart.chartDataValues = chart.chartDataValues.values().filter(function(n){return typeof(n) != 'function'}).map(function(d) {
             if (chart.chartType.indexOf('grouped_') != -1) {
                 // data shaped for grouped-column or -bar presentation
@@ -100,7 +101,7 @@ function Chart(options) {
             }
             return dataObj
         });
-        
+
         // set base chart dimensions
         chart.settings = {
             width: parseInt(chart.chartContainer.style('width'), 10) - parseInt(chart.chartContainer.style('margin-right'), 10),
@@ -108,7 +109,7 @@ function Chart(options) {
             margin: { top: 0, right: 0, bottom: 0, left: 0 },
             hovercardBuffer: { x: 0, y: 25 }
         }
-        
+
         // add blank hovercard
         chart.initHovercard()
 
@@ -120,11 +121,11 @@ function Chart(options) {
         }
         return chart;
     };
-    
+
     chart.draw = function() {
         chart.chartContainer
             .classed("chart", true);
-            
+
         // hand off based on desired type of chart
         if (chart.chartType == 'pie') {
             chart.makePieChart();
@@ -189,7 +190,7 @@ function Chart(options) {
                 .data(chart.chartDataValues)
             .enter().append("div")
                 .classed("bar-set", true);
-                
+
         if (chart.chartType == 'grouped_bar') {
             // grouped presentation
             chart.barGroups = chart.htmlBase
@@ -205,7 +206,7 @@ function Chart(options) {
                             .text(function(d) {
                                 return d.name;
                             });
-                            
+
                         // drop each bar into bar-group
                         groupValues.forEach(function(v, i) {
                             bar = g.append("a")
@@ -213,19 +214,19 @@ function Chart(options) {
                                 .style("position", "relative")
                                 .style("width", function(d) { return (chart.settings.displayWidth) + "px"; })
                                 .datum(function (d) { return v });
-                                
+
                             bar.append("span")
                                 .attr("class", "area")
                                 .style("background-color", chart.colorbrewer[chart.chartColorScale][i])
                                 .style("width", function(d) { return (chart.settings.displayWidth - chart.x(d.value)) + "px"; });
-                                
+
                             bar.append("span")
                                 .classed("label", true)
                                 .style("left", function(d) { return (chart.settings.displayWidth - chart.x(d.value)) + "px"; })
                                 .html(function(d) {
                                     return chart.getValueFmt(v);
                                 });
-                                
+
                             // add the specific label below the bar
                             g.append("h4")
                                 .classed("label secondary", true)
@@ -242,7 +243,7 @@ function Chart(options) {
                     .style("position", "relative")
                     .style("width", function(d) { return (chart.settings.displayWidth) + "px"; })
                     .datum(function (d) { return d });
-                    
+
             chart.barAreas = chart.bars
                 .append("span")
                     .attr("class", "area")
@@ -268,16 +269,16 @@ function Chart(options) {
 
         // now that bars are in place, capture height for hover calculations
         chart.settings.height = parseInt(chart.chartContainer.style('height'), 10);
-        
+
         // listen for interactions
         chart.bars = chart.htmlBase.selectAll(".bar")
             .on("click", chart.cardToggle)
             .on("mouseover", chart.mouseover)
             .on("mouseout", chart.mouseout);
-            
+
         chart.chartContainer
             .on("mousemove", chart.mousemove);
-        
+
         if (!!chart.chartQualifier) {
             chart.addChartQualifier(chart.chartContainer);
         }
@@ -285,11 +286,11 @@ function Chart(options) {
 
         return chart;
     }
-    
+
     chart.makeColumnChart = function() {
         chart.chartContainer
             .classed("column-chart", true);
-        
+
         // add basic settings specific to this chart type
         chart.updateSettings({
             margin: { top: 20, right: 0, bottom: 10, left: 30 },
@@ -297,7 +298,7 @@ function Chart(options) {
             outerColumnPadding: .25,
             columnPadding: .1
         });
-        
+
         // adjust left margin, padding for charts hiding Y axis
         if (!chart.chartChartShowYAxis || chart.chartChartShowYAxis == 'false') {
             chart.updateSettings({
@@ -312,7 +313,7 @@ function Chart(options) {
             displayWidth: chart.settings.width - chart.settings.margin.left - chart.settings.margin.right,
             displayHeight: chart.settings.height - chart.settings.margin.top - chart.settings.margin.bottom
         });
-        
+
         // create the base for upcoming html elements
         chart.htmlBase = chart.chartContainer.append("div")
             .attr("class", "column-set")
@@ -362,14 +363,14 @@ function Chart(options) {
             } else {
                 var yValues = chart.chartDataValues.map(function(d) { return d.value; });
             }
-            
+
             var yDomain = [0, (d3.max(yValues) * 1.33)],
                 yTickRange = d3.range(0, (d3.max(yValues) * 1.33), ((d3.max(yValues) * 1.33) / 5));
         }
         chart.y = d3.scale.linear()
             .range([chart.settings.displayHeight, 0])
             .domain(yDomain);
-            
+
         if (chart.chartChartShowYAxis) {
             // if we really need to render a y axis, easier to use an svg
             chart.svgBaseContainer = chart.chartContainer.append("svg")
@@ -392,17 +393,17 @@ function Chart(options) {
                 .attr("class", "y axis")
                 .call(chart.yAxis);
         }
-        
+
         // add columns as <a> elements, with built-in category labels
         if (chart.chartType == 'grouped_column') {
             var g, groupValues, columnWidth, column;
-            
+
             // a little extra tick padding for dual labels
             chart.settings.tickPadding += 5;
 
             chart.chartContainer
                 .classed('grouped-column-chart', true);
-                
+
             chart.columnGroups = chart.htmlBase.selectAll(".column-group")
                     .data(chart.chartDataValues)
                 .enter().append("div")
@@ -411,21 +412,21 @@ function Chart(options) {
                         g = d3.select(this);
                         groupValues = d3.values(d.values);
                         columnWidth = Math.floor(chart.x.rangeBand() / groupValues.length);
-                        
+
                         g.append("span")
                             .classed("x axis label", true)
                             .style("width", chart.x.rangeBand() + "px")
                             .style("top", function(d) { return (chart.settings.displayHeight + 51) + "px"; })
                             .style("left", function(d) { return (chart.x(d.name) + chart.settings.margin.left) + "px"; })
                             .text(function(d) { return chart.capitalize(d.name); });
-                            
+
                         groupValues.forEach(function(v, i) {
                             column = g.append("a").attr("class", "column")
                                 .style("width", columnWidth + "px")
                                 .style("bottom", function(d) { return (chart.settings.margin.bottom + chart.settings.tickPadding) + "px"; })
                                 .style("left", function(d) { return (chart.x(d.name) + chart.settings.margin.left + ((columnWidth + 2) * i)) + "px"; })
-                                .style("height", function(d) { 
-                                    return (chart.settings.displayHeight) + "px"; 
+                                .style("height", function(d) {
+                                    return (chart.settings.displayHeight) + "px";
                                 })
                                 .datum(function (d) { return v });
 
@@ -434,17 +435,17 @@ function Chart(options) {
                                 .style("background-color", chart.colorbrewer[chart.chartColorScale][i])
                                 .style("width", columnWidth + "px")
                                 .style("bottom", "0")
-                                .style("height", function(d) { 
+                                .style("height", function(d) {
                                     return (chart.settings.displayHeight - chart.y(v.value)) + "px";
                                 });
-                                
+
                             column.append("span")
                                 .classed("x axis label secondary", true)
                                 .style("top", function(d) {
                                     return (chart.settings.displayHeight + 5) + "px";
                                 })
                                 .text(function(d) { return chart.capitalize(v.name); });
-                                
+
                             column.append("span")
                                 .classed("label", true)
                                 .style("bottom", function(d) {
@@ -455,7 +456,7 @@ function Chart(options) {
                                 });
                             });
                         });
-                        
+
             // now that we've created all the columns in their groups,
             // select them for interaction handling
             chart.columns = chart.htmlBase.selectAll(".column");
@@ -468,7 +469,7 @@ function Chart(options) {
                     .style("bottom", function(d) { return (chart.settings.margin.bottom + chart.settings.tickPadding) + "px"; })
                     .style("left", function(d) { return (chart.x(d.name) + chart.settings.margin.left) + "px"; })
                     .style("height", function(d) { return (chart.settings.displayHeight) + "px"; });
-                    
+
             chart.columnAreas = chart.columns
                 .append("span")
                     .attr("class", "area")
@@ -502,7 +503,7 @@ function Chart(options) {
             .on("click", chart.cardToggle)
             .on("mouseover", chart.mouseover)
             .on("mouseout", chart.mouseout);
-            
+
         chart.chartContainer
             .on("mousemove", chart.mousemove);
 
@@ -517,7 +518,7 @@ function Chart(options) {
     chart.makePieChart = function() {
         chart.chartContainer
             .classed("pie-chart", true);
-            
+
         // give the chart display dimensions
         chart.updateSettings({
             legendWidth: chart.settings.width * .38,
@@ -525,13 +526,13 @@ function Chart(options) {
             displayWidth: chart.settings.width - chart.settings.margin.left - chart.settings.margin.right,
             displayHeight: chart.settings.height - chart.settings.margin.top - chart.settings.margin.bottom
         });
-        
+
         // add optional title, adjust height available height for arcs if necessary
         if (!!chart.chartChartTitle) {
             chart.addChartTitle(chart.chartContainer);
             chart.settings.displayHeight -= 20;
         }
-        
+
         // if width is narrow enough that legend won't have room
         // for decent display, drop it below the chart instead
         if ((chart.settings.pieWidth / chart.settings.displayHeight) < .85) {
@@ -540,7 +541,7 @@ function Chart(options) {
                 pieWidth: chart.settings.width * .78,
             });
         }
-        
+
         // give the chart its radius
         chart.updateSettings({
             radius: (Math.min(chart.settings.pieWidth, chart.settings.displayHeight) / 2.1),
@@ -551,12 +552,12 @@ function Chart(options) {
         chart.chartCategories = chart.chartDataValues.map(function(d) {
             return d.name
         });
-        
+
         // use ColorBrewer Set2 for pie charts
         chart.color = d3.scale.ordinal()
             .domain(chart.chartCategories)
             .range(chart.colorbrewer[chart.chartColorScale]);
-        
+
         // adjust radii to set chart's size relative to container
         chart.arc = d3.svg.arc()
             .outerRadius(chart.settings.radius)
@@ -567,14 +568,14 @@ function Chart(options) {
             .sort(null)
             .value(function(d) { return d.value; });
         chart.pieData = chart.pie(chart.chartDataValues);
-        
+
         // get the max value for initial labeling
         if (!!chart.chartInitialSort) {
             chart.initialSlice = chart.pieData.slice(0).sort(chart.sortDataBy(chart.chartInitialSort))[0];
         } else {
             chart.initialSlice = chart.pieData[0];
         }
-        
+
         // primary svg container
         chart.svgBase = chart.chartContainer.append("svg")
             .attr("class", "svg-chart")
@@ -630,10 +631,10 @@ function Chart(options) {
                     return d == data;
                 })
                 .classed("hovered", true);
-            
+
             chart.centerLabel.text(data.data.name);
             chart.centerValue.html(chart.getValueFmt(data.data));
-            
+
             // also trigger standard mouseover
             chart.mouseover(data.data);
         }
@@ -647,10 +648,10 @@ function Chart(options) {
 
             chart.centerLabel.text(chart.initialSlice.data.name);
             chart.centerValue.html(chart.getValueFmt(chart.initialSlice.data));
-            
+
             chart.mouseout();
         }
-        
+
         // add arc paths to arc group
         chart.arcs = chart.arcGroup.selectAll(".arc")
                 .data(chart.pieData)
@@ -658,7 +659,7 @@ function Chart(options) {
                 .classed("arc", true)
                 .attr("d", chart.arc)
                 .style("fill", function(d) { return chart.color(d.data.name); });
-                
+
         // place legend to right of chart, or below if necessary
         if (chart.settings.legendWidth < chart.settings.displayWidth) {
             chart.legend = chart.htmlBase.append("ul")
@@ -670,7 +671,7 @@ function Chart(options) {
         } else {
             chart.legend = chart.chartContainer.append("ul")
                 .attr("class", "legend legend-full-width clearfix");
-                
+
             chart.updateSettings({
                 height: parseInt(chart.settings.height) + 50
             });
@@ -692,7 +693,7 @@ function Chart(options) {
                         .attr("class", "label")
                         .text(d.data.name);
                 });
-                
+
         // add initial center label
         chart.arcReset();
 
@@ -701,7 +702,7 @@ function Chart(options) {
             .on("click", chart.cardToggle)
             .on("mouseover", chart.arcHover)
             .on("mouseout", chart.arcReset);
-        
+
         // listen for legend interactions
         chart.legendItems
             .on("click", chart.cardToggle)
@@ -720,12 +721,12 @@ function Chart(options) {
 
         return chart;
     }
-    
+
     chart.addActionLinks = function() {
         chart.actionLinks = chart.chartContainer
             .append("div")
             .classed("action-links", true);
-            
+
         chart.getData = chart.actionLinks
             .append("a")
                 .classed("chart-get-data", true)
@@ -740,7 +741,7 @@ function Chart(options) {
                 .text("Embed")
                 .on("click", chart.showEmbedCode);
     }
-    
+
     chart.fillEmbedCode = function(textarea, align) {
         var embedHeight = 300,
             embedWidth = (chart.chartType == 'pie') ? 300 : 720,
@@ -759,21 +760,21 @@ function Chart(options) {
                 statType: (chart.chartStatType || '')
             };
             embedAlign = (align == 'left' || align == 'right') ? ' float: ' + align + ';' : '';
-        
+
         var querystring = $.param(embedParams);
-        
+
         var embedCode = [
             '<iframe id="'+embedID+'" class="census-reporter-embed" src="' + EMBED_URL + '/embed/iframe.html?'+querystring+'" frameborder="0" width="100%" height="300" style="margin: 1em; max-width: '+embedWidth+'px;' + embedAlign + '"></iframe>',
             '\n<script src="' + EMBED_URL + '/static/js/embed.chart.make.js"></script>'
         ].join('');
-        
+
         textarea.html(embedCode);
     }
 
     chart.showEmbedCode = function() {
         var lightboxWrapper = d3.select('body').append('div')
                 .attr('id', 'lightbox');
-                
+
         var lightbox = lightboxWrapper.append('div')
                 .classed('hovercard-wrapper', true)
             .append('div')
@@ -786,13 +787,13 @@ function Chart(options) {
                     d3.event.stopPropagation();
                     d3.select('#lightbox').remove();
                 });
-                
+
         lightbox.append('h2')
                 .html('Embed code for this chart');
 
         lightbox.append('p')
                 .text('Copy the code below, then paste into your own CMS or HTML. Embedded charts are responsive to your page width, and have been tested in Firefox, Safari, Chrome, and IE8 and above.');
-                
+
         var textarea = lightbox.append('textarea')
                 .on('click', function() {
                     this.select();
@@ -812,7 +813,7 @@ function Chart(options) {
                     d3.select(this).classed('option-selected', true);
                     chart.fillEmbedCode(textarea, this.text.toLowerCase())
                 });
-                
+
         d3.select('#embed-align-normal')
             .classed('option-selected', true);
 
@@ -821,7 +822,7 @@ function Chart(options) {
         //         .attr('href', '/examples/embed-charts/')
         //         .attr('target', '_blank')
         //         .html('Learn more about ' + SITE_NAME + '&rsquo;s embedded charts');
-                
+
         chart.fillEmbedCode(textarea);
     }
 
@@ -833,7 +834,7 @@ function Chart(options) {
             valueMOEFlag = data.context.error_ratio[place] >= 10 ? "<sup>&dagger;</sup>" : "";
         return chart.valFmt(valueText, decimals) + valueMOEFlag;
     }
-    
+
     // opens drawer with tabular data under chart
     chart.toggleDataDrawer = function() {
         var row = d3.select(chart.findAncestor(this, "section")),
@@ -842,21 +843,21 @@ function Chart(options) {
             hide = clicked.classed("opened"),
             tableID = chart.capitalize(chart.initialData.metadata.table_id);
         chart.dataDrawer = row.select(".data-drawer");
-        
+
         // make sure we're in a pristine state
         chart.dataDrawer.remove();
         clickTargets.text('Show data').classed("opened", false);
-        
+
         // handle the toggling
         if (hide) {
             clicked.classed("opened", false);
         } else {
             clicked.classed("opened", true);
             clicked.text('Hide data');
-            
+
             // tell Google Analytics about the event
             chart.trackEvent('Charts', 'Show data', tableID);
-            
+
             chart.dataDrawer = row.append("div")
                     .attr("class", "data-drawer column-full");
 
@@ -869,7 +870,7 @@ function Chart(options) {
                                " <li><a class='smaller' href='" + chart.mapURL + "'>Map</a></li>" +
                                " <li><a class='smaller' href='" + chart.distributionURL + "'>Distribution</a></li>";
                     });
-                    
+
             chart.dataDrawer.append("h3")
                     .attr("class", "chart-title")
                     .html(function() {
@@ -885,7 +886,7 @@ function Chart(options) {
             chart.dataTable = chart.dataDrawer.append("table")
                     .attr("id", "data-table")
                     .attr("class", "full-width");
-                    
+
             // get chart data ready for tabular format
             var rowValues = []
             chart.chartDataValues.forEach(function(d, i){
@@ -915,9 +916,9 @@ function Chart(options) {
                     .on("click", chart.toggleDataDrawer);
         }
     }
-    
+
     chart.DataDrawerPlaces = ['this', 'province', 'country'];
-    
+
     chart.fillDataDrawerHeader = function(selection, d) {
         var headerData = [
             { colspan: 1, cellClass: 'name', cellContents: 'Column' }
@@ -938,7 +939,7 @@ function Chart(options) {
                 .attr("colspan", function(d) { return d.colspan })
                 .text(function(d) { return d.cellContents });
     }
-    
+
     chart.fillDataDrawerRows = function(selection, rowValues) {
         rowValues.forEach(function(d) {
             rowData = [
@@ -954,7 +955,7 @@ function Chart(options) {
                     //rowData.push({ cellClass: 'context', cellContents: '&plusmn;' + chart.commaFmt(d.context.numerator_errors[k]) });
                 }
             })
-            
+
             selection.append("tr").selectAll("td")
                     .data(rowData)
                 .enter().append("td")
@@ -962,7 +963,7 @@ function Chart(options) {
                     .html(function(d) { return d.cellContents });
         })
     }
-    
+
     chart.initHovercard = function() {
         chart.hovercard = chart.chartContainer.append("div")
             .attr("class", "hovercard")
@@ -980,7 +981,7 @@ function Chart(options) {
             width: 0
         };
     }
-    
+
     chart.cardToggle = function(data) {
         var cardData = (chart.chartType == 'pie') ? data.data : data;
         if (!!chart.hovercard) {
@@ -992,7 +993,7 @@ function Chart(options) {
             }
         }
     }
-    
+
     chart.fillHovercard = function(data) {
         var value,
             index,
@@ -1008,7 +1009,7 @@ function Chart(options) {
                 value = contextData.values[k];
                 index = contextData.index[k];
                 moeFlag = contextData.error_ratio[k] >= 10 ? "<sup>&dagger;</sup>" : "";
-                
+
                 // generate the comparative text for this parent level
                 if (!!index) {
                     phraseBits = chart.getComparisonThreshold(index);
@@ -1022,13 +1023,13 @@ function Chart(options) {
                 );
             }
         });
-        
+
         var card = [
             "<h3>" + contextData.name + ": <span class='normal'>" + cardStat + "</span></h3>",
             "<ul>" + cardComparison.join('') + "</ul>"
         ].join('');
-        
-        
+
+
         var maxMOE = d3.values(contextData.error_ratio);
         // if any MOEs get daggered, show the explanatory text
         maxMOE.sort(function(x, y) { return y - x });
@@ -1038,7 +1039,7 @@ function Chart(options) {
 
         return card
     }
-    
+
     chart.mouseover = function(data) {
         // reset screen position to account for scrolling
         chart.screenPosition = chart.chartContainer.node().getBoundingClientRect();
@@ -1091,7 +1092,7 @@ function Chart(options) {
                 .style("opacity", 1e-6);
         }
     }
-    
+
     chart.addChartTitle = function(container) {
         if (!!chart.chartChartTitle) {
             container.append("h3")
@@ -1099,7 +1100,7 @@ function Chart(options) {
                 .text(chart.chartChartTitle);
         }
     }
-    
+
     chart.addChartQualifier = function(container) {
         if (!!chart.chartQualifier) {
             container.append("span")
@@ -1111,10 +1112,10 @@ function Chart(options) {
             });
         }
     }
-    
+
     // format percentages and/or dollar signs
     chart.valFmt = function(value, decimals) {
-        var precision = (!!decimals) ? decimals : 0,
+        var precision = (!!decimals) ? decimals : chart.decimalPlaces,
             factor = Math.pow(10, precision),
             value = Math.round(value * factor) / factor;
 
@@ -1127,14 +1128,14 @@ function Chart(options) {
         }
         return value;
     }
-    
+
     // commas for human-friendly integers
     chart.commaFmt = d3.format(",");
-    
+
     chart.capitalize = function(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
-    
+
     chart.exclude = function(array, obj) {
         var i = array.length;
         while (i--) {
@@ -1144,18 +1145,18 @@ function Chart(options) {
         }
         return obj;
     }
-    
+
     chart.lastItem = function(array) {
         return array[array.length - 1]
     }
-    
+
     chart.findAncestor = function(node, match) {
       if (!node) {
           return null;
       } else if (!node.nodeType || typeof(match) != 'string') {
           return node;
       }
-      
+
       if ((match = match.split('.')).length === 1) {
           match.push(null);
       } else if(!match[0]) {
@@ -1168,17 +1169,17 @@ function Chart(options) {
         }
       }
       while(node = node.parentNode);
- 
+
       return node;
     }
-    
+
     chart.sortDataBy = function(field, sortFunc) {
         // allow reverse sorts, e.g. '-value'
         var sortOrder = (field[0] === "-") ? -1 : 1;
         if (sortOrder == -1) {
             field = field.substr(1);
         }
-        
+
         // allow passing in a sort function
         var key = sortFunc ? function (x) { return sortFunc(x[field]); } : function (x) { return x[field]; };
 
@@ -1187,17 +1188,17 @@ function Chart(options) {
             return ((A < B) ? -1 : (A > B) ? +1 : 0) * sortOrder;
         }
     }
-    
+
     chart.getParentHeight = function() {
         return parseInt(d3.select(chart.chartContainer.node().parentNode).style('height'), 10);
     }
-    
+
     chart.updateSettings = function(newSettings) {
         for (var setting in newSettings) {
             chart.settings[setting] = newSettings[setting]
         }
     }
-    
+
     // Colorbrewer color specifications and designs
     // by Cynthia Brewer (http://colorbrewer.org/)
     // https://github.com/mbostock/d3/tree/master/lib/colorbrewer
@@ -1206,9 +1207,9 @@ function Chart(options) {
         // saturated version of Colorbrewer 'Set2' scheme, so the unhovered
         // state, at 80% opacity, looks like the original colorbrewer color
         Set2S: ['#33b5b5', '#ed8b69', '#6295cc', '#dd85c0', '#8ecc23', '#fccd06', '#dbba97', '#aaaaaa']
-        
+
     };
-    
+
     chart.comparisonPhrases = {
         206: ["more than double", ""],
         195: ["about double", ""],
@@ -1237,17 +1238,17 @@ function Chart(options) {
         8: ["about 10 percent", "of"],
         0: ["less than 10 percent", "of"],
     }
-    
+
     chart.comparisonThresholds = d3.keys(chart.comparisonPhrases).map(Number);
-    
+
     chart.getComparisonThreshold = function(value) {
         var threshold = chart.lastItem(chart.comparisonThresholds.filter(function(i) {
             return i <= value
         }));
-        
+
         return chart.comparisonPhrases[threshold]
     }
-    
+
     chart.getComparisonNoun = function() {
         if (chart.chartStatType == 'percentage' || chart.chartStatType == 'scaled-percentage') {
             return 'rate';
@@ -1256,7 +1257,7 @@ function Chart(options) {
         }
         return 'figure';
     }
-    
+
     chart.trackEvent = function(category, action, label) {
         // make sure we have Google Analytics function available
         if (typeof(ga) == 'function') {
