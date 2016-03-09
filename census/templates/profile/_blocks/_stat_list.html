@@ -3,7 +3,7 @@
     <span class="{% if stat_class %}{{ stat_class }}{% else %}primary{% endif %}">
         <span class="value">
             {% if not stat.values.this %}
-                N/A
+                {% if WAZIMAP.na_label %}{{ WAZIMAP.na_label }}{% else %}N/A{% endif %}
             {% else %}
                 {% if stat_type == 'name' %}
                     {{ stat.name }}
@@ -24,7 +24,7 @@
             {% endif %}
         </span>
         <span class="name">{% if stat_type == 'name' %}{{ stat_name }}{% else %}{{ stat.name }}{% endif %}</span>
-        
+
         {% if stat_class == 'secondary' %}
             <span class="context">
                 {% if stat.error.this %}
