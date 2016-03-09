@@ -139,12 +139,14 @@
                 </div>
                 <div class="column-quarter">
                     <ul class="ul-icon-list">
+                        {% block footer_branding %}
                         <li>
                             <a href="http://www.mediamonitoringafrica.org/"><img class="mma-logo" src="{% static 'img/mma.png' %}"></a>
                         </li>
                         <li>
                             <a href="http://www.code4sa.org/"><img src="{% static 'img/code4sa-logo-small.png' %}"></a>
                         </li>
+                        {% endblock %}
                     </ul>
                 </div>
                 {% endblock footer_content %}
