@@ -210,4 +210,7 @@ WAZIMAP = {
 
     # URL where embeds are hosted, default is the site URL
     'embed_url': None,
+
+    # Label to display if data is not available.
+    'na_label': 'N/A'
 }
