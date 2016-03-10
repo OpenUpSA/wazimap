@@ -45,4 +45,6 @@ build python as usual.
 
 Ensure django is included in your requirements.txt.
 
-Finally, just use ``git push heroku`` or ``git push dokku`` to deploy as you usually would.
+Finally, just use ``git push heroku`` or ``git push dokku master`` to deploy as you usually would.
+
+Should you need to do a database migration, you can run ``dokku run <app-name> python manage.py migrate`` on your server.
