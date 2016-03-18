@@ -103,4 +103,4 @@ function StaticGeometryLoader(geometry_urls) {
     };
 }
 
-GeometryLoader = new StaticGeometryLoader(GEOMETRY_URLS);
+var GeometryLoader = new StaticGeometryLoader(GEOMETRY_URLS);
