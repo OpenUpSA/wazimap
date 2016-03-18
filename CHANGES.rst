@@ -1,6 +1,12 @@
 Wazimap Change Log
 ==================
 
+0.2.5 (18 March 2016)
+--------------------
+
+* Change the way geometries are loaded in comparison views
+* Simplify template overrides in wazimap templates
+
 0.2.4 (8 March 2016)
 --------------------
 

@@ -1728,7 +1728,7 @@ function Comparison(options) {
     }
 
     comparison.loadMapData = function(cb) {
-        GeometryLoader.loadGeometryFor(comparison.dataGeoIDs, cb);
+        GeometryLoader.loadGeometryForComparison(comparison, cb);
     }
     
     // ready, set, go
