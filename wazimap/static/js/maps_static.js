@@ -16,11 +16,19 @@ function StaticGeometryLoader(geometry_urls) {
     this.geometry = {};
 
     /**
+     * Fetches geometry data for a comparison view and calls the +success+
+     * callback with an object mapping each geo-id to a GeoJSON object.
+     */
+    this.loadGeometryForComparison = function(comparison, success) {
+        this.loadGeometryforGeoIds(comparison.dataGeoIDs, success);
+    };
+
+    /**
      * Fetches geometry data for a list of geo ids (level-code)
      * and calls the +success+ callback with an object mapping
      * each geo-id to a GeoJSON object.
      */
-    this.loadGeometryFor = function(geo_ids, success) {
+    this.loadGeometryForGeoIds = function(geo_ids, success) {
         var by_level = {};
 
         _.each(geo_ids, function(geo_id) {
@@ -103,4 +111,4 @@ function StaticGeometryLoader(geometry_urls) {
     };
 }
 
-GeometryLoader = new StaticGeometryLoader(GEOMETRY_URLS);
+var GeometryLoader = new StaticGeometryLoader(GEOMETRY_URLS);

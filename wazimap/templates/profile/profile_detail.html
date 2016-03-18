@@ -13,11 +13,11 @@
 {% endblock %}
 
 {% block head_css_extra %}
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+<link rel="stylesheet" href="//cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
 <!--[if lte IE 8]>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+    <link rel="stylesheet" href="//cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
 <![endif]-->
-<link href='{{STATIC_URL}}css/vendor/leaflet.label.css' rel='stylesheet' />
+<link href="{% static 'css/vendor/leaflet.label.css' %}" rel="stylesheet" />
 {% endblock %}
 {% block body_id %}profile{% endblock %}
 
@@ -119,12 +119,12 @@
 {{ block.super }}
 
 {% block profile_javascript_libs %}
-<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+<script src="//cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 <script src="{% static 'js/vendor/topojson.v1.min.js' %}"></script>
 <script src="{% static 'js/vendor/leaflet.label.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
 <script src="{% static 'js/head2head.js' %}"></script>
-<script src="{% static 'js/maps.js' %}"></script>
+<script src="{% static 'js/maps_static.js' %}"></script>
 <script src="{% static 'js/profile_map.js' %}"></script>
 {% endblock %}
 
