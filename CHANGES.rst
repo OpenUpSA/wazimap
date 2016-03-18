@@ -1,7 +1,7 @@
 Wazimap Change Log
 ==================
 
-0.2.5 (18 March 2016)
+0.2.5 (unreleased)
 --------------------
 
 * Change the way geometries are loaded in comparison views
