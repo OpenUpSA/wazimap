@@ -48,3 +48,12 @@ Ensure django is included in your requirements.txt.
 Finally, just use ``git push heroku`` or ``git push dokku master`` to deploy as you usually would.
 
 Should you need to do a database migration, you can run ``dokku run <app-name> python manage.py migrate`` on your server.
+
+HTTPS and SSL
+-------------
+
+.. note:: We recommend running your website over HTTPS.
+
+We recommend that you run your site over HTTPS (SSL). If you don't use HTTPS, then any website
+that does use HTTPS **will not** be able to embed a chart from your Wazimap. This is because
+websites using HTTPS cannot load content from non-HTTPS sites.

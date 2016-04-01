@@ -148,7 +148,10 @@ WAZIMAP = {
     # The full name of the website
     'name': 'Wazimap',
 
-    # The site's base URL, including scheme
+    # The site's base URL, including scheme.
+    # NOTE: if your site supports HTTPS, this MUST be
+    # an 'https' url, otherwise embeds that are over HTTPS might
+    # not load correctly.
     'url': 'http://wazimap.example',
 
     # Twitter handle
@@ -209,6 +212,9 @@ WAZIMAP = {
     },
 
     # URL where embeds are hosted, default is the site URL
+    # NOTE: if your site supports HTTPS, this MUST be
+    # an 'https' url, otherwise embeds that are over HTTPS might
+    # not load correctly.
     'embed_url': None,
 
     # Label to display if data is not available.

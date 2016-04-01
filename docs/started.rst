@@ -50,6 +50,7 @@ from the Wazimap application, rather than your Django application like normal.
 
       # Localise this instance of Wazimap
       WAZIMAP['name'] = 'Wazimap Example'
+      # NB: this must be https if your site supports HTTPS.
       WAZIMAP['url'] = 'http://wazimap.example.com'
       WAZIMAP['country_code'] = 'EX'
 

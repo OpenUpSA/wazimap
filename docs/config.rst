@@ -11,6 +11,8 @@ always set in ``settings.py`` in the ``WAZIMAP`` dict.
 
 ``url``
   The site's base url, including scheme, WITHOUT and ending slash.
+  If your site supports HTTPS, this **must** be an ``https`` url, otherwise
+  embeds that are over HTTPS might not load correctly.
   Default: ``http://wazimap.example``
 
 ``twitter``
@@ -81,7 +83,9 @@ always set in ``settings.py`` in the ``WAZIMAP`` dict.
 
 ``embed_url``
   The full url, including scheme (but no ending slash) where embeds are hosted.
-  This is generally not sude. The default is the same as ``url``.
+  This is generally not used.  If your site supports HTTPS, this **must** be an
+  ``https`` url, otherwise embeds that are over HTTPS might not load correctly.
+  The default is the same as ``url``.
 
 ``na_label``
   The label to display for stats which have no data available.
