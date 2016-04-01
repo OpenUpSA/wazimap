@@ -1,6 +1,7 @@
-#landing-slippy-map {
+#homepage #slippy-map {
     width: 100%;
     height: 35em;
+    position: relative;
 }
 
 #examples span.zoom-in, #examples span.zoom-out {

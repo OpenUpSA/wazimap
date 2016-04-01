@@ -204,5 +204,9 @@ class GeoData(object):
 
         return [(lev, ancestors[lev].geo_code) for lev in self.comparative_levels if lev in ancestors]
 
+    def first_child_level(self):
+        # first child level in the hierarchy
+        return self.geo_levels[self.root_level]['children'][0]
+
 
 geo_data = import_string(settings.WAZIMAP['geodata'])()
