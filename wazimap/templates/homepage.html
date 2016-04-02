@@ -130,6 +130,8 @@ if (Modernizr.geolocation) {
 geoSelect.focus()
 
 var maps = new ProfileMaps();
-maps.drawMapForHomepage('{{ geo_data.first_child_level }}');
+var centre = {% if WAZIMAP.map_centre %}{{ WAZIMAP.map_centre }}{% else %}null{% endif %};
+var zoom = {% if WAZIMAP.map_zoom %}{{ WAZIMAP.map_zoom }}{% else %}null{% endif %};
+maps.drawMapForHomepage('{{ geo_data.first_child_level }}', centre, zoom);
 </script>
 {% endblock %}

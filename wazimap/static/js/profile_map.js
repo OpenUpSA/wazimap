@@ -31,16 +31,22 @@ var ProfileMaps = function() {
         this.drawAllFeatures();
     };
 
-    this.drawMapForHomepage = function(geo_level) {
+    this.drawMapForHomepage = function(geo_level, centre, zoom) {
         // draw a homepage map, but only for big displays
         if (browserWidth <= 480 || $('#slippy-map').length === 0) return;
 
         this.createMap();
         this.addImagery();
 
+        if (centre) {
+            self.map.setView(centre, zoom);
+        }
+
         GeometryLoader.loadGeometryForLevel(geo_level, function(features) {
             var layer = self.drawFeatures(features);
-            self.map.fitBounds(layer.getBounds());
+            if (!centre) {
+                self.map.fitBounds(layer.getBounds());
+            }
         });
     };
 

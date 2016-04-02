@@ -81,6 +81,11 @@ always set in ``settings.py`` in the ``WAZIMAP`` dict.
         '': 'geo/all.geojson',
       }
 
+``map_centre``, ``map_zoom``
+  Centre coordinates and zoom level defaults for maps. Centre must be a ``[lat, long]`` pair
+  and zoom is a zoom level (1-12).
+  If not set, both are determined from the geometry.
+
 ``embed_url``
   The full url, including scheme (but no ending slash) where embeds are hosted.
   This is generally not used.  If your site supports HTTPS, this **must** be an
