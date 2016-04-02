@@ -1,12 +1,13 @@
 Wazimap Change Log
 ==================
 
-0.2.5 (unreleased)
+0.2.5 (2 April 2016)
 --------------------
 
 * Change the way geometries are loaded in comparison views
 * Simplify template overrides in wazimap templates
 * Fix link to GitHub repo in homepage template
+* Add map back to the homepage [#4]
 * DOCS: update deployment documentation and example files
 * DOCS: make note that we recommend running securely over HTTPS
 

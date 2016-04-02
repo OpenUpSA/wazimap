@@ -31,6 +31,25 @@ var ProfileMaps = function() {
         this.drawAllFeatures();
     };
 
+    this.drawMapForHomepage = function(geo_level, centre, zoom) {
+        // draw a homepage map, but only for big displays
+        if (browserWidth <= 480 || $('#slippy-map').length === 0) return;
+
+        this.createMap();
+        this.addImagery();
+
+        if (centre) {
+            self.map.setView(centre, zoom);
+        }
+
+        GeometryLoader.loadGeometryForLevel(geo_level, function(features) {
+            var layer = self.drawFeatures(features);
+            if (!centre) {
+                self.map.fitBounds(layer.getBounds());
+            }
+        });
+    };
+
     this.createMap = function() {
         var allowMapDrag = (browserWidth > 480) ? true : false;
 
@@ -120,7 +139,7 @@ var ProfileMaps = function() {
 
     this.drawFeatures = function(features) {
         // draw all others
-        L.geoJson(features, {
+        return L.geoJson(features, {
             style: this.layerStyle,
             onEachFeature: function(feature, layer) {
                 layer.bindLabel(feature.properties.name, {direction: 'auto'});

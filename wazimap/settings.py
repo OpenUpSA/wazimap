@@ -211,6 +211,12 @@ WAZIMAP = {
         '': 'geo/all.geojson',
     },
 
+    # centre coordinates and zoom level defaults for maps. Centre must be a ``[lat, long]`` pair
+    # and zoom is a zoom level (1-12).
+    # If not set, the centre is determined from the geometry.
+    'map_centre': None,
+    'map_zoom': None,
+
     # URL where embeds are hosted, default is the site URL
     # NOTE: if your site supports HTTPS, this MUST be
     # an 'https' url, otherwise embeds that are over HTTPS might
