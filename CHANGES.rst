@@ -1,6 +1,11 @@
 Wazimap Change Log
 ==================
 
+0.2.6 (4 April 2016)
+--------------------
+
+* FIX: cleanly hide homepage map on small (<768px) screens
+
 0.2.5 (2 April 2016)
 --------------------
 
