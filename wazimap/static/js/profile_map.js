@@ -33,7 +33,7 @@ var ProfileMaps = function() {
 
     this.drawMapForHomepage = function(geo_level, centre, zoom) {
         // draw a homepage map, but only for big displays
-        if (browserWidth <= 480 || $('#slippy-map').length === 0) return;
+        if (browserWidth < 768 || $('#slippy-map').length === 0) return;
 
         this.createMap();
         this.addImagery();
