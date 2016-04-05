@@ -87,7 +87,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'wazimap.middleware.RewriteStaticEmbeds',
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 

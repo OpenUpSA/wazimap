@@ -1,6 +1,11 @@
 Wazimap Change Log
 ==================
 
+0.2.7 (unreleased)
+--------------------
+
+* Remove unnecessary rewrites for /static/iframe.html, this is only needed by wazimap-za.
+
 0.2.6 (4 April 2016)
 --------------------
 
