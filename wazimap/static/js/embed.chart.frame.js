@@ -10,7 +10,7 @@ function makeEmbedFrame() {
             search = /([^&=]+)=?([^&]*)/g,
             decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); },
             query = window.location.search.substring(1);
-        
+
         while (match = search.exec(query)) {
             embedFrame.params[decode(match[1])] = decode(match[2]);
         }
@@ -22,7 +22,7 @@ function makeEmbedFrame() {
         embedFrame.parentContainerID = 'cr-embed-'+embedFrame.params.geoID+'-'+embedFrame.params.chartDataID;
         embedFrame.params.chartDataID = embedFrame.params.chartDataID.split('-');
         embedFrame.params.chartDataYearDir = (!!embedFrame.params.dataYear) ? embedFrame.params.dataYear+'/' : '';
-        embedFrame.dataSource = EMBED_URL + '/profiles/'+embedFrame.params.geoID+'.json';
+        embedFrame.dataSource = '/profiles/'+embedFrame.params.geoID+'.json';
         // avoid css media-query caching issues with multiple embeds on same page
         $('#chart-styles').attr('href','css/charts.css?'+embedFrame.parentContainerID)
 
