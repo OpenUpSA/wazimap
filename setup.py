@@ -16,6 +16,7 @@ install_requires = [
     'Django>=1.8.0',
     'SQLAlchemy>=0.9.4',
     'boto>=2.27.0',
+    'django-cors-headers>=1.1.0',
     'dj-database-url>=0.4.0',
     'django-pipeline>=1.6.4',
     'ecdsa>=0.11',
