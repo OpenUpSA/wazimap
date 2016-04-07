@@ -1,6 +1,11 @@
 Wazimap Change Log
 ==================
 
+0.2.9 (7 April 2016)
+--------------------
+
+* FIX: correctly hide slippy map on mobile, making elements clickable again
+
 0.2.8 (5 April 2016)
 --------------------
 
