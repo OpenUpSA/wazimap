@@ -1,6 +1,11 @@
 Wazimap Change Log
 ==================
 
+0.2.10 (10 April 2016)
+--------------------
+
+* FIX: show slippy map on desktop, fixing bug introduced in 0.2.9.
+
 0.2.9 (7 April 2016)
 --------------------
 
