@@ -1,6 +1,13 @@
 Wazimap Change Log
 ==================
 
+0.2.11 (unreleased)
+-------------------
+
+* Make homepage easier to override
+* DOCS: how to override templates
+* DOCS: profile page chart options
+
 0.2.10 (10 April 2016)
 --------------------
 
