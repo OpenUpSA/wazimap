@@ -13,6 +13,8 @@
 {% endblock %}
 
 {% block content_container %}
+
+{% block place_finder %}
 <div class="content-container clearfix tan-stripe">
     <article id="profile" class="clearfix wrapper">
         <section class="column-full clearfix big-action">
@@ -32,7 +34,9 @@
         </section>
     </article>
 </div>
+{% endblock %}
 
+{% block homepage_detail %}
 <div class="content-container clearfix">
     <article class="wrapper">
         <section class="column-full clearfix">
@@ -108,6 +112,8 @@
         </header>
     </article>
 </div>
+{% endblock %}
+
 {% endblock %}
 
 {% block body_javascript_extra %}
