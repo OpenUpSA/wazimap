@@ -71,4 +71,70 @@ If you're working with Simple Tables, you'll want to use ``get_datatable`` and `
 The Profile Page Template
 -------------------------
 
-TODO
+You need to tell Wazimap how to display your stats on a place's profile page. 
+
+The file you want to override is ``templates/profile/profile_detail.html``, you can `see what it looks like in the repo <https://github.com/Code4SA/wazimap/blob/master/wazimap/templates/profile/profile_detail.html>`_. You generally only need to change the ``profile_detail`` block.
+
+Create a new file in your project called ``templates/profile/profile_detail.html`` that extends the existing template and provides
+your new content for the ``profile_detail`` block::
+
+    {% extends 'profile/profile_detail.html' %}
+
+    {% block profile_detail %}
+    ... your stats go here ...
+    {% endblock %}
+
+If you reload your site you'll see the homepage has your new content. Django uses this template instead of Wazimap's version,
+relying on Wazimap for the blocks you don't override. There are lots of other blocks you can change, take a look at
+the original file for more ideas.
+
+.. seealso:: There's more information on changing Wazimap templates in :ref:`customising`.
+
+You must still provide the content that goes into each stats block. The easiest right now is to see how other countries do it, such as
+`South Africa's default census profile <https://github.com/Code4SA/wazimap-za/blob/master/wazimap_za/templates/profile/profile_detail_census.html>`_.
+
+Profile Page Charts
+-------------------
+
+The Django template for the profile page creates empty slots for each chart, which are filled by Javascript when the page loads. These placeholders look something like this:
+
+.. code-block:: html
+
+    <div class="column-half" id="chart-histogram-demographics-age-distribution" data-stat-type="scaled-percentage" data-chart-title="Population by age range"></div>
+
+The ``column-*`` class isn't really important here; that's just a structural setting that gives the block an appropriate amount of width that can be governed with media queries. What we really care about are the ``id`` and ``data-*`` attribute values. The ``id`` value tells the constructor what type of chart to draw and which data to use.The ``data`` attributes allow you to optionally make changes to how the chart is drawn.
+
+Chart ID
+........
+
+The ``id`` tells Wazimap everything it needs to know to create this chart from the profile data. The id is broken into a few parts::
+
+    chart-<chartType>-<chartData>
+
+The ``chartType``, in our example case ``histogram``, tells Wazimap the type of chart to draw. Wazimap supports:
+
+* pie
+* column
+* grouped_column
+* histogram
+* bar
+* grouped_bar
+
+The ``chartData`` provides the path to the data that should fill this chart. Wazimap starts at the top, in this case `demographics`, and then drills down based on the rest of the keys: `demographics` > `age` > `distribution`. That's where Wazimap expects to find the data to draw the chart.
+
+Data Attributes
+...............
+
+You can use optional data attributes to change how the chart is shown.
+
+Use ``data-chart-title`` to specify a title to place above the chart.
+
+Use ``data-initial-sort`` to change how pie charts are sorted. Determines which category to highlight when the chart is drawn. Using ``data-initial-sort="-value"`` will display the highest data value in the chart first. Otherwise the first value in the chart data will be used.
+
+Use ``data-qualifier`` to add a trailing line below the chart, prepended with an "*" character. This is useful when charts require a little extra context.
+
+Use ``data-stat-type`` to provide formatting hints for the chart's language and display. Standard chart behavior may be overriden with these values:
+
+* **percentage**: Adds a "%" character after figures in the chart. Sets chart domain to 0-100. Uses "rate" in comparison sentences.
+* **scaled-percentage**: Does the same things as "percentage," but also scales the chart so that the highest category value takes up the full vertical space available.
+* **dollar**: Adds a "$" character before figures in the chart. Uses "amount" in comparison sentences.
