@@ -157,10 +157,6 @@ class GeoData(object):
 
         Returns an ordered list of geo models.
         """
-        if levels:
-            levels = [lev.strip() for lev in levels.split(',')]
-            levels = [lev for lev in levels if lev]
-
         search_term = search_term.strip()
 
         query = self.geo_model.objects\
@@ -177,7 +173,7 @@ class GeoData(object):
         objects = sorted(query[:10], key=lambda o: [o.geo_level, o.name, o.geo_code])
         return objects
 
-    def get_locations_from_coords(self, longitude, latitude):
+    def get_locations_from_coords(self, longitude, latitude, levels=None):
         """
         Returns a list of geographies containing this point.
         """
@@ -189,7 +185,8 @@ class GeoData(object):
                 if feature['shape'] and feature['shape'].contains(p):
                     geo = self.get_geography(feature['properties']['code'],
                                              feature['properties']['level'])
-                    geos.append(geo)
+                    if not levels or geo.geo_level in levels:
+                        geos.append(geo)
         return geos
 
     def get_summary_geo_info(self, geo_code=None, geo_level=None):
