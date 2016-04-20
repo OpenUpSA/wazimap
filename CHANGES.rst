@@ -7,6 +7,7 @@ Wazimap Change Log
 * Make homepage easier to override
 * DOCS: how to override templates
 * DOCS: profile page chart options
+* Improve limiting searches to specific geo levels
 
 0.2.10 (10 April 2016)
 --------------------

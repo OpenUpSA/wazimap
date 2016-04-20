@@ -105,9 +105,13 @@ class GeographyJsonView(GeographyDetailView):
 
 class PlaceSearchJson(View):
     def get(self, request, *args, **kwargs):
+        geo_levels = request.GET.get('geolevels', None)
+        if geo_levels:
+            geo_levels = [lev.strip() for lev in geo_levels.split(',')]
+            geo_levels = [lev for lev in geo_levels if lev]
+
         if 'q' in request.GET:
             search_term = request.GET['q']
-            geo_levels = request.GET.get('geolevels', None)
             places = geo_data.get_locations(search_term, geo_levels)
             return render_json_to_response(
                 {'results': [p.as_dict() for p in places]}
@@ -121,7 +125,7 @@ class PlaceSearchJson(View):
             except ValueError as e:
                 return HttpResponseBadRequest('bad parameter: %s' % e.message)
 
-            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon)
+            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon, levels=geo_levels)
             return render_json_to_response({'results': [p.as_dict() for p in places]})
 
         else:
