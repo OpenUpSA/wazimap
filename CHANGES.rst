@@ -1,7 +1,7 @@
 Wazimap Change Log
 ==================
 
-0.2.11 (unreleased)
+0.2.11 (20 April 2016)
 -------------------
 
 * Make homepage easier to override
