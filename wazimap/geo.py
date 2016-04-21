@@ -160,7 +160,7 @@ class GeoData(object):
         search_term = search_term.strip()
 
         query = self.geo_model.objects\
-            .filter(Q(name__istartswith=search_term) |
+            .filter(Q(name__icontains=search_term) |
                     Q(geo_code=search_term.upper()))\
 
         if levels:
