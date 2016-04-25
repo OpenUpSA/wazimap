@@ -1,6 +1,11 @@
 Wazimap Change Log
 ==================
 
+0.2.12 (unreleased)
+-------------------
+
+* FIX: place search is wildcarded on both sides
+
 0.2.11 (20 April 2016)
 -------------------
 
