@@ -5,6 +5,7 @@ Wazimap Change Log
 -------------------
 
 * FIX: place search is wildcarded on both sides
+* Make it easier to subclass from the default Wazimap Geography model by using GeographyBase
 
 0.2.11 (20 April 2016)
 -------------------

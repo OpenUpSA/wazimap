@@ -83,7 +83,7 @@ class GeoMixin(object):
         return self.full_name
 
 
-class Geography(models.Model, GeoMixin):
+class GeographyBase(models.Model, GeoMixin):
     #: The level for this geography (eg. `country`) which, together with
     #: `geo_code`, makes up the unique geo id.
     geo_level = models.CharField(max_length=15, null=False)
@@ -111,6 +111,7 @@ class Geography(models.Model, GeoMixin):
     parent_code = models.CharField(max_length=10, null=True)
 
     class Meta:
+        abstract = True
         unique_together = ('geo_level', 'geo_code')
 
     @property
@@ -136,3 +137,7 @@ class Geography(models.Model, GeoMixin):
             ancestors.append(g)
             g = g.parent
         return ancestors
+
+
+class Geography(GeographyBase):
+    pass
