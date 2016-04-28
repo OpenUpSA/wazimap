@@ -1,14 +1,14 @@
 Wazimap Change Log
 ==================
 
-0.2.12 (unreleased)
--------------------
+0.2.12 (28 April 2016)
+----------------------
 
 * FIX: place search is wildcarded on both sides
 * Make it easier to subclass from the default Wazimap Geography model by using GeographyBase
 
 0.2.11 (20 April 2016)
--------------------
+----------------------
 
 * Make homepage easier to override
 * DOCS: how to override templates
@@ -16,7 +16,7 @@ Wazimap Change Log
 * Improve limiting searches to specific geo levels
 
 0.2.10 (10 April 2016)
---------------------
+----------------------
 
 * FIX: show slippy map on desktop, fixing bug introduced in 0.2.9.
 
