@@ -1,8 +1,8 @@
 Wazimap Change Log
 ==================
 
-0.2.13 (Unreleased)
--------------------
+0.2.13 (29 April 2016)
+----------------------
 
 * Serve most (all?) assets over https if site is loaded over https
 
