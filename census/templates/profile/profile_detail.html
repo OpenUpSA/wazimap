@@ -476,8 +476,7 @@
 {% endblock %}
 
 {% block body_javascript_extra %}{{ block.super }}
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-53744e46066d519d"></script>
-<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+<script src="{% static 'js/vendor/leaflet-0.6.4.js' %}"></script>
 <script src="{% static 'js/vendor/leaflet.label.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
 <script src="{% static 'js/head2head.js' %}"></script>

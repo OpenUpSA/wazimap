@@ -119,7 +119,7 @@
 {{ block.super }}
 
 {% block profile_javascript_libs %}
-<script src="//cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+<script src="{% static 'js/vendor/leaflet-0.6.4.js' %}"></script>
 <script src="{% static 'js/vendor/topojson.v1.min.js' %}"></script>
 <script src="{% static 'js/vendor/leaflet.label.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
