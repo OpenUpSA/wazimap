@@ -1,10 +1,17 @@
 Wazimap Change Log
 ==================
 
+0.2.14 (3 May 2016)
+-------------------
+
+* Load leaflet locally so that it works over https
+* Load fonts over https if necessary
+
 0.2.13 (29 April 2016)
 ----------------------
 
 * Serve most (all?) assets over https if site is loaded over https
+* NOTE: this release still doesn't work correctly over https
 
 0.2.12 (28 April 2016)
 ----------------------
