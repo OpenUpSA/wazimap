@@ -14,11 +14,11 @@
 {% endblock %}
 
 {% block head_css_extra %}
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+<link rel="stylesheet" href="{% static 'css/vendor/leaflet-0.6.4.css' %}" />
 <!--[if lte IE 8]>
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+    <link rel="stylesheet" href="{% static 'css/vendor/leaflet-0.6.4.ie.css' %}" />
 <![endif]-->
-<link href='{{STATIC_URL}}css/vendor/leaflet.label.css' rel='stylesheet' />
+<link href="{% static 'css/vendor/leaflet.label.css' %}" rel="stylesheet" />
 {% endblock %}
 {% block body_id %}profile{% endblock %}
 
@@ -476,8 +476,7 @@
 {% endblock %}
 
 {% block body_javascript_extra %}{{ block.super }}
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-53744e46066d519d"></script>
-<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+<script src="{% static 'js/vendor/leaflet-0.6.4.js' %}"></script>
 <script src="{% static 'js/vendor/leaflet.label.js' %}"></script>
 <script src="{% static 'js/charts.js' %}"></script>
 <script src="{% static 'js/head2head.js' %}"></script>

@@ -1,4 +1,4 @@
-
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,13 +7,15 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
-    <!--[if lte IE 8]><link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" /><![endif]-->
+    <link rel="stylesheet" href="{% static 'css/vendor/leaflet-0.6.4.css' %}" />
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="{% static 'css/vendor/leaflet-0.6.4.ie.css' %}" />
+    <![endif]-->
 </head>
 <body>
     <div id="map" style="width: 600px; height: 400px"></div>
 
-    <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+    <script src="{% static 'js/vendor/leaflet-0.6.4.js' %}"></script>
     <script>
 
         var map = L.map('map').setView([39.6, -96.4], 5);
