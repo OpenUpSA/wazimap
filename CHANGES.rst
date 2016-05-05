@@ -1,7 +1,7 @@
 Wazimap Change Log
 ==================
 
-0.2.14 (3 May 2016)
+0.2.14 (5 May 2016)
 -------------------
 
 * Load leaflet locally so that it works over https
