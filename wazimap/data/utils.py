@@ -404,19 +404,20 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             else:
                 key = capitalize(key)
 
-            def add_keys_in_order():
+            def add_keys_in_order(data):
                 for fld in key_order[field]:
                     data[fld] = OrderedDict()
+                return data
 
             # enforce key ordering
             if not data and field in key_order:
-                add_keys_in_order()
+                add_keys_in_order(data)
 
             # ensure it's there
             if key not in data:
                 # check if key exists in key_order
-                if key in key_order:
-                    add_keys_in_order()
+                if field in key_order:
+                    add_keys_in_order(data)
                 else:
                     data[key] = OrderedDict()
 
