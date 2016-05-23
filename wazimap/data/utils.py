@@ -404,8 +404,8 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             else:
                 key = capitalize(key)
 
-            # enforce key ordering
-            if not data and field in key_order:
+            # enforce key ordering the first time we see this field
+            if (not data or data.keys() == ['metadata']) and field in key_order:
                 for fld in key_order[field]:
                     data[fld] = OrderedDict()
 
