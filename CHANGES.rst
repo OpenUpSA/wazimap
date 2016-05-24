@@ -1,6 +1,11 @@
 Wazimap Change Log
 ==================
 
+0.2.15 (Unreleased)
+-------------------
+
+* FIX ordering of keys for nested values
+
 0.2.14 (5 May 2016)
 -------------------
 
