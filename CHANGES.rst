@@ -5,6 +5,7 @@ Wazimap Change Log
 -------------------
 
 * FIX ordering of keys for nested values
+* FIX paramiko version should be less than 2, which breaks in deployment
 
 0.2.14 (5 May 2016)
 -------------------
