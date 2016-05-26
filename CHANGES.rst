@@ -1,6 +1,11 @@
 Wazimap Change Log
 ==================
 
+0.2.16 (26 May 2016)
+-------------------
+
+* Add leaflet images included by css
+
 0.2.15 (25 May 2016)
 -------------------
 
