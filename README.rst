@@ -42,4 +42,4 @@ License
 
 Wazimap code is licensed under the MIT License.
 
-Wazimap branding is copyright Code for South Africa.
+Wazimap branding is copyright Media Monitoring Africa (MMA) and cannot be used without permission.
