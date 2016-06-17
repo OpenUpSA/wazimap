@@ -260,7 +260,6 @@ class TableAPIView(View):
     """
     View that lists data tables.
     """
-
     def get(self, request, *args, **kwargs):
         return render_json_to_response([t.as_dict(columns=False) for t in DATA_TABLES.itervalues()])
 
@@ -303,3 +302,20 @@ class GeoAPIView(View):
 
         parents = [g.as_dict() for g in geo.ancestors()]
         return render_json_to_response(parents)
+
+
+class TableDetailView(TemplateView):
+    template_name = 'table/table_detail.html'
+
+    def dispatch(self, *args, **kwargs):
+        try:
+            self.table = get_datatable(kwargs['table'])
+        except KeyError:
+            raise Http404
+
+        return super(TableDetailView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, *args, **kwargs):
+        return {
+            'table': self.table,
+        }
