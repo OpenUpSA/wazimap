@@ -1,6 +1,7 @@
 import os.path
 import json
 import logging
+from itertools import chain
 
 from django.conf import settings
 from django.utils.module_loading import import_string
@@ -38,7 +39,7 @@ class GeoData(object):
         self.comparative_levels = ['this'] + settings.WAZIMAP['comparative_levels']
         self.geo_levels = settings.WAZIMAP['levels']
 
-        ancestors = {}
+        parents = {}
         for code, level in self.geo_levels.iteritems():
             level.setdefault('name', code)
             level.setdefault('plural', code + 's')
@@ -46,11 +47,14 @@ class GeoData(object):
             level['sumlev'] = code
 
             for kid in level['children']:
-                ancestors.setdefault(kid, []).append(code)
+                parents.setdefault(kid, []).append(code)
 
         # fold in the ancestors
-        for code, items in ancestors.iteritems():
-            self.geo_levels[code]['ancestors'] = items
+        def climb(code):
+            return chain(parents.get(code, []), *[climb(p) for p in parents.get(code, [])])
+
+        for code, items in parents.iteritems():
+            self.geo_levels[code]['ancestors'] = list(set(climb(code)))
 
         # root level
         roots = [key for key, lev in self.geo_levels.iteritems() if not lev.get('ancestors')]

@@ -1,6 +1,11 @@
 Wazimap Change Log
 ==================
 
+0.2.17 (17 June 2016)
+-------------------
+
+* FIX how geo level ancestors are determined to fix issues with geography levels deeper than two.
+
 0.2.16 (26 May 2016)
 -------------------
 
