@@ -1,6 +1,12 @@
 Wazimap Change Log
 ==================
 
+0.2.19 (Unreleased)
+-------------------
+
+* Add table detail view, linked from homepage, to help users find data rather than
+  always starting with a place.
+
 0.2.18 (17 June 2016)
 ---------------------
 
