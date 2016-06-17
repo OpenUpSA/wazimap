@@ -44,7 +44,7 @@ class GeoMixin(object):
             kids = set(c for c in candidates if c.geo_level == level)
             if kids:
                 return list(kids)
-            candidates = list(itertools.chain(c.children() for c in candidates))
+            candidates = list(itertools.chain(*[c.children() for c in candidates]))
         return []
 
     @property
