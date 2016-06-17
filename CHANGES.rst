@@ -1,18 +1,23 @@
 Wazimap Change Log
 ==================
 
+0.2.18 (17 June 2016)
+---------------------
+
+* Make it easier to add provinces up the hierarchy in the data table view
+
 0.2.17 (17 June 2016)
--------------------
+---------------------
 
 * FIX how geo level ancestors are determined to fix issues with geography levels deeper than two.
 
 0.2.16 (26 May 2016)
--------------------
+--------------------
 
 * Add leaflet images included by css
 
 0.2.15 (25 May 2016)
--------------------
+--------------------
 
 * FIX ordering of keys for nested values
 

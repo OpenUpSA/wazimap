@@ -288,3 +288,18 @@ class GeographyCompareView(TemplateView):
             raise Http404
 
         return page_context
+
+
+class GeoAPIView(View):
+    """
+    View that lists things about geos. Currently just parents.
+    """
+    def get(self, request, geo_id, *args, **kwargs):
+        try:
+            level, code = geo_id.split('-', 1)
+            geo = geo_data.get_geography(code, level)
+        except (ValueError, LocationNotFound):
+            raise Http404
+
+        parents = [g.as_dict() for g in geo.ancestors()]
+        return render_json_to_response(parents)
