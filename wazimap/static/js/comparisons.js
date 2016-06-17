@@ -23,7 +23,7 @@ function Comparison(options) {
     var comparison = {
         tableSearchAPI: '/api/1.0/table',
         geoSearchAPI: '/place-search/json/',
-        rootGeoAPI: 'http://api.censusreporter.org/1.0/geo/tiger2012/',
+        rootGeoAPI: '/api/1.0/geo/',
         dataAPI: '/api/1.0/data/show/latest'
     };
 
@@ -1224,13 +1224,10 @@ function Comparison(options) {
     }
 
     comparison.makeParentOptions = function() {
-        // XXX: not supported
-        return;
-
         // no tribbles!
         d3.selectAll('#comparison-parents').remove();
 
-        if (!!comparison.primaryGeoID && comparison.thisSumlev != '010') {
+        if (!!comparison.primaryGeoID && !_.isEmpty(sumlevMap[comparison.thisSumlev].ancestors)) {
             var parentGeoAPI = comparison.rootGeoAPI + comparison.primaryGeoID + '/parents',
                 parentOptionsContainer = comparison.aside.append('div')
                     .attr('class', 'aside-block hidden')
@@ -1242,24 +1239,20 @@ function Comparison(options) {
                         .attr('class', 'bottom display-type strong')
                         .html('Add all ' + sumlevMap[comparison.thisSumlev]['plural'] + ' in&nbsp;&hellip;');
 
-                    var parents = _.reject(results['parents'], function(i) {
-                        return i.relation == 'this'
-                    })
-
                     parentOptionsContainer.append('ul')
                             .attr('class', 'sumlev-list')
                         .selectAll('li')
-                            .data(parents)
+                            .data(results)
                         .enter().append('li').append('a')
                             .attr('href', function(d) {
                                 var newGeoIDs = comparison.geoIDs.slice(0);
-                                newGeoIDs.push(comparison.thisSumlev + '|' + d.geoid);
+                                newGeoIDs.push(comparison.thisSumlev + '|' + d.full_geoid);
 
                                 return comparison.buildComparisonURL(
                                     comparison.dataFormat, comparison.tableID, newGeoIDs, comparison.primaryGeoID
                                 )
                             })
-                            .text(function(d) { return d.display_name });
+                            .text(function(d) { return d.full_name });
 
                 });
         }

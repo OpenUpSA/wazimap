@@ -9,7 +9,8 @@ from django.views.generic.base import RedirectView, TemplateView
 from census.views import HealthcheckView, DataView, ExampleView
 
 from wazimap.views import (HomepageView, GeographyDetailView, GeographyJsonView, PlaceSearchJson,
-                           LocateView, DataAPIView, TableAPIView, AboutView, GeographyCompareView)
+                           LocateView, DataAPIView, TableAPIView, AboutView, GeographyCompareView,
+                           GeoAPIView)
 
 
 admin.autodiscover()
@@ -89,6 +90,14 @@ urlpatterns = patterns('',
         view    = cache_page(STANDARD_CACHE_TIME)(TableAPIView.as_view()),
         kwargs  = {},
         name    = 'api_list_tables',
+    ),
+
+    # geo API
+    url(
+        regex   = '^api/1.0/geo/(?P<geo_id>\w+-\w+)/parents$',
+        view    = cache_page(STANDARD_CACHE_TIME)(GeoAPIView.as_view()),
+        kwargs  = {},
+        name    = 'api_geo_parents',
     ),
 
     # TODO enable this see: https://github.com/Code4SA/censusreporter/issues/31
