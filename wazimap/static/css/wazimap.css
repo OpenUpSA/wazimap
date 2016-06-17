@@ -11,6 +11,11 @@
     }
 }
 
+#homepage #explore-topic-place-picker,
+#homepage #explore-topic-place-picker-parent {
+  display: none;
+}
+
 #examples span.zoom-in, #examples span.zoom-out {
     background-color: #fff;
     border-bottom: 1px solid #ccc;
