@@ -47,7 +47,7 @@ DATA_TABLES = {}
 
 
 def get_datatable(id):
-    return DATA_TABLES[id.lower()]
+    return DATA_TABLES[id.upper()]
 
 
 class ZeroRow(object):
@@ -91,10 +91,10 @@ class SimpleTable(object):
         :param str year: the year the table belongs to
         :param str dataset: the name of the dataset the table belongs to
         """
-        self.id = id
+        self.id = id.upper()
 
         if model == 'auto':
-            model = get_table_model(id)
+            model = get_table_model(self.id.lower())
 
         self.model = model
         self.universe = universe
@@ -353,7 +353,7 @@ class FieldTable(SimpleTable):
                 model.data_table = self
                 self.models[level] = model
         else:
-            self.model = self._build_model_from_fields(self.fields, self.id)
+            self.model = self._build_model_from_fields(self.fields, self.id.lower())
             self.model.data_table = self
 
     def get_model(self, geo_level):
@@ -633,7 +633,7 @@ def get_table_id(fields):
     sorted_fields = sorted(fields)
     table_id = TABLE_BAD_CHARS.sub('', '_'.join(sorted_fields))
 
-    return table_id[:MAX_TABLE_NAME_LENGTH]
+    return table_id[:MAX_TABLE_NAME_LENGTH].upper()
 
 
 # the geo levels applicable to different datasets

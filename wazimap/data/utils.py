@@ -86,7 +86,7 @@ def add_metadata(data, table):
     if hasattr(table, 'data_table'):
         table = table.data_table
 
-    data['metadata']['table_id'] = table.id.upper()
+    data['metadata']['table_id'] = table.id
     if table.universe:
         data['metadata']['universe'] = table.universe
     if table.year:

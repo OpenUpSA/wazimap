@@ -10,7 +10,7 @@ from census.views import HealthcheckView, DataView, ExampleView
 
 from wazimap.views import (HomepageView, GeographyDetailView, GeographyJsonView, PlaceSearchJson,
                            LocateView, DataAPIView, TableAPIView, AboutView, GeographyCompareView,
-                           GeoAPIView)
+                           GeoAPIView, TableDetailView)
 
 
 admin.autodiscover()
@@ -123,12 +123,12 @@ urlpatterns = patterns('',
     #    name    = 'redirect_C23002',
     #),
 
-    #url(
-    #    regex   = '^tables/(?P<table>[a-zA-Z0-9]+)/$',
-    #    view    = cache_page(STANDARD_CACHE_TIME)(TableDetailView.as_view()),
-    #    kwargs  = {},
-    #    name    = 'table_detail',
-    #),
+    url(
+        regex   = '^tables/(?P<table>[a-zA-Z0-9_-]+)/$',
+        view    = cache_page(STANDARD_CACHE_TIME)(TableDetailView.as_view()),
+        kwargs  = {},
+        name    = 'table_detail',
+    ),
 
     #url(
     #    regex   = '^tables/$',

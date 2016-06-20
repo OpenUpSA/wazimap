@@ -11,6 +11,11 @@
     }
 }
 
+#homepage #explore-topic-place-picker,
+#homepage #explore-topic-place-picker-parent {
+  display: none;
+}
+
 #examples span.zoom-in, #examples span.zoom-out {
     background-color: #fff;
     border-bottom: 1px solid #ccc;
@@ -84,8 +89,9 @@
     margin-left: 4px;
 }
 
-header.section-contents.table-explorer h1 a {
+header.section-contents h1 a {
     float: none;
+    display: block;
 }
 
 .hovercard .context,
