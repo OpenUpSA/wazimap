@@ -1,8 +1,8 @@
 Wazimap Change Log
 ==================
 
-0.2.20 (unreleased)
--------------------
+0.2.20 (11 July 2016)
+---------------------
 
 * FIX correct comparative levels
 
