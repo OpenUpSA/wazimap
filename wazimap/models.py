@@ -3,7 +3,7 @@ import itertools
 
 from django.db import models
 from django.utils.text import slugify
-
+from django.conf import settings
 
 # Geographies
 class GeoMixin(object):
@@ -120,7 +120,7 @@ class GeographyBase(models.Model, GeoMixin):
         the hierarchy.
         """
         if not hasattr(self, '_parent'):
-            if self.parent_level and self.parent_code:
+            if self.parent_level and self.parent_code and self.parent_level in settings.WAZIMAP['comparative_levels']:
                 self._parent = self.__class__.objects.filter(geo_level=self.parent_level, geo_code=self.parent_code).first()
             else:
                 self._parent = None
