@@ -1,8 +1,8 @@
 Wazimap Change Log
 ==================
 
-0.2.21 (unreleased)
--------------------
+0.2.21 (20 July 2016)
+---------------------
 
 * Footer Wazimap links use WAZIMAP.name where appropriate
 * Change GitHub link in Footer
