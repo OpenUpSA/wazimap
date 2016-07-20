@@ -51,7 +51,10 @@
                 <i id="menu-toggle" class="fa fa-bars"></i>
                 {% endif %}
                 <a class="title" href="{% url 'homepage' %}">
-                    <img src="{% static 'img/wazi-logo.png' %}"> {{ WAZIMAP.name }}
+                    {% block header_logo %}
+                    <img src="{% static 'img/wazi-logo.png' %}">
+                    {% endblock %}
+                    {{ WAZIMAP.name }}
                 </a>
                 {% if not hide_nav_tools %}
                     {% block nav_tools %}
@@ -74,7 +77,9 @@
                     {% endblock %}
                 {% endif %}
                 <div class="header-buttons">
+                    {% if WAZIMAP.twitter %}
                     <a class="wide-only" href="https://twitter.com/{{ WAZIMAP.twitter }}" title="{{ WAZIMAP.twitter }} on Twitter"><i class="fa fa-2x fa-twitter"></i></a>
+                    {% endif %}
                 {% block header_branding %}
                     <a href="http://www.mediamonitoringafrica.org/" target="_blank">
                         <img class="mma-logo" src="{% static 'img/mma.png' %}">
@@ -98,11 +103,13 @@
                 <div class="column-quarter">
                     <ul class="ul-icon-list">
                         <li>
-                            <i class="fa fa-info"></i> <a href="/about">About Wazimap</a>
+                            <i class="fa fa-info"></i> <a href="/about">About {{ WAZIMAP.name }}</a>
                         </li>
+                        {% if WAZIMAP.twitter %}
                         <li>
-                            <i class="fa fa-twitter"></i> <a href="http://twitter.com/Wazimap" target="_blank">@Wazimap</a>
+                            <i class="fa fa-twitter"></i> <a href="http://twitter.com/{{ WAZIMAP.twitter }}" target="_blank">{{ WAZIMAP.twitter }}</a>
                         </li>
+                        {% endif %}
                         <li>
                             <i class="fa fa-pencil"></i> <a href="http://www.newstools.co.za/" target="_blank">More Newstools</a>
                         </li>
@@ -130,7 +137,7 @@
                 <div class="column-quarter">
                     <ul class="ul-icon-list">
                         <li>
-                            <i class="fa fa-github"></i> <a href="https://github.com/Code4SA/censusreporter" target="_blank">Wazimap on Github</a>
+                            <i class="fa fa-github"></i> <a href="https://github.com/Code4SA/wazimap" target="_blank">Wazimap on Github</a>
                         </li>
                         <li>
                             <i class="fa fa-github"></i> Built on <a href="http://censusreporter.org" target="_blank">CensusReporter.org</a>

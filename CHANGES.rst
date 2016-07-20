@@ -1,6 +1,14 @@
 Wazimap Change Log
 ==================
 
+0.2.21 (unreleased)
+-------------------
+
+* Footer Wazimap links use WAZIMAP.name where appropriate
+* Change GitHub link in Footer
+* Easier to override logo
+* Twitter link is now optional
+
 0.2.20 (11 July 2016)
 ---------------------
 
