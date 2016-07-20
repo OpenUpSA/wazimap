@@ -38,11 +38,14 @@
                   {% endif %}
                 </p>
             </header>
+
             <div class="column-half">
                 <div class="stat">
                     <span class="primary">
+                        {% block profile_header_population %}
                         <span class="value">{{ demographics.total_population.values.this|floatformat:"0" }}</span>
                         <span class="name">Population</span>
+                        {% endblock %}
                     </span>
                 </div>
             </div>
@@ -55,8 +58,10 @@
                     </span>
                     {% if demographics.population_density.values.this %}
                     <span class="secondary">
+                        {% block profile_header_density %}
                         <span class="value">{{ demographics.population_density.values.this|floatformat:"1" }}</span>
                         <span class="name"> people per square kilometre</span>
+                        {% endblock %}
                     </span>
                     {% endif %}
                     {% block geography_extra_sq_km %}
