@@ -1,6 +1,11 @@
 Wazimap Change Log
 ==================
 
+0.2.22 (22 July 2016)
+---------------------
+
+* Easier to override header blocks
+
 0.2.21 (20 July 2016)
 ---------------------
 
