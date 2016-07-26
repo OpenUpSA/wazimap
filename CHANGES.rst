@@ -1,6 +1,11 @@
 Wazimap Change Log
 ==================
 
+0.2.23 (26 July 2016)
+---------------------
+
+* FIX geography search in table view
+
 0.2.22 (22 July 2016)
 ---------------------
 
