@@ -39,6 +39,7 @@ Contents
    profiles
    customising
    deploying
+   version_history
 
 
 Indices and tables

@@ -1,5 +1,5 @@
-Wazimap Change Log
-==================
+Wazimap Version History
+=======================
 
 0.2.23 (26 July 2016)
 ---------------------
