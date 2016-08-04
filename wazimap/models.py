@@ -39,13 +39,15 @@ class GeoMixin(object):
         all the objects that are of geo_level +level+ and descendents
         of this geography.
         """
+        from wazimap.geo import geo_data
+        levels = [level] + geo_data.geo_levels[level]['ancestors']
+
         candidates = self.children()
+        kids = set()
         while candidates:
-            kids = set(c for c in candidates if c.geo_level == level)
-            if kids:
-                return list(kids)
-            candidates = list(itertools.chain(*[c.children() for c in candidates]))
-        return []
+            kids.update(c for c in candidates if c.geo_level == level)
+            candidates = list(itertools.chain(*[c.children() for c in candidates if c.geo_level in levels]))
+        return list(kids)
 
     @property
     def full_name(self):
