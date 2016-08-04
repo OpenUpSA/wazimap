@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.2.24 (4 August 2016)
+----------------------
+
+* FIX splitting geographies into child levels
+
 0.2.23 (26 July 2016)
 ---------------------
 
