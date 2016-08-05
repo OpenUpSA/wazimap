@@ -31,11 +31,7 @@ You'll need a Procfile, too: ::
     web: gunicorn --worker-class gevent wazimap.wsgi:application -t 120 --log-file -
 
 Wazimap requires GDAL and GEOS. The easiet way to get these installed on Heroku or Dokku is to use
-the *multi* buildpack. Set:
-
-* ``BUILDPACK_URL=https://github.com/ddollar/heroku-buildpack-multi.git``
-
-Then create a file ``.buildpacks`` in your project's root directory: ::
+multiple buildpacks. Create a file ``.buildpacks`` in your project's root directory: ::
 
     https://github.com/cyberdelia/heroku-geo-buildpack.git
     https://github.com/heroku/heroku-buildpack-python.git
