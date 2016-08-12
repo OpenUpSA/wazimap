@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.2.25 (12 August 2016)
+----------------------
+
+* FIX reordering pure-integer keys in javascript
+
 0.2.24 (4 August 2016)
 ----------------------
 

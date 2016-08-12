@@ -45,6 +45,8 @@ TABLE_BAD_CHARS = re.compile('[ /-]')
 # All SimpleTable and FieldTable instances by id
 DATA_TABLES = {}
 
+INT_RE = re.compile("^[0-9]+$")
+
 
 def get_datatable(id):
     return DATA_TABLES[id.upper()]
@@ -432,7 +434,11 @@ class FieldTable(SimpleTable):
             session.close()
 
     def column_id(self, field_values):
-        return '-'.join(field_values)
+        if len(field_values) == 1 and INT_RE.match(field_values[0]):
+            # javascript re-orders keys that are pure integers, so force it to be a string
+            return field_values[0] + "_"
+        else:
+            return '-'.join(field_values)
 
     def raw_data_for_geos(self, geos):
         """
