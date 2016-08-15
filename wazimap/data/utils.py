@@ -378,6 +378,12 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     model = get_model_from_fields(table_fields or fields, geo_level, table_name, table_dataset)
     objects = get_objects_by_geo(model, geo_code, geo_level, session, fields=fields, order_by=order_by)
 
+    if total is None and percent and model.data_table.total_column is None:
+        # The table doesn't support calculating percentages, but the caller
+        # has asked for a percentage without providing a total value to use.
+        # Either specify a total, or specify percent=False
+        raise ValueError("Asking for a percent on table %s that doesn't support totals and no total parameter specified." % model.data_table.id)
+
     root_data = OrderedDict()
     our_total = {}
 

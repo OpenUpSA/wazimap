@@ -310,7 +310,7 @@ class FieldTable(SimpleTable):
 
     """
     def __init__(self, fields, id=None, universe='Population', description=None, denominator_key=None,
-                 table_per_level=False, **kwargs):
+                 table_per_level=False, has_total=True, **kwargs):
         """
         Describe a new field table.
 
@@ -329,6 +329,8 @@ class FieldTable(SimpleTable):
                                     the id of the column has been calculated.
         :param bool table_per_level: is there a separate database table for each geo level,
                                      or are all levels in one table (default: False, one table)
+        :param bool has_total: does it make sense to calculate a total column and express percentages
+                                  for values in this table? (default: True)
         """
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
@@ -337,6 +339,7 @@ class FieldTable(SimpleTable):
         self.field_set = set(fields)
         self.denominator_key = denominator_key
         self.table_per_level = table_per_level
+        self.has_total = has_total
 
         super(FieldTable, self).__init__(id=id, model=None, universe=universe, description=description, **kwargs)
 
@@ -396,9 +399,13 @@ class FieldTable(SimpleTable):
         #   female
 
         # map from column id to column info.
-        self.total_column = self.column_id([self.denominator_key or 'total'])
         self.columns = OrderedDict()
-        self.columns[self.total_column] = {'name': 'Total', 'indent': 0}
+
+        if self.has_total:
+            self.total_column = self.column_id([self.denominator_key or 'total'])
+            self.columns[self.total_column] = {'name': 'Total', 'indent': 0}
+        else:
+            self.total_column = None
 
         session = get_session()
         try:
@@ -519,8 +526,9 @@ class FieldTable(SimpleTable):
                     total = permute(0, [], geo_rows)
 
                     # total
-                    geo_values['estimate'][self.total_column] = total
-                    geo_values['error'][self.total_column] = 0
+                    if self.total_column:
+                        geo_values['estimate'][self.total_column] = total
+                        geo_values['error'][self.total_column] = 0
 
             finally:
                 session.close()
