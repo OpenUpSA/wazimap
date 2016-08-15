@@ -1,10 +1,11 @@
 Wazimap Version History
 =======================
 
-0.3 (15 August 2016)
+0.3.1 (15 August 2016)
 --------------------
 
 * FEATURE a FieldTable can now optionally not support percentages (``has_total`` parameter)
+* FIX correctly serialize Decimal() values in JSON
 
 0.2.25 (12 August 2016)
 ----------------------
