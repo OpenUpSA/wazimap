@@ -2,6 +2,7 @@ from itertools import chain
 import json
 
 from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.safestring import SafeString
 from django.utils.module_loading import import_string
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
@@ -9,7 +10,6 @@ from django.views.generic import View, TemplateView
 from django.shortcuts import redirect
 
 from census.views import GeographyDetailView as BaseGeographyDetailView, LocateView as BaseLocateView, render_json_to_response
-from census.utils import LazyEncoder
 
 from wazimap.geo import geo_data
 from wazimap.profiles import enhance_api_data
@@ -75,7 +75,7 @@ class GeographyDetailView(BaseGeographyDetailView):
         profile_data = enhance_api_data(profile_data)
         page_context.update(profile_data)
 
-        profile_data_json = SafeString(json.dumps(profile_data, cls=LazyEncoder))
+        profile_data_json = SafeString(json.dumps(profile_data, cls=DjangoJSONEncoder))
 
         page_context.update({
             'profile_data_json': profile_data_json
