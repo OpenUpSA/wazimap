@@ -385,7 +385,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         raise ValueError("Asking for a percent on table %s that doesn't support totals and no total parameter specified." % model.data_table.id)
 
     root_data = OrderedDict()
-    our_total = {}
+    running_total = 0
 
     def get_data_object(obj):
         """ Recurse down the list of fields and return the
@@ -442,13 +442,13 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         if not data:
             continue
 
-        our_total[key] = our_total.get(key, 0.0) + obj.total
         data['numerators']['this'] += obj.total
+        running_total += obj.total
 
     if total is not None:
         grand_total = total
     else:
-        grand_total = sum(our_total.values())
+        grand_total = running_total
 
     # add in percentages
     def calc_percent(data):
@@ -456,8 +456,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             if not key == 'metadata':
                 if 'numerators' in data:
                     if percent:
-                        tot = our_total[key] if many_fields else grand_total
-                        perc = 0 if tot == 0 else (data['numerators']['this'] / tot * 100)
+                        perc = 0 if grand_total == 0 else (data['numerators']['this'] / grand_total * 100)
                         data['values'] = {'this': round(perc, 2)}
                     else:
                         data['values'] = dict(data['numerators'])
