@@ -237,10 +237,11 @@ def group_remainder(data, num_items=4, make_percentage=True,
                                         for k, v in values['numerators'].iteritems())
 
 
-def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, order_by=None):
+def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, order_by=None,
+                       only=None, exclude=None):
     """ Get rows of statistics from the stats mode +db_model+ at a particular
     geo_code and geo_level, summing over the 'total' field and grouping by
-    +fields+.
+    +fields+. Filters to include +only+ and ignore +exclude+, if given.
     """
     if db_model.data_table.table_per_level:
         geo_attr = '%s_code' % geo_level
@@ -256,6 +257,14 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
         .query(func.sum(db_model.total).label('total'), *fields)\
         .group_by(*fields)\
         .filter(getattr(db_model, geo_attr) == geo_code)
+
+    if only:
+        for k, v in only.iteritems():
+            objects = objects.filter(getattr(db_model, k).in_(v))
+
+    if exclude:
+        for k, v in exclude.iteritems():
+            objects = objects.filter(getattr(db_model, k).notin_(v))
 
     if not db_model.data_table.table_per_level:
         objects = objects.filter(db_model.geo_level == geo_level)
@@ -376,7 +385,8 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             recode = dict((f, recode) for f in fields)
 
     model = get_model_from_fields(table_fields or fields, geo_level, table_name, table_dataset)
-    objects = get_objects_by_geo(model, geo_code, geo_level, session, fields=fields, order_by=order_by)
+    objects = get_objects_by_geo(model, geo_code, geo_level, session, fields=fields, order_by=order_by,
+                                 only=only, exclude=exclude)
 
     if total is None and percent and model.data_table.total_column is None:
         # The table doesn't support calculating percentages, but the caller
@@ -394,12 +404,6 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
 
         for i, field in enumerate(fields):
             key = getattr(obj, field)
-
-            if only and field in only and key not in only.get(field, {}):
-                return key, None
-
-            if exclude and key in exclude.get(field, {}):
-                return key, None
 
             if recode and field in recode:
                 recoder = recode[field]
