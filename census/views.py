@@ -12,6 +12,7 @@ import json
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -45,7 +46,7 @@ def render_json_to_response(context):
     '''
     Utility method for rendering a view's data to JSON response.
     '''
-    result = json.dumps(context, sort_keys=False, indent=4)
+    result = json.dumps(context, sort_keys=False, cls=DjangoJSONEncoder)
     return HttpResponse(result, content_type='application/javascript')
 
 ### HEALTH CHECK ###
