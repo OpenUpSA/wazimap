@@ -1,11 +1,13 @@
 Wazimap Version History
 =======================
 
-0.3.2 (17 August 2016)
+0.3.3 (17 August 2016)
 --------------------
 
 * FEATURE get_stat_data now applies the ``only`` and ``exclude`` parameters in the database. This makes it possible to specify filters on fields that don't need to be fetched.
 * FIX get_stat_data now uses the ``denominator_key`` to determine the table total for FieldTables that have ``denominator_key`` specified.
+* FIX correctly serialise Decimal() in additional places
+* Don't use whitespace in JSON responses.
 
 0.3.1 (15 August 2016)
 --------------------
