@@ -237,10 +237,11 @@ def group_remainder(data, num_items=4, make_percentage=True,
                                         for k, v in values['numerators'].iteritems())
 
 
-def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, order_by=None):
+def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, order_by=None,
+                       only=None, exclude=None):
     """ Get rows of statistics from the stats mode +db_model+ at a particular
     geo_code and geo_level, summing over the 'total' field and grouping by
-    +fields+.
+    +fields+. Filters to include +only+ and ignore +exclude+, if given.
     """
     if db_model.data_table.table_per_level:
         geo_attr = '%s_code' % geo_level
@@ -256,6 +257,14 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
         .query(func.sum(db_model.total).label('total'), *fields)\
         .group_by(*fields)\
         .filter(getattr(db_model, geo_attr) == geo_code)
+
+    if only:
+        for k, v in only.iteritems():
+            objects = objects.filter(getattr(db_model, k).in_(v))
+
+    if exclude:
+        for k, v in exclude.iteritems():
+            objects = objects.filter(getattr(db_model, k).notin_(v))
 
     if not db_model.data_table.table_per_level:
         objects = objects.filter(db_model.geo_level == geo_level)
@@ -376,7 +385,8 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             recode = dict((f, recode) for f in fields)
 
     model = get_model_from_fields(table_fields or fields, geo_level, table_name, table_dataset)
-    objects = get_objects_by_geo(model, geo_code, geo_level, session, fields=fields, order_by=order_by)
+    objects = get_objects_by_geo(model, geo_code, geo_level, session, fields=fields, order_by=order_by,
+                                 only=only, exclude=exclude)
 
     if total is None and percent and model.data_table.total_column is None:
         # The table doesn't support calculating percentages, but the caller
@@ -384,8 +394,9 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         # Either specify a total, or specify percent=False
         raise ValueError("Asking for a percent on table %s that doesn't support totals and no total parameter specified." % model.data_table.id)
 
+    denominator_key = getattr(model.data_table, 'denominator_key')
     root_data = OrderedDict()
-    our_total = {}
+    running_total = 0
 
     def get_data_object(obj):
         """ Recurse down the list of fields and return the
@@ -394,12 +405,6 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
 
         for i, field in enumerate(fields):
             key = getattr(obj, field)
-
-            if only and field in only and key not in only.get(field, {}):
-                return key, None
-
-            if exclude and key in exclude.get(field, {}):
-                return key, None
 
             if recode and field in recode:
                 recoder = recode[field]
@@ -437,18 +442,23 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         if obj.total == 0 and exclude_zero:
             continue
 
+        if denominator_key and getattr(obj, model.data_table.fields[-1]) == denominator_key:
+            total = obj.total
+            # don't include the denominator key in the output
+            continue
+
         # get the data dict where these values must go
         key, data = get_data_object(obj)
         if not data:
             continue
 
-        our_total[key] = our_total.get(key, 0.0) + obj.total
         data['numerators']['this'] += obj.total
+        running_total += obj.total
 
     if total is not None:
         grand_total = total
     else:
-        grand_total = sum(our_total.values())
+        grand_total = running_total
 
     # add in percentages
     def calc_percent(data):
@@ -456,8 +466,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             if not key == 'metadata':
                 if 'numerators' in data:
                     if percent:
-                        tot = our_total[key] if many_fields else grand_total
-                        perc = 0 if tot == 0 else (data['numerators']['this'] / tot * 100)
+                        perc = 0 if grand_total == 0 else (data['numerators']['this'] / grand_total * 100)
                         data['values'] = {'this': round(perc, 2)}
                     else:
                         data['values'] = dict(data['numerators'])
