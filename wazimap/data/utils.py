@@ -394,6 +394,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         # Either specify a total, or specify percent=False
         raise ValueError("Asking for a percent on table %s that doesn't support totals and no total parameter specified." % model.data_table.id)
 
+    denominator_key = getattr(model.data_table, 'denominator_key')
     root_data = OrderedDict()
     running_total = 0
 
@@ -439,6 +440,11 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     # run the stats for the objects
     for obj in objects:
         if obj.total == 0 and exclude_zero:
+            continue
+
+        if denominator_key and getattr(obj, model.data_table.fields[-1]) == denominator_key:
+            total = obj.total
+            # don't include the denominator key in the output
             continue
 
         # get the data dict where these values must go
