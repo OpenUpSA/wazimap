@@ -1,0 +1,18 @@
+{% load humanize madlibs stats %}
+{# to be called via `comparatives` inclusion tag #}
+<li>
+    {% if index and stat_type != 'count' %}
+    {{ index|comparison_index_phrase }} the {{ stat_type|stat_type_to_number_noun }} in {{ place_name }}: {% statvalue value %}
+    {% if error_ratio >= 10 %}<sup>&dagger;</sup>{% endif %}
+    {% else %}
+    <strong>{{ place_name }}:</strong> {% statvalue value %}
+    {% endif %}
+    {% if numerator %}
+        <span class="context">{% statvalue numerator isnumerator=True %}</span>
+        {% if error %}
+        <span class="context">(&plusmn; {% statvalue error %}{% if numerator_error %} / &plusmn;{% statvalue numerator_error isnumerator=True %}{% endif %})</span>
+        {% endif %}
+    {% elif error %}
+        <span class="context">&plusmn;{% statvalue error %}</span>
+    {% endif %}
+</li>
