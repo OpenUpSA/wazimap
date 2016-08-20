@@ -4,7 +4,7 @@ Configuration
 =============
 
 There are a number of options to configure how Wazimap behaves. Options are
-always set in ``settings.py`` in the ``WAZIMAP`` dict.
+set in ``settings.py`` in the ``WAZIMAP`` dict.
 
 ``name``
   The full name of the website. Default: ``Wazimap Example``
@@ -95,3 +95,20 @@ always set in ``settings.py`` in the ``WAZIMAP`` dict.
 ``na_label``
   The label to display for stats which have no data available.
   The default is N/A.
+
+Localisation
+------------
+
+You can customise how Wazimap formats numbers shown on a profile page by
+using Django's `FORMAT_MODULE_PATH <https://docs.djangoproject.com/en/1.10/ref/settings/#std:setting-FORMAT_MODULE_PATH>`_ setting.
+These settings in particular apply:
+
+``THOUSAND_SEPARATOR``
+  The thousand separator used when formatter numbers.
+
+``DECIMAL_SEPARATOR``
+  The decimal separator used when formatter numbers.
+
+``CURRENCY_SYMBOL``
+  The currency symbol to be used before currency amounts. Not in Django.
+  Default: $
