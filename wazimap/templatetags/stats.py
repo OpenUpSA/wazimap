@@ -1,8 +1,13 @@
 from django import template
+from django.utils import formats
 from django.template.defaultfilters import floatformat
 from django.contrib.humanize.templatetags.humanize import intcomma
 
 register = template.Library()
+
+CURRENCY_SYMBOL = formats.get_format('CURRENCY_SYMBOL')
+if CURRENCY_SYMBOL == 'CURRENCY_SYMBOL':
+    CURRENCY_SYMBOL = '$'
 
 
 @register.simple_tag(takes_context=True)
@@ -16,9 +21,8 @@ def statvalue(context, value, decimals=None, stat_type=None, isnumerator=False):
     if value.endswith(".0"):
         value = value[:-2]
 
-    if stat_type == "dollar":
-        # TODO: currency symbol
-        value = "R" + value
+    if stat_type in ["dollar", "currency"]:
+        value = CURRENCY_SYMBOL + value
     elif stat_type == "percentage" and not isnumerator:
         value = value + "%"
 
