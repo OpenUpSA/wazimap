@@ -1,8 +1,14 @@
 Wazimap Version History
 =======================
 
+0.4 (unreleased)
+----------------
+
+* FEATURE control the number of decimals for stats shown with the ``_stat_list`` include by using the ``decimals`` parameter.
+* FEATURE adjust the currency symbol used for ``currency`` stats shown by ``_stat_list`` by setting ``CURRENCY_SYMBOL`` in the file specified by Django's FORMAT_MODULE_PATH.
+
 0.3.3 (17 August 2016)
---------------------
+----------------------
 
 * FEATURE get_stat_data now applies the ``only`` and ``exclude`` parameters in the database. This makes it possible to specify filters on fields that don't need to be fetched.
 * FIX get_stat_data now uses the ``denominator_key`` to determine the table total for FieldTables that have ``denominator_key`` specified.
@@ -10,13 +16,13 @@ Wazimap Version History
 * Don't use whitespace in JSON responses.
 
 0.3.1 (15 August 2016)
---------------------
+----------------------
 
 * FEATURE a FieldTable can now optionally not support percentages (``has_total`` parameter)
 * FIX correctly serialize Decimal() values in JSON
 
 0.2.25 (12 August 2016)
-----------------------
+-----------------------
 
 * FIX reordering pure-integer keys in javascript
 
