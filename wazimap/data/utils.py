@@ -296,7 +296,8 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
 def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                   percent=True, total=None, table_fields=None,
                   table_name=None, only=None, exclude=None, exclude_zero=False,
-                  recode=None, key_order=None, table_dataset=None):
+                  recode=None, key_order=None, table_dataset=None,
+                  percent_grouping=None, slices=None):
     """
     This is our primary helper routine for building a dictionary suitable for
     a place's profile page, based on a statistic.
@@ -319,6 +320,9 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     :param dbsession session: sqlalchemy session
     :param str order_by: field to order by, or None for default, eg. '-total'
     :param bool percent: should we calculate percentages, or just sum raw values?
+    :param list percent_grouping: when calculating percentages, which fields should rows be grouped by?
+                                  Default: none of them -- calculate each entry as a percentage of the
+                                  whole dataset. Ignored unless ``percent`` is ``True``.
     :param list table_fields: list of fields to use to find the table, defaults to `fields`
     :param int total: the total value to use for percentages, or None to total columns automatically
     :param str table_name: override the table name, otherwise it's calculated from the fields and geo_level
@@ -340,6 +344,8 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                       The default ordering is determined by ``order``.
     :type key_order: dict or list
     :param str table_dataset: dataset used to help find the table if ``table_name`` isn't given.
+    :param list slices: return only a slice of the final data, by choosing a single value for each
+                       field in the field list, as specified in the slice list.
 
     :return: (data-dictionary, total)
     """
@@ -377,9 +383,6 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     else:
         key_order = {}
 
-    if total is not None and many_fields:
-        raise ValueError("Cannot specify a total if many fields are given")
-
     if recode:
         if not isinstance(recode, dict) or not many_fields:
             recode = dict((f, recode) for f in fields)
@@ -388,15 +391,33 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     objects = get_objects_by_geo(model, geo_code, geo_level, session, fields=fields, order_by=order_by,
                                  only=only, exclude=exclude)
 
+    if total is not None and many_fields:
+        raise ValueError("Cannot specify a total if many fields are given")
+
+    if total and percent_grouping:
+        raise ValueError("Cannot specify a total if percent_grouping is given")
+
     if total is None and percent and model.data_table.total_column is None:
         # The table doesn't support calculating percentages, but the caller
         # has asked for a percentage without providing a total value to use.
         # Either specify a total, or specify percent=False
         raise ValueError("Asking for a percent on table %s that doesn't support totals and no total parameter specified." % model.data_table.id)
 
+    # sanity check the percent grouping
+    if percent:
+        if percent_grouping:
+            for field in percent_grouping:
+                if field not in fields:
+                    raise ValueError("Field '%s' specified in percent_grouping must be in the fields list." % field)
+            # re-order percent grouping to be same order as in the field list
+            percent_grouping = [f for f in fields if f in percent_grouping]
+    else:
+        percent_grouping = None
+
     denominator_key = getattr(model.data_table, 'denominator_key')
     root_data = OrderedDict()
     running_total = 0
+    group_totals = {}
 
     def get_data_object(obj):
         """ Recurse down the list of fields and return the
@@ -435,7 +456,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             data['name'] = key
             data['numerators'] = {'this': 0.0}
 
-        return key, data
+        return data
 
     # run the stats for the objects
     for obj in objects:
@@ -448,12 +469,16 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             continue
 
         # get the data dict where these values must go
-        key, data = get_data_object(obj)
+        data = get_data_object(obj)
         if not data:
             continue
 
         data['numerators']['this'] += obj.total
         running_total += obj.total
+        if percent_grouping:
+            key = tuple(getattr(obj, field) for field in percent_grouping)
+            data['_group_key'] = key
+            group_totals[key] = group_totals.get(key, 0) + obj.total
 
     if total is not None:
         grand_total = total
@@ -466,7 +491,12 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             if not key == 'metadata':
                 if 'numerators' in data:
                     if percent:
-                        perc = 0 if grand_total == 0 else (data['numerators']['this'] / grand_total * 100)
+                        if '_group_key' in data:
+                            total = group_totals[data.pop('_group_key')]
+                        else:
+                            total = grand_total
+
+                        perc = 0 if total == 0 else (data['numerators']['this'] / total * 100)
                         data['values'] = {'this': round(perc, 2)}
                     else:
                         data['values'] = dict(data['numerators'])
@@ -475,6 +505,10 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                     calc_percent(data)
 
     calc_percent(root_data)
+
+    if slices:
+        for v in slices:
+            root_data = root_data[v]
 
     add_metadata(root_data, model)
 
