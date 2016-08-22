@@ -1,8 +1,8 @@
 Wazimap Version History
 =======================
 
-0.4 (unreleased)
-----------------
+0.4 (22 August 2016)
+--------------------
 
 * FEATURE control the number of decimals for stats shown with the ``_stat_list`` include by using the ``decimals`` parameter.
 * FEATURE adjust the currency symbol used for ``currency`` stats shown by ``_stat_list`` by setting ``CURRENCY_SYMBOL`` in the file specified by Django's FORMAT_MODULE_PATH.
