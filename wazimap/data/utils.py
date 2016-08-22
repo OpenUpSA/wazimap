@@ -94,7 +94,7 @@ def add_metadata(data, table):
 
 
 # dictionaries that merge_dicts will merge
-MERGE_KEYS = set(['values', 'numerators'])
+MERGE_KEYS = set(['values', 'numerators', 'error'])
 
 
 def collapse_categories(data, categories, key_order=None):
