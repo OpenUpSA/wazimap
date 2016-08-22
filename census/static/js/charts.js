@@ -29,6 +29,7 @@ function Chart(options) {
         chart.chartInitialSort = options.chartInitialSort || null;
         chart.chartStatType = options.chartStatType || 'number';
         chart.decimalPlaces = parseInt(options.chartDecimalPlaces) || 0;
+        chart.tableDecimalPlaces = parseInt(options.chartDecimalPlaces) || 1;
         chart.chartChartShowYAxis = options.chartChartShowYAxis || (chart.chartStatType == "percentage" ? true : false);
         chart.chartHeight = options.chartHeight || (chart.parentHeight < 180 ? 180 : chart.parentHeight);
         chart.chartColorScale = options.chartColorScale || 'Set2S';
@@ -947,7 +948,7 @@ function Chart(options) {
             ];
             _.each(d.context.values, function(v, k) {
                 // add the primary value
-                rowData.push({ cellClass: 'value', cellContents: chart.getValueFmt(d, k, 1) });
+                rowData.push({ cellClass: 'value', cellContents: chart.getValueFmt(d, k, chart.tableDecimalPlaces) });
                 // rowData.push({ cellClass: 'context', cellContents: '&plusmn;' + chart.valFmt(d.context.error[k], 1) });
                 // add the numerator value if it exists
                 if (d.context.numerators[k] !== null) {
