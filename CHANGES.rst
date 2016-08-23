@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.4.2 (23 August 2016)
+----------------------
+
+* Support decimal places in chart tables
+
 0.4.1 (22 August 2016)
 ----------------------
 
