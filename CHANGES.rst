@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.4.3 (6 September 2016)
+------------------------
+
+* Allow overriding of favicon.
+
 0.4.2 (23 August 2016)
 ----------------------
 
