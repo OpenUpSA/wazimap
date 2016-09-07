@@ -32,7 +32,9 @@
 
         </script>
         <!-- End Google Analytics -->
+        {% block favicon %}
         <link rel="shortcut icon" href="{{ STATIC_URL }}img/icons/favicon.ico" />
+        {% endblock favicon %}
         <link rel="apple-touch-icon-precomposed" href="{{ STATIC_URL }}img/icons/touch-icon-144x144.png" sizes="144x144" />
         {% block head_facebook_tags %}{% endblock %}
         {% block head_twitter_tags %}{% endblock %}
