@@ -32,7 +32,7 @@ install_requires = [
 if not on_rtd:
     # these aren't available when building docs for readthedocs.org
     install_requires += [
-        'GDAL==1.11.0',
+        'GDAL>=1.11.0,<2.0',
         'Shapely>=1.5.13',
     ]
 
