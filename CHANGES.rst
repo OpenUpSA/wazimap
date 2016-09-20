@@ -1,10 +1,12 @@
 Wazimap Version History
 =======================
 
-0.4.5 (20 September 2016)
+0.4.6 (20 September 2016)
 -------------------------
 
 * Be more tolerant of GDAL versions >= 1.11.0 and < 2.0
+* Lazy load OGR/GDAL
+* Don't allow Django 1.10
 
 0.4.4 (8 September 2016)
 ------------------------
