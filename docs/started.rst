@@ -29,11 +29,15 @@ from the Wazimap application, rather than your Django application like normal.
 
     rm wazimap_ex/urls.py wazimap_ex/wsgi.py
 
-4. Install Wazimap and its dependencies ::
+4. Wazimap needs GDAL installed to allow users to download data in KML, GeoJSON, Excel, etc.
+   GDAL can be complicated to install. For development, we recommend you follow the
+   `Django instructions <https://docs.djangoproject.com/en/1.8/ref/contrib/gis/install/geolibs/>`_.
+
+5. Install Wazimap and its dependencies ::
 
     pip install wazimap
 
-5. At this point you have the absolute basics in place. We're now going to configure
+6. At this point you have the absolute basics in place. We're now going to configure
    your Django application to load its settings from Wazimap.
 
    Change your ``settings.py`` file to import most settings from Wazimap, and then
@@ -58,7 +62,7 @@ from the Wazimap application, rather than your Django application like normal.
 
        See the :ref:`config` section for more details on configuration options.
 
-6. You'll need a running PostgreSQL server. The default database settings are:
+7. You'll need a running PostgreSQL server. The default database settings are:
 
    * Username: wazimap
    * Password: wazimap
@@ -80,10 +84,10 @@ from the Wazimap application, rather than your Django application like normal.
        If you want to use a different database, configure the default database
        as you normally would for a Django application.
 
-7. Run migrations to setup the database: ::
+8. Run migrations to setup the database: ::
 
     python manage.py migrate
 
-8. You now have a Wazimap application and matching database ready to load
+9. You now have a Wazimap application and matching database ready to load
    geographies and data into. Those steps are covered in the rest of this
    guide.

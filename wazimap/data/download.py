@@ -5,7 +5,6 @@ import logging
 import zipfile
 import re
 
-from osgeo import ogr, osr
 from wazimap.geo import geo_data
 
 
@@ -24,6 +23,11 @@ class DownloadManager(object):
     }
 
     def generate_download_bundle(self, tables, geos, geo_ids, data, fmt):
+        try:
+            from osgeo import ogr, osr
+        except ImportError as e:
+            log.error("Unable to import GDAL (ogr). You need to have the GDAL binaries and a matching python GDAL installed.")
+            raise e
         ogr.UseExceptions()
 
         format = self.DOWNLOAD_FORMATS[fmt]
