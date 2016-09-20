@@ -20,7 +20,7 @@ from the Wazimap application, rather than your Django application like normal.
 
 2. Install Django (version 1.8.0 or newer) and start a new Django project. ::
 
-    pip install django
+    pip install 'django<1.10'
     django-admin startproject wazimap_ex
     cd wazimap_ex
 
