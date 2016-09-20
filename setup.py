@@ -13,7 +13,7 @@ with open(path.join(here, 'VERSION')) as f:
     version = f.read().strip()
 
 install_requires = [
-    'Django>=1.8.0',
+    'Django>=1.8.0,<1.10',
     'SQLAlchemy>=0.9.4',
     'boto>=2.27.0',
     'django-cors-headers>=1.1.0',
