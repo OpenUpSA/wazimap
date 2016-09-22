@@ -311,7 +311,7 @@ class FieldTable(SimpleTable):
 
     """
     def __init__(self, fields, id=None, universe='Population', description=None, denominator_key=None,
-                 table_per_level=False, has_total=True, total_type='Integer', **kwargs):
+                 table_per_level=False, has_total=True, value_type='Integer', **kwargs):
         """
         Describe a new field table.
 
@@ -332,7 +332,7 @@ class FieldTable(SimpleTable):
                                      or are all levels in one table (default: False, one table)
         :param bool has_total: does it make sense to calculate a total column and express percentages
                                   for values in this table? (default: True)
-        :param str total_type: the data type for the total column - Integer or Float (default: 'Integer')
+        :param str value_type: the data type for the total column (default: 'Integer')
         """
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
@@ -357,11 +357,11 @@ class FieldTable(SimpleTable):
 
         if self.table_per_level:
             for level in DATASET_GEO_LEVELS[self.dataset_name]:
-                model = self._build_model_from_fields(self.fields, self._table_name(level), level, total_type=self.total_type)
+                model = self._build_model_from_fields(self.fields, self._table_name(level), level, value_type=self.value_type)
                 model.data_table = self
                 self.models[level] = model
         else:
-            self.model = self._build_model_from_fields(self.fields, self.id.lower(), total_type=self.total_type)
+            self.model = self._build_model_from_fields(self.fields, self.id.lower(), value_type=self.value_type)
             self.model.data_table = self
 
     def get_model(self, geo_level):
@@ -538,7 +538,7 @@ class FieldTable(SimpleTable):
 
         return data
 
-    def _build_model_from_fields(self, fields, table_name, geo_level=None, total_type=Integer):
+    def _build_model_from_fields(self, fields, table_name, geo_level=None, value_type=Integer):
         '''
         Generates an ORM model for arbitrary census fields by geography.
 
@@ -576,7 +576,7 @@ class FieldTable(SimpleTable):
         # Now add the columns
         table_args.extend(Column(field, String(128), primary_key=True) for field in fields)
         # and the value column
-        table_args.append(Column('total', total_type, nullable=False))
+        table_args.append(Column('total', value_type, nullable=False))
 
         # create the table model
         class Model(Base):
