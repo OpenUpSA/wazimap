@@ -2,7 +2,7 @@ import re
 from itertools import groupby
 from collections import OrderedDict
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, func
+from sqlalchemy import Column, ForeignKey, Integer, String, Float, Table, func
 
 from wazimap.geo import geo_data
 from wazimap.data.base import Base
@@ -44,6 +44,13 @@ TABLE_BAD_CHARS = re.compile('[ /-]')
 
 # All SimpleTable and FieldTable instances by id
 DATA_TABLES = {}
+
+# Map column type strings to SQLAlchemy types
+
+TOTAL_COL_TYPES = {
+    'Integer': Integer,
+    'Float': Float
+}
 
 INT_RE = re.compile("^[0-9]+$")
 
@@ -310,7 +317,7 @@ class FieldTable(SimpleTable):
 
     """
     def __init__(self, fields, id=None, universe='Population', description=None, denominator_key=None,
-                 table_per_level=False, has_total=True, **kwargs):
+                 table_per_level=False, has_total=True, total_type='Integer', **kwargs):
         """
         Describe a new field table.
 
@@ -331,6 +338,7 @@ class FieldTable(SimpleTable):
                                      or are all levels in one table (default: False, one table)
         :param bool has_total: does it make sense to calculate a total column and express percentages
                                   for values in this table? (default: True)
+        :param str total_type: the data type for the total column - Integer or Float (default: 'Integer')
         """
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
@@ -340,6 +348,7 @@ class FieldTable(SimpleTable):
         self.denominator_key = denominator_key
         self.table_per_level = table_per_level
         self.has_total = has_total
+        self.total_type = TOTAL_COL_TYPES[total_type]
 
         super(FieldTable, self).__init__(id=id, model=None, universe=universe, description=description, **kwargs)
 
@@ -354,11 +363,11 @@ class FieldTable(SimpleTable):
 
         if self.table_per_level:
             for level in DATASET_GEO_LEVELS[self.dataset_name]:
-                model = self._build_model_from_fields(self.fields, self._table_name(level), level)
+                model = self._build_model_from_fields(self.fields, self._table_name(level), level, total_type=self.total_type)
                 model.data_table = self
                 self.models[level] = model
         else:
-            self.model = self._build_model_from_fields(self.fields, self.id.lower())
+            self.model = self._build_model_from_fields(self.fields, self.id.lower(), total_type=self.total_type)
             self.model.data_table = self
 
     def get_model(self, geo_level):
@@ -535,7 +544,7 @@ class FieldTable(SimpleTable):
 
         return data
 
-    def _build_model_from_fields(self, fields, table_name, geo_level=None):
+    def _build_model_from_fields(self, fields, table_name, geo_level=None, total_type=Integer):
         '''
         Generates an ORM model for arbitrary census fields by geography.
 
@@ -572,9 +581,8 @@ class FieldTable(SimpleTable):
 
         # Now add the columns
         table_args.extend(Column(field, String(128), primary_key=True) for field in fields)
-
         # and the value column
-        table_args.append(Column('total', Integer, nullable=False))
+        table_args.append(Column('total', total_type, nullable=False))
 
         # create the table model
         class Model(Base):
