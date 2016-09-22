@@ -2,7 +2,8 @@ import re
 from itertools import groupby
 from collections import OrderedDict
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Float, Table, func
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, func
+import sqlalchemy.types
 
 from wazimap.geo import geo_data
 from wazimap.data.base import Base
@@ -44,13 +45,6 @@ TABLE_BAD_CHARS = re.compile('[ /-]')
 
 # All SimpleTable and FieldTable instances by id
 DATA_TABLES = {}
-
-# Map column type strings to SQLAlchemy types
-
-TOTAL_COL_TYPES = {
-    'Integer': Integer,
-    'Float': Float
-}
 
 INT_RE = re.compile("^[0-9]+$")
 
@@ -348,7 +342,7 @@ class FieldTable(SimpleTable):
         self.denominator_key = denominator_key
         self.table_per_level = table_per_level
         self.has_total = has_total
-        self.total_type = TOTAL_COL_TYPES[total_type]
+        self.value_type = getattr(sqlalchemy.types, value_type)
 
         super(FieldTable, self).__init__(id=id, model=None, universe=universe, description=description, **kwargs)
 
