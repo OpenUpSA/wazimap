@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.5.0 (22 September 2016)
+-------------------------
+
+* Support floating point values in tables
+
 0.4.6 (20 September 2016)
 -------------------------
 
