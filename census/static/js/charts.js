@@ -40,17 +40,21 @@ function Chart(options) {
             geographyParents = options.geographyData.parents;
         chart.thisGeo = geographyThis;
         chart.parentGeo = geographyParents;
+        chart.comparisonLevels = options.comparisonLevels;
 
         chart.comparisonNames = {
             'this': (!!geographyThis) ? geographyThis.short_name : 'here',
-            'province': (!!geographyParents.province) ? geographyParents.province.short_name : 'province',
-            'country': (!!geographyParents.country) ? geographyParents.country.short_name : 'country'
         }
+        chart.comparisonLevels.forEach(function(d) {
+            chart.comparisonNames[d] = (!!geographyParents[d]) ? geographyParents[d].short_name : d
+        });
+
         chart.comparisonNamePhrases = {
-            'this': (!!geographyThis) ? 'in ' + geographyThis.short_name : 'here',
-            'province': (!!geographyParents.province) ? 'in ' + geographyParents.province.short_name : 'province-wide',
-            'country': (!!geographyParents.country) ? 'in ' + geographyParents.country.short_name : 'country-wide'
+            'this': (!!geographyThis) ? 'in ' + geographyThis.short_name : 'here'
         }
+        chart.comparisonLevels.forEach(function(d) {
+            chart.comparisonNamePhrases[d] = (!!geographyParents[d]) ? 'in ' + geographyParents[d]short_name : d + "-wide"
+        });
 
         chart.primaryGeoID = geographyThis.full_geoid;
         chart.geoIDs = [geographyThis.full_geoid];
