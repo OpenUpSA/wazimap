@@ -53,7 +53,7 @@ function Chart(options) {
             'this': (!!geographyThis) ? 'in ' + geographyThis.short_name : 'here'
         }
         chart.comparisonLevels.forEach(function(d) {
-            chart.comparisonNamePhrases[d] = (!!geographyParents[d]) ? 'in ' + geographyParents[d]short_name : d + "-wide"
+            chart.comparisonNamePhrases[d] = (!!geographyParents[d]) ? 'in ' + geographyParents[d].short_name : d + "-wide"
         });
 
         chart.primaryGeoID = geographyThis.full_geoid;
