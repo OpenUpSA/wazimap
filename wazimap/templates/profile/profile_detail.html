@@ -167,7 +167,8 @@ var makeCharts = function() {
             chartStatType = $(this).data('stat-type'),
             chartDecimalPlaces = $(this).data('decimal-places'),
             chartQualifier = $(this).data('qualifier') || null,
-            geographyData = profileData['geography'];
+            geographyData = profileData['geography'],
+            comparisonLevels = {{ WAZIMAP.comparative_levels|safe }};
 
         // allow arbitrary nesting in API data structure
         var drilldown = chartDataID.length - 1;
@@ -197,7 +198,8 @@ var makeCharts = function() {
             chartInitialSort: chartInitialSort,
             chartStatType: chartStatType,
             chartDecimalPlaces: chartDecimalPlaces,
-            geographyData: geographyData
+            geographyData: geographyData,
+            comparisonLevels: comparisonLevels
         }
         try {
             Charts[i] = Chart(chartstuff);

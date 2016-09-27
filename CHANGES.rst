@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.5.1 (27 September 2016)
+-------------------------
+
+* Correctly send comparative_levels setting to profile page
+
 0.5.0 (22 September 2016)
 -------------------------
 
