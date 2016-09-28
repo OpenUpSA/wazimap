@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.5.2 (28 September 2016)
+-------------------------
+
+* Fix profile page tables for non-percentages
+
 0.5.1 (27 September 2016)
 -------------------------
 
