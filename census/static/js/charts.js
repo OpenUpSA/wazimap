@@ -925,8 +925,6 @@ function Chart(options) {
             { colspan: 1, cellClass: 'name', cellContents: 'Column' }
         ];
 
-        var data = d;
-
         _.each(d.context.values, function(v, k) {
             headerData.push({
                 colspan: (d.context.numerators[k] !== null) ? 2 : 1,
