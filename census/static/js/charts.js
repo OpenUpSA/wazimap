@@ -925,9 +925,11 @@ function Chart(options) {
             { colspan: 1, cellClass: 'name', cellContents: 'Column' }
         ];
 
+        var data = d;
+
         _.each(d.context.values, function(v, k) {
             headerData.push({
-                colspan: 2, //(d.context.numerators[k] !== null) ? 4 : 2,
+                colspan: (d.context.numerators[k] !== null) ? 2 : 1,
                 cellClass: 'name',
                 cellContents: chart.comparisonNames[k]
             });
