@@ -267,6 +267,8 @@ class TableAPIView(View):
 class AboutView(TemplateView):
     template_name = 'about.html'
 
+class HowToUseView(TemplateView):
+    template_name = 'how_to_use.html'
 
 class GeographyCompareView(TemplateView):
     template_name = 'profile/head2head.html'
