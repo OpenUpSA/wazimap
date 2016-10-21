@@ -20,7 +20,7 @@ function StaticGeometryLoader(geometry_urls) {
      * callback with an object mapping each geo-id to a GeoJSON object.
      */
     this.loadGeometryForComparison = function(comparison, success) {
-        this.loadGeometryforGeoIds(comparison.dataGeoIDs, success);
+        this.loadGeometryForGeoIds(comparison.dataGeoIDs, success);
     };
 
     /**
