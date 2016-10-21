@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.5.3 (21 October 2016)
+-----------------------
+
+* Fix loadGeometryForGeoIds bug (contributed by cliftonmcintosh)
+
 0.5.2 (28 September 2016)
 -------------------------
 
