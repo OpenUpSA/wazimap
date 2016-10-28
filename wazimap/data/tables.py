@@ -107,9 +107,6 @@ class SimpleTable(object):
         self.total_column = total_column
         self.setup_columns()
 
-        if not self.columns:
-            raise ValueError("I couldn't work out the columns from them model.")
-
         if self.total_column and self.total_column not in self.columns:
             raise ValueError("Total column is not in the column list. Given '%s', column list: %s" % (self.total_column, self.columns.keys()))
 
