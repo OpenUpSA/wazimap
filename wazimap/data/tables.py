@@ -406,6 +406,7 @@ class FieldTable(SimpleTable):
             self.columns[self.total_column] = {'name': 'Total', 'indent': 0}
         else:
             self.total_column = None
+            self.columns['total'] = {'name': 'Total', 'indent': 0}
 
         session = get_session()
         try:
