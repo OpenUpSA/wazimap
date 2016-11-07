@@ -66,7 +66,8 @@ function makeEmbedFrame() {
             chartChartTitle: embedFrame.params.chartTitle,
             chartInitialSort: embedFrame.params.chartInitialSort,
             chartStatType: embedFrame.params.statType,
-            geographyData: embedFrame.data.geographyData
+            geographyData: embedFrame.data.geographyData,
+            comparisonLevels: embedFrame.data.geographyData.comparatives
         });
 
         if (!!embedFrame.parentOrigin) {
