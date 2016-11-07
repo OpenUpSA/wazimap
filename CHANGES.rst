@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.5.5 (7 November 2016)
+-----------------------
+
+* Fix embedded charts (contributed by mevey)
+
 0.5.4 (28 October 2016)
 -----------------------
 
