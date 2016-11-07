@@ -1,10 +1,15 @@
 Wazimap Version History
 =======================
 
-0.5.4 (7 November 2016)
+0.5.5 (7 November 2016)
 -----------------------
 
 * Fix embedded charts (contributed by mevey)
+
+0.5.4 (28 October 2016)
+-----------------------
+
+* Don't show error for empty FieldTable with has_total=True
 
 0.5.3 (21 October 2016)
 -----------------------
