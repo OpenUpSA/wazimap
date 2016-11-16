@@ -272,6 +272,7 @@ class SimpleTable(object):
             'denominator_column_id': self.total_column,
             'columns': self.columns,
             'table_id': self.id.upper(),
+            'value_type': 'Float' if self.value_type == sqlalchemy.sql.sqltypes.Float else 'Integer'
         }
 
 
