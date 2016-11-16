@@ -18,7 +18,7 @@ This expects to have Underscore, D3 and jQuery.
 
 function Comparison(options) {
 
-    var API_URL = typeof(CR_API_URL) != 'undefined' ? CR_API_URL : API_URL + 'http://api.censusreporter.org'; 
+    var API_URL = typeof(CR_API_URL) != 'undefined' ? CR_API_URL : API_URL + 'http://api.censusreporter.org';
 
     var comparison = {
         tableSearchAPI: '/api/1.0/table',
@@ -44,7 +44,7 @@ function Comparison(options) {
         comparison.headerContainer = d3.select(options.displayHeader);
         comparison.dataContainer = d3.select(options.dataContainer);
         comparison.aside = d3.select('aside');
-        
+
         // add the "change table" widget and listener
         comparison.makeTopicSelectWidget();
 
@@ -128,7 +128,7 @@ function Comparison(options) {
 
     // BEGIN THE MAP-SPECIFIC THINGS
     comparison.makeMapDisplay = function() {
-        var API_URL = typeof(CR_API_URL) != 'undefined' ? CR_API_URL : API_URL + 'http://api.censusreporter.org'; 
+        var API_URL = typeof(CR_API_URL) != 'undefined' ? CR_API_URL : API_URL + 'http://api.censusreporter.org';
 
         // some extra setup for map view
         // for triggering overflow-y: visible on table search
@@ -150,7 +150,7 @@ function Comparison(options) {
         } else {
             comparison.chosenColumn = comparison.columnKeys[0];
         }
-        
+
         var allowMapDrag = (browserWidth > 480) ? true : false;
         var mapDataLoaded = function(features) {
             comparison.geoFeatures = features;
@@ -179,7 +179,7 @@ function Comparison(options) {
               subdomains: 'abc',
               maxZoom: 17
             }).addTo(comparison.map);
-                
+
             comparison.showChoropleth();
 
             comparison.sumlevSelector.fadeIn();
@@ -188,7 +188,7 @@ function Comparison(options) {
         };
 
         comparison.loadMapData(mapDataLoaded);
-        
+
         comparison.changeMapControls();
         comparison.addGeographyCompareTools();
         if (!!comparison.denominatorColumn) {
@@ -509,10 +509,10 @@ function Comparison(options) {
         if (comparison.valueType != 'percentage') {
             precision = (max <= 1) ? 2 : (max <= 10) ? 1 : 0;
         }
-        
+
         labelData.unshift(min);
         labelData.push(max);
-        
+
         var legendLabels = d3.select("#map-legend")
             .selectAll("span")
             .data(labelData)
@@ -858,7 +858,7 @@ function Comparison(options) {
     comparison.makeDistributionLabels = function(points) {
         var chartPointLabels = points.append('span')
                 .classed('hovercard', true);
-                
+
         chartPointLabels.append('a')
                 .classed('label-title', true)
                 .attr('href', function(d) { return '/profiles/' + d.geoID + '/'; })
@@ -1575,6 +1575,10 @@ function Comparison(options) {
     }
 
     comparison.getStatType = function() {
+        if (comparison.table.value_type == 'Float') {
+            return 'percentage';
+        }
+
         var title = comparison.table.title.toLowerCase();
 
         if (title.indexOf('dollars') !== -1 && title.indexOf('percent') == -1) {
@@ -1702,7 +1706,7 @@ function Comparison(options) {
             ga('send', 'event', category, action, label);
         }
     }
-    
+
     comparison.addNumbertoggles = function(redrawFunction) {
         d3.select('#number-toggles').remove();
         var toggleText = (comparison.valueType == 'estimate') ? 'Switch to percentages' : 'Switch to totals',
@@ -1723,7 +1727,7 @@ function Comparison(options) {
     comparison.loadMapData = function(cb) {
         GeometryLoader.loadGeometryForComparison(comparison, cb);
     }
-    
+
     // ready, set, go
     comparison.init(options);
     return comparison;
