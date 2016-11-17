@@ -521,8 +521,12 @@ function Comparison(options) {
                     if (comparison.valueType == 'percentage') {
                         return roundNumber(d, precision) + '%';
                     } else {
-                        var prefix = (comparison.statType == 'dollar') ? '$' : '';
-                        return prefix + numberWithCommas(d, precision);
+                        if (comparison.statType == 'percentage') {
+                            return roundNumber(d, precision) + '%';
+                        } else {
+                            var prefix = (comparison.statType == 'dollar') ? '$' : '';
+                            return prefix + numberWithCommas(d, precision);
+                        }
                     }
                 }
             });
