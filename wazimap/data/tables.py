@@ -76,7 +76,7 @@ class SimpleTable(object):
     """
 
     def __init__(self, id, universe, description, model='auto', total_column='total',
-                 year='2011', dataset='Census 2011'):
+                 year='2011', dataset='Census 2011', stat_type='number'):
         """
         Describe a new simple table.
 
@@ -93,6 +93,8 @@ class SimpleTable(object):
                                  absolute values (not percentages) are used.
         :param str year: the year the table belongs to
         :param str dataset: the name of the dataset the table belongs to
+        :param str stat_type: used to determine how the values should be displayed in the templates.
+                              'number' or 'percentage'
         """
         self.id = id.upper()
 
@@ -105,6 +107,7 @@ class SimpleTable(object):
         self.year = year
         self.dataset_name = dataset
         self.total_column = total_column
+        self.stat_type = stat_type
         self.setup_columns()
 
         if self.total_column and self.total_column not in self.columns:
@@ -272,6 +275,7 @@ class SimpleTable(object):
             'denominator_column_id': self.total_column,
             'columns': self.columns,
             'table_id': self.id.upper(),
+            'stat_type': self.stat_type,
         }
 
 
@@ -308,7 +312,7 @@ class FieldTable(SimpleTable):
 
     """
     def __init__(self, fields, id=None, universe='Population', description=None, denominator_key=None,
-                 table_per_level=False, has_total=True, value_type='Integer', **kwargs):
+                 table_per_level=False, has_total=True, value_type='Integer', stat_type='number', **kwargs):
         """
         Describe a new field table.
 
@@ -330,6 +334,8 @@ class FieldTable(SimpleTable):
         :param bool has_total: does it make sense to calculate a total column and express percentages
                                   for values in this table? (default: True)
         :param str value_type: the data type for the total column (default: 'Integer')
+        :param str stat_type: used to determine how the values should be displayed in the templates.
+                              'number' or 'percentage'
         """
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
@@ -341,7 +347,7 @@ class FieldTable(SimpleTable):
         self.has_total = has_total
         self.value_type = getattr(sqlalchemy.types, value_type)
 
-        super(FieldTable, self).__init__(id=id, model=None, universe=universe, description=description, **kwargs)
+        super(FieldTable, self).__init__(id=id, model=None, universe=universe, description=description, stat_type=stat_type, **kwargs)
 
         FIELD_TABLE_FIELDS.update(self.fields)
         FIELD_TABLES[self.id] = self
