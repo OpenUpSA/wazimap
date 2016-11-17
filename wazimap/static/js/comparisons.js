@@ -1575,7 +1575,7 @@ function Comparison(options) {
     }
 
     comparison.getStatType = function() {
-        if (comparison.table.value_type == 'Float') {
+        if (comparison.table.stat_type == 'percentage') {
             return 'percentage';
         }
 
