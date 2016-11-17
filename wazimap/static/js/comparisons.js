@@ -518,15 +518,11 @@ function Comparison(options) {
             .data(labelData)
             .text(function(d){
                 if (typeof(d) != 'undefined') {
-                    if (comparison.valueType == 'percentage') {
+                    if (comparison.valueType == 'percentage' || comparison.statType == 'percentage') {
                         return roundNumber(d, precision) + '%';
                     } else {
-                        if (comparison.statType == 'percentage') {
-                            return roundNumber(d, precision) + '%';
-                        } else {
-                            var prefix = (comparison.statType == 'dollar') ? '$' : '';
-                            return prefix + numberWithCommas(d, precision);
-                        }
+                        var prefix = (comparison.statType == 'dollar') ? '$' : '';
+                        return prefix + numberWithCommas(d, precision);
                     }
                 }
             });
