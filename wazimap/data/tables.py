@@ -346,7 +346,6 @@ class FieldTable(SimpleTable):
         self.table_per_level = table_per_level
         self.has_total = has_total
         self.value_type = getattr(sqlalchemy.types, value_type)
-        self.stat_type = stat_type
 
         super(FieldTable, self).__init__(id=id, model=None, universe=universe, description=description, stat_type=stat_type, **kwargs)
 
