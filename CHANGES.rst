@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.5.6 (17 November 2016)
+------------------------
+
+* Support tables with raw values that are percentages
+
 0.5.5 (7 November 2016)
 -----------------------
 
