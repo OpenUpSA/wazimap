@@ -518,7 +518,7 @@ function Comparison(options) {
             .data(labelData)
             .text(function(d){
                 if (typeof(d) != 'undefined') {
-                    if (comparison.valueType == 'percentage') {
+                    if (comparison.valueType == 'percentage' || comparison.statType == 'percentage') {
                         return roundNumber(d, precision) + '%';
                     } else {
                         var prefix = (comparison.statType == 'dollar') ? '$' : '';
