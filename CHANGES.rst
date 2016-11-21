@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.5.8 (21 November 2016)
+------------------------
+
+* Support percentage values in the map view
+
 0.5.7 (17 November 2016)
 ------------------------
 
