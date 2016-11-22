@@ -9,7 +9,7 @@ var ProfileMaps = function() {
         "fillOpacity": 0.5,
         "clickable": false
     };
-    
+
     this.layerStyle = {
         "clickable": true,
         "color": "#00d",
@@ -31,23 +31,15 @@ var ProfileMaps = function() {
         this.drawAllFeatures();
     };
 
-    this.drawMapForHomepage = function(geo_level, centre, zoom) {
+    this.drawMapForHomepage = function(geo, centre, zoom) {
         // draw a homepage map, but only for big displays
         if (browserWidth < 768 || $('#slippy-map').length === 0) return;
 
+        this.geo = geo;
         this.createMap();
         this.addImagery();
+        this.drawAllFeatures()
 
-        if (centre) {
-            self.map.setView(centre, zoom);
-        }
-
-        GeometryLoader.loadGeometryForLevel(geo_level, function(features) {
-            var layer = self.drawFeatures(features);
-            if (!centre) {
-                self.map.fitBounds(layer.getBounds());
-            }
-        });
     };
 
     this.createMap = function() {
