@@ -460,7 +460,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
 
     # run the stats for the objects
     for obj in objects:
-        if obj.total == 0 and exclude_zero:
+        if not obj.total and exclude_zero:
             continue
 
         if denominator_key and getattr(obj, model.data_table.fields[-1]) == denominator_key:
@@ -473,12 +473,17 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         if not data:
             continue
 
-        data['numerators']['this'] += obj.total
-        running_total += obj.total
+        if obj.total:
+            data['numerators']['this'] += obj.total
+            running_total += obj.total
+        else:
+            data['numerators']['this'] = None
+
         if percent_grouping:
-            key = tuple(getattr(obj, field) for field in percent_grouping)
-            data['_group_key'] = key
-            group_totals[key] = group_totals.get(key, 0) + obj.total
+            if obj.total:
+                key = tuple(getattr(obj, field) for field in percent_grouping)
+                data['_group_key'] = key
+                group_totals[key] = group_totals.get(key, 0) + obj.total
 
     if total is not None:
         grand_total = total
@@ -495,9 +500,11 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                             total = group_totals[data.pop('_group_key')]
                         else:
                             total = grand_total
-
-                        perc = 0 if total == 0 else (data['numerators']['this'] / total * 100)
-                        data['values'] = {'this': round(perc, 2)}
+                        if data['numerators']['this']:
+                            perc = 0 if total == 0 else (data['numerators']['this'] / total * 100)
+                            data['values'] = {'this': round(perc, 2)}
+                        else:
+                            data['values'] = {'this': None}
                     else:
                         data['values'] = dict(data['numerators'])
                         data['numerators']['this'] = None
