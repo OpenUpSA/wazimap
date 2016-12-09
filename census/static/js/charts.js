@@ -28,6 +28,7 @@ function Chart(options) {
         chart.chartQualifier = options.chartQualifier || null;
         chart.chartInitialSort = options.chartInitialSort || null;
         chart.chartStatType = options.chartStatType || 'number';
+        chart.chartNullLabel = options.chartNullLabel || "N/A";
         chart.decimalPlaces = parseInt(options.chartDecimalPlaces) || 0;
         chart.tableDecimalPlaces = parseInt(options.chartDecimalPlaces) || 1;
         chart.chartChartShowYAxis = options.chartChartShowYAxis || (chart.chartStatType == "percentage" ? true : false);
@@ -100,7 +101,7 @@ function Chart(options) {
                 // otherwise, just grab the name and value of the data point
                 dataObj = {
                     name: d.name,
-                    value: +d.values['this'],
+                    value: (d.values['this'] === null) ? null : +d.values['this'],
                     context: d
                 }
             }
@@ -1120,6 +1121,9 @@ function Chart(options) {
 
     // format percentages and/or dollar signs
     chart.valFmt = function(value, decimals) {
+        if (value === null) {
+            return chart.chartNullLabel;
+        }
         var precision = (!!decimals) ? decimals : chart.decimalPlaces,
             factor = Math.pow(10, precision),
             value = Math.round(value * factor) / factor;
