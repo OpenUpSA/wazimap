@@ -820,6 +820,7 @@ function Comparison(options) {
             var chartPoints = chart.selectAll('.chart-point')
                     .data(d3.values(v.geographies))
                 .enter().append('li')
+                    .filter(function(d) { return d[comparison.valueType] !== null; })
                     .classed('chart-point', true)
                     .style('left', function(d) {
                         return roundNumber(v.xScale(d[comparison.valueType]), 1)+'%';
