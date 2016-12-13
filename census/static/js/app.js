@@ -104,15 +104,23 @@ var slugify = function(str) {
 
 // math utils
 var calcPct = function(numerator, denominator) {
-    if (denominator == 0) {
-        return 0
-    } else if (numerator >= 0 && denominator > 0) {
-        return Math.round(((numerator / denominator) * 100) * 10) / 10
+    if (numerator === null || denominator === null) {
+      return null;
     }
-    return null
+
+    if (denominator === 0) {
+        return 0;
+    } else if (numerator >= 0 && denominator > 0) {
+        return Math.round(((numerator / denominator) * 100) * 10) / 10;
+    }
+    return null;
 }
 
 var calcPctMOE = function(numerator, denominator, numerator_moe, denominator_moe) {
+    if (numerator === null || denominator === null) {
+      return null;
+    }
+
     // From http://www.census.gov/acs/www/Downloads/handbooks/ACSGeneralHandbook.pdf
     if (denominator == 0) {
         return 0

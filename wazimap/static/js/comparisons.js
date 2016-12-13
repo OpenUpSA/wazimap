@@ -636,7 +636,10 @@ function Comparison(options) {
                     gridRowCol = '';
 
                 // add raw numbers
-                if (thisValue >= 0) {
+                if (thisValue === null) {
+                    gridRowCol += '<span class="value null">N/A</span>';
+                    gridRowCol += '<span class="context null">N/A</span>';
+                } else if (thisValue >= 0) {
                     gridRowCol += '<span class="value number">' + valFmt(thisValue, thisFmt) + '</span>';
                     gridRowCol += '<span class="context number">&plusmn;' + valFmt(thisValueMOE, thisFmt) + '</span>';
                 }
