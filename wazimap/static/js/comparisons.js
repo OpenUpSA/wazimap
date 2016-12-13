@@ -437,7 +437,9 @@ function Comparison(options) {
                 pctLabel += '<span class="context">&plusmn;' + valFmt(thisPctMOE, 'percentage') + '</span>';
                 pctLabel += closeParen + '</span>';
             }
-            if (!!thisValue) {
+            if (thisValue === null) {
+                valLabel = '<span class="inline-stat">N/A</span>';
+            } else if (!!thisValue) {
                 var openParen = (thisIsPct) ? '(' : '',
                     closeParen = (thisIsPct) ? ')' : '';
                 valLabel = '<span class="inline-stat">' + openParen + valFmt(thisValue, comparison.statType);
@@ -468,11 +470,11 @@ function Comparison(options) {
         var viewGeoData = _.filter(comparison.geoFeatures, function(g) {
             var thisSumlev = g.properties.geoid.split('-')[0];
             return thisSumlev == comparison.chosenSumlev;
-        })
+        });
 
         var values = d3.values(viewGeoData).map(function(d) {
             return d.properties.data[comparison.valueType][comparison.chosenColumn];
-        });
+        }).filter(function(d) { return d !== null; });
 
 
         // create the legend
@@ -492,11 +494,11 @@ function Comparison(options) {
             comparison.legendContainer.selectAll('li')
                     .data(colors)
                 .enter().append('li')
-                    .style('background-color', function(d) { if (d) { return d }})
-                    .classed('empty', function(d) { return (d == null) })
+                    .style('background-color', function(d) { if (d) { return d; }})
+                    .classed('empty', function(d) { return (d === null); })
                 .append('span')
                     .classed('quantile-label', true);
-        }
+        };
         buildLegend(quintileColors);
 
         // add the actual label values
@@ -517,7 +519,7 @@ function Comparison(options) {
             .selectAll("span")
             .data(labelData)
             .text(function(d){
-                if (typeof(d) != 'undefined') {
+                if (typeof(d) != 'undefined' && d != null) {
                     if (comparison.valueType == 'percentage' || comparison.statType == 'percentage') {
                         return roundNumber(d, precision) + '%';
                     } else {
@@ -528,10 +530,9 @@ function Comparison(options) {
             });
 
         var styleFeature = function(feature) {
+            var val = feature.properties.data[comparison.valueType][comparison.chosenColumn];
             return {
-                fillColor: comparison.colors[
-                    comparison.quantize(feature.properties.data[comparison.valueType][comparison.chosenColumn])
-                ],
+                fillColor: val === null ? 'white' : comparison.colors[comparison.quantize(val)],
                 weight: 1.0,
                 opacity: 1.0,
                 color: '#fff',
@@ -636,7 +637,10 @@ function Comparison(options) {
                     gridRowCol = '';
 
                 // add raw numbers
-                if (thisValue >= 0) {
+                if (thisValue === null) {
+                    gridRowCol += '<span class="value null">N/A</span>';
+                    gridRowCol += '<span class="context null">N/A</span>';
+                } else if (thisValue >= 0) {
                     gridRowCol += '<span class="value number">' + valFmt(thisValue, thisFmt) + '</span>';
                     gridRowCol += '<span class="context number">&plusmn;' + valFmt(thisValueMOE, thisFmt) + '</span>';
                 }
@@ -817,6 +821,7 @@ function Comparison(options) {
             var chartPoints = chart.selectAll('.chart-point')
                     .data(d3.values(v.geographies))
                 .enter().append('li')
+                    .filter(function(d) { return d[comparison.valueType] !== null; })
                     .classed('chart-point', true)
                     .style('left', function(d) {
                         return roundNumber(v.xScale(d[comparison.valueType]), 1)+'%';

@@ -333,7 +333,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                     mapping field names to a list of strings. Field names are checked
                     before any recoding.
     :type exclude: dict or list
-    :param bool exclude_zero: ignore fields that have a zero total
+    :param bool exclude_zero: ignore fields that have a zero or null total
     :param recode: function or dict to recode values of ``key_field``. If ``fields`` is a singleton,
                    then the keys of this dict must be the values to recode from, otherwise
                    they must be the field names and then the values. If this is a lambda,
@@ -477,6 +477,9 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             data['numerators']['this'] += obj.total
             running_total += obj.total
         else:
+            # TODO: sanity check this is the right thing to do for multiple fields with
+            # nested nulls -- does aggregating over nulls treat them as zero, or should we
+            # treat them as null?
             data['numerators']['this'] = None
 
         if percent_grouping:

@@ -498,7 +498,7 @@ class FieldTable(SimpleTable):
 
                 def permute(level, field_keys, rows):
                     field = self.fields[level]
-                    total = 0
+                    total = None
                     denominator = 0
 
                     for key, rows in groupby(rows, lambda r: getattr(r, field)):
@@ -506,19 +506,25 @@ class FieldTable(SimpleTable):
                         col_id = self.column_id(new_keys)
 
                         if level + 1 < len(self.fields):
-                            count = permute(level + 1, new_keys, rows)
+                            value = permute(level + 1, new_keys, rows)
                         else:
                             # we've bottomed out
-                            count = sum(row.total for row in rows)
+
+                            rows = list(rows)
+                            if all(row.total is None for row in rows):
+                                value = None
+                            else:
+                                value = sum(row.total or 0 for row in rows)
 
                             if self.denominator_key and self.denominator_key == key:
                                 # this row must be used as the denominator total,
                                 # rather than as an entry in the table
-                                denominator = count
+                                denominator = value
                                 continue
 
-                        total += count
-                        geo_values['estimate'][col_id] = count
+                        if value is not None:
+                            total = (total or 0) + value
+                        geo_values['estimate'][col_id] = value
                         geo_values['error'][col_id] = 0
 
                     if self.denominator_key:
