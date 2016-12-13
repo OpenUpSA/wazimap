@@ -28,6 +28,8 @@ class DownloadManager(object):
         except ImportError as e:
             log.error("Unable to import GDAL (ogr). You need to have the GDAL binaries and a matching python GDAL installed.")
             raise e
+        self.ogr = ogr
+        self.osr = osr
         ogr.UseExceptions()
 
         format = self.DOWNLOAD_FORMATS[fmt]
@@ -85,6 +87,10 @@ class DownloadManager(object):
                     for column_id, column_info in table.columns.iteritems():
                         if column_id in table_estimates:
                             est = table_estimates[column_id]
+                            # None values get changed to zero, which isn't accurate
+                            if est is None:
+                                continue
+
                             # GDAL generates invalid excel spreadsheets for
                             # zero values in real columns
                             if fmt == 'xlsx' and est == 0:
@@ -122,4 +128,4 @@ class DownloadManager(object):
         shape = details['shape']
 
         if shape:
-            return ogr.CreateGeometryFromWkb(shape.wkb)
+            return self.ogr.CreateGeometryFromWkb(shape.wkb)
