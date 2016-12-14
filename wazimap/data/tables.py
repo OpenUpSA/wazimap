@@ -585,7 +585,7 @@ class FieldTable(SimpleTable):
         # Now add the columns
         table_args.extend(Column(field, String(128), primary_key=True) for field in fields)
         # and the value column
-        table_args.append(Column('total', value_type, nullable=False))
+        table_args.append(Column('total', value_type, nullable=True))
 
         # create the table model
         class Model(Base):
