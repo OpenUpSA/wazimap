@@ -418,6 +418,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     root_data = OrderedDict()
     running_total = 0
     group_totals = {}
+    grand_total = -1
 
     def get_data_object(obj):
         """ Recurse down the list of fields and return the
@@ -464,7 +465,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             continue
 
         if denominator_key and getattr(obj, model.data_table.fields[-1]) == denominator_key:
-            total = obj.total
+            grand_total = obj.total
             # don't include the denominator key in the output
             continue
 
@@ -488,10 +489,8 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                 data['_group_key'] = key
                 group_totals[key] = group_totals.get(key, 0) + obj.total
 
-    if total is not None:
-        grand_total = total
-    else:
-        grand_total = running_total
+    if grand_total == -1:
+        grand_total = running_total if total is None else total
 
     # add in percentages
     def calc_percent(data):
@@ -504,7 +503,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                         else:
                             total = grand_total
 
-                        if data['numerators']['this'] is not None:
+                        if total is not None and data['numerators']['this'] is not None:
                             perc = 0 if total == 0 else (data['numerators']['this'] / total * 100)
                             data['values'] = {'this': round(perc, 2)}
                         else:
