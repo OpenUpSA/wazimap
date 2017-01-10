@@ -3,7 +3,7 @@ from codecs import open
 from os import path, environ
 
 here = path.abspath(path.dirname(__file__))
-on_rtd = environ.get('READTHEDOCS', None) == 'True' or environ.get('TRAVIS', None) == 'true'
+on_rtd = environ.get('READTHEDOCS', None) == 'True'# or environ.get('TRAVIS', None) == 'true'
 
 # Get the long description from the relevant file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
@@ -32,7 +32,7 @@ install_requires = [
 if not on_rtd:
     # these aren't available when building docs for readthedocs.org
     install_requires += [
-        'GDAL>=1.11.0,<2.0',
+        #'GDAL>=1.11.0,<2.0',
         'Shapely>=1.5.13',
     ]
 
