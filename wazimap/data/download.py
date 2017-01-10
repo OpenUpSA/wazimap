@@ -26,7 +26,7 @@ class DownloadManager(object):
         try:
             from osgeo import ogr, osr
         except ImportError as e:
-            log.error("Unable to import GDAL (ogr). You need to have the GDAL binaries and a matching python GDAL installed.")
+            log.error("Unable to import GDAL (ogr). You need to have the GDAL binaries and a matching python GDAL installed. Install GDAL and then run 'pip install wazimap[gdal]'.")
             raise e
         self.ogr = ogr
         self.osr = osr

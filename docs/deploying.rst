@@ -30,8 +30,9 @@ You'll need a Procfile, too: ::
 
     web: gunicorn --worker-class gevent wazimap.wsgi:application -t 120 --log-file -
 
-Wazimap requires GDAL and GEOS. The easiet way to get these installed on Heroku or Dokku is to use
-multiple buildpacks. Create a file ``.buildpacks`` in your project's root directory: ::
+Wazimap requires GDAL and GEOS to support data downloads in formats like KML.
+The easiet way to get these installed on Heroku or Dokku is to use multiple
+buildpacks. Create a file ``.buildpacks`` in your project's root directory: ::
 
     https://github.com/cyberdelia/heroku-geo-buildpack.git
     https://github.com/heroku/heroku-buildpack-python.git
@@ -39,7 +40,14 @@ multiple buildpacks. Create a file ``.buildpacks`` in your project's root direct
 That tells Heroku and Dokku to load the geo dependencies (including GDAL and GEOS) and then
 build python as usual.
 
-Ensure django is included in your requirements.txt.
+By default, Wazimap doesn't install the libraries to use GDAL because it can be difficult to install.
+Tell Wazimap to install everything it needs for GDAL by install it with ``wazimap[gdal]`` or specify
+``GDAL>=1.11.0,<2.0`` in your requirements.txt.
+
+Add Wazimap and Django as dependencies for your project in your ``requirements.txt`` file: ::
+
+    wazimap[gdal]
+    Django==1.9.2
 
 Finally, just use ``git push heroku`` or ``git push dokku master`` to deploy as you usually would.
 
