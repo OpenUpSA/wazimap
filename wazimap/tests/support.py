@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from wazimap.data.utils import get_session
+from wazimap.data.utils import get_session, _engine
 from wazimap.data.tables import DATA_TABLES, FieldTable
 
 
@@ -34,3 +34,4 @@ class WazimapTestCase(TestCase):
 
     def tearDown(self):
         self.s.close()
+        _engine.dispose()
