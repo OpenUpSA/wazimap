@@ -27,13 +27,13 @@ install_requires = [
     'unicodecsv>=0.9.4',
     'whitenoise>=1.0.6',
     'wsgiref>=0.1.2',
+    'Shapely>=1.5.13',
 ]
 
 if not on_rtd:
     # these aren't available when building docs for readthedocs.org
     install_requires += [
         'GDAL>=1.11.0,<2.0',
-        'Shapely>=1.5.13',
     ]
 
 setup(
