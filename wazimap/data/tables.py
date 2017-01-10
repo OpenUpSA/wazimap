@@ -7,7 +7,7 @@ import sqlalchemy.types
 
 from wazimap.geo import geo_data
 from wazimap.data.base import Base
-from wazimap.data.utils import get_session, get_table_model, capitalize, percent as p, add_metadata
+from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata
 
 
 '''
@@ -99,7 +99,7 @@ class SimpleTable(object):
         self.id = id.upper()
 
         if model == 'auto':
-            model = get_table_model(self.id.lower())
+            model = Table(self.id.lower(), Base.metadata, autoload=True)
 
         self.model = model
         self.universe = universe

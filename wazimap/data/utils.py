@@ -15,10 +15,6 @@ def get_session():
     return _Session()
 
 
-def get_table_model(name):
-    return Table(name, _metadata, autoload=True, autoload_with=_engine)
-
-
 class LocationNotFound(Exception):
     pass
 
