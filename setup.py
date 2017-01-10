@@ -3,7 +3,7 @@ from codecs import open
 from os import path, environ
 
 here = path.abspath(path.dirname(__file__))
-on_rtd = environ.get('READTHEDOCS', None) == 'True'
+on_rtd = environ.get('READTHEDOCS', None) == 'True' or environ.get('TRAVIS', None) == 'true'
 
 # Get the long description from the relevant file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
