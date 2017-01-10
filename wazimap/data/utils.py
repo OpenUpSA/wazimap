@@ -473,7 +473,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         if not data:
             continue
 
-        if obj.total:
+        if obj.total is not None:
             data['numerators']['this'] += obj.total
             running_total += obj.total
         else:
@@ -483,7 +483,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             data['numerators']['this'] = None
 
         if percent_grouping:
-            if obj.total:
+            if obj.total is not None:
                 key = tuple(getattr(obj, field) for field in percent_grouping)
                 data['_group_key'] = key
                 group_totals[key] = group_totals.get(key, 0) + obj.total
@@ -503,7 +503,8 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                             total = group_totals[data.pop('_group_key')]
                         else:
                             total = grand_total
-                        if data['numerators']['this']:
+
+                        if data['numerators']['this'] is not None:
                             perc = 0 if total == 0 else (data['numerators']['this'] / total * 100)
                             data['values'] = {'this': round(perc, 2)}
                         else:
