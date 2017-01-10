@@ -1,22 +1,29 @@
 from __future__ import division
 from collections import OrderedDict
 
-from sqlalchemy import create_engine, MetaData, Table, func
+from sqlalchemy import create_engine, MetaData, func
 from sqlalchemy.orm import sessionmaker, class_mapper
 from django.conf import settings
 
+if settings.TESTING:
+    # Hack to ensure the sqlalchemy database name matches the Django one
+    # during testing
+    from django.db.backends.base.creation import TEST_DATABASE_PREFIX
 
-_engine = create_engine(settings.DATABASE_URL)
-_metadata = MetaData()
+    url = settings.DATABASE_URL
+    parts = url.split("/")
+    parts[-1] = TEST_DATABASE_PREFIX + parts[-1]
+    url = '/'.join(parts)
+    _engine = create_engine(url)
+else:
+    _engine = create_engine(settings.DATABASE_URL)
+
+_metadata = MetaData(bind=_engine)
 _Session = sessionmaker(bind=_engine)
 
 
 def get_session():
     return _Session()
-
-
-def get_table_model(name):
-    return Table(name, _metadata, autoload=True, autoload_with=_engine)
 
 
 class LocationNotFound(Exception):
