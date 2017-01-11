@@ -1,0 +1,10 @@
+language: python
+python:
+  - "2.7"
+services:
+  - postgresql
+env:
+  - DATABASE_URL=postgres://postgres:@localhost:5432/wazimap
+install:
+  - python setup.py -q install
+script: python manage.py test

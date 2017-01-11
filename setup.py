@@ -4,6 +4,7 @@ from os import path, environ
 
 here = path.abspath(path.dirname(__file__))
 on_rtd = environ.get('READTHEDOCS', None) == 'True'
+on_travis = environ.get('TRAVIS', None) == 'true'
 
 # Get the long description from the relevant file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
@@ -27,13 +28,13 @@ install_requires = [
     'unicodecsv>=0.9.4',
     'whitenoise>=1.0.6',
     'wsgiref>=0.1.2',
+    'Shapely>=1.5.13',
 ]
 
-if not on_rtd:
+if not on_rtd and not on_travis:
     # these aren't available when building docs for readthedocs.org
     install_requires += [
         'GDAL>=1.11.0,<2.0',
-        'Shapely>=1.5.13',
     ]
 
 setup(

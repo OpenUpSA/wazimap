@@ -1,10 +1,12 @@
 # Django settings for Wazimap
 import os
+import sys
 import dj_database_url
 
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true') == 'true'
 TEMPLATE_DEBUG = DEBUG
+TESTING = 'test' in sys.argv[1:3]
 
 ROOT_URLCONF = 'wazimap.urls'
 WSGI_APPLICATION = 'wazimap.wsgi.application'

@@ -1,22 +1,29 @@
 from __future__ import division
 from collections import OrderedDict
 
-from sqlalchemy import create_engine, MetaData, Table, func
+from sqlalchemy import create_engine, MetaData, func
 from sqlalchemy.orm import sessionmaker, class_mapper
 from django.conf import settings
 
+if settings.TESTING:
+    # Hack to ensure the sqlalchemy database name matches the Django one
+    # during testing
+    from django.db.backends.base.creation import TEST_DATABASE_PREFIX
 
-_engine = create_engine(settings.DATABASE_URL)
-_metadata = MetaData()
+    url = settings.DATABASE_URL
+    parts = url.split("/")
+    parts[-1] = TEST_DATABASE_PREFIX + parts[-1]
+    url = '/'.join(parts)
+    _engine = create_engine(url)
+else:
+    _engine = create_engine(settings.DATABASE_URL)
+
+_metadata = MetaData(bind=_engine)
 _Session = sessionmaker(bind=_engine)
 
 
 def get_session():
     return _Session()
-
-
-def get_table_model(name):
-    return Table(name, _metadata, autoload=True, autoload_with=_engine)
 
 
 class LocationNotFound(Exception):
@@ -333,7 +340,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                     mapping field names to a list of strings. Field names are checked
                     before any recoding.
     :type exclude: dict or list
-    :param bool exclude_zero: ignore fields that have a zero total
+    :param bool exclude_zero: ignore fields that have a zero or null total
     :param recode: function or dict to recode values of ``key_field``. If ``fields`` is a singleton,
                    then the keys of this dict must be the values to recode from, otherwise
                    they must be the field names and then the values. If this is a lambda,
@@ -418,6 +425,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     root_data = OrderedDict()
     running_total = 0
     group_totals = {}
+    grand_total = -1
 
     def get_data_object(obj):
         """ Recurse down the list of fields and return the
@@ -460,11 +468,11 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
 
     # run the stats for the objects
     for obj in objects:
-        if obj.total == 0 and exclude_zero:
+        if not obj.total and exclude_zero:
             continue
 
         if denominator_key and getattr(obj, model.data_table.fields[-1]) == denominator_key:
-            total = obj.total
+            grand_total = obj.total
             # don't include the denominator key in the output
             continue
 
@@ -473,17 +481,23 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         if not data:
             continue
 
-        data['numerators']['this'] += obj.total
-        running_total += obj.total
-        if percent_grouping:
-            key = tuple(getattr(obj, field) for field in percent_grouping)
-            data['_group_key'] = key
-            group_totals[key] = group_totals.get(key, 0) + obj.total
+        if obj.total is not None:
+            data['numerators']['this'] += obj.total
+            running_total += obj.total
+        else:
+            # TODO: sanity check this is the right thing to do for multiple fields with
+            # nested nulls -- does aggregating over nulls treat them as zero, or should we
+            # treat them as null?
+            data['numerators']['this'] = None
 
-    if total is not None:
-        grand_total = total
-    else:
-        grand_total = running_total
+        if percent_grouping:
+            if obj.total is not None:
+                key = tuple(getattr(obj, field) for field in percent_grouping)
+                data['_group_key'] = key
+                group_totals[key] = group_totals.get(key, 0) + obj.total
+
+    if grand_total == -1:
+        grand_total = running_total if total is None else total
 
     # add in percentages
     def calc_percent(data):
@@ -496,8 +510,11 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                         else:
                             total = grand_total
 
-                        perc = 0 if total == 0 else (data['numerators']['this'] / total * 100)
-                        data['values'] = {'this': round(perc, 2)}
+                        if total is not None and data['numerators']['this'] is not None:
+                            perc = 0 if total == 0 else (data['numerators']['this'] / total * 100)
+                            data['values'] = {'this': round(perc, 2)}
+                        else:
+                            data['values'] = {'this': None}
                     else:
                         data['values'] = dict(data['numerators'])
                         data['numerators']['this'] = None

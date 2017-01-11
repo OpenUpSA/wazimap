@@ -1,4 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from wazimap.data.utils import _metadata
 
 
 class Base(object):
@@ -12,4 +13,4 @@ class Base(object):
                                       for c in self.__table__.columns]))
 
 
-Base = declarative_base(cls=Base)
+Base = declarative_base(cls=Base, metadata=_metadata)
