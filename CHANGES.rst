@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.6.1 (11 January 2017)
+-----------------------
+
+* FIX bug in testing database names
+
 0.6.0 (11 January 2017)
 -----------------------
 
