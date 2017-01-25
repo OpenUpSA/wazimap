@@ -482,7 +482,8 @@ function Chart(options) {
                     .style("position", "absolute")
                     .style("background-color", chart.colorbrewer[chart.chartColorScale][0])
                     .style("width", chart.x.rangeBand() + "px")
-                    .style("bottom", function(d) { return (chart.settings.margin.bottom + chart.settings.tickPadding) + "px"; })
+                    .style("bottom", function(d) {
+                        return (chart.settings.margin.bottom + chart.settings.tickPadding + ((d.value !== null) ? 0 : 20)) + "px"; })
                     .style("height", function(d) { return (chart.settings.displayHeight - chart.y(d.value)) + "px"; });
 
             chart.columnNames = chart.columns

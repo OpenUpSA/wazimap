@@ -3,16 +3,24 @@ from collections import OrderedDict
 
 from sqlalchemy import create_engine, MetaData, func
 from sqlalchemy.orm import sessionmaker, class_mapper
+
 from django.conf import settings
+from django.db.backends.base.creation import TEST_DATABASE_PREFIX
+from django.db import connection
+
 
 if settings.TESTING:
     # Hack to ensure the sqlalchemy database name matches the Django one
     # during testing
-    from django.db.backends.base.creation import TEST_DATABASE_PREFIX
-
     url = settings.DATABASE_URL
     parts = url.split("/")
-    parts[-1] = TEST_DATABASE_PREFIX + parts[-1]
+
+    # use the test database name
+    db_name = connection.settings_dict.get('TEST', {}).get('NAME')
+    if db_name is None:
+        db_name = TEST_DATABASE_PREFIX + parts[-1]
+
+    parts[-1] = db_name
     url = '/'.join(parts)
     _engine = create_engine(url)
 else:

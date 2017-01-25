@@ -4,8 +4,8 @@ Wazimap
 .. image:: https://badge.fury.io/py/wazimap.svg
     :target: http://badge.fury.io/py/wazimap
 
-.. image:: https://travis-ci.org/Code4SA/indigo.svg
-    :target: http://travis-ci.org/Code4SA/indigo
+.. image:: https://travis-ci.org/Code4SA/wazimap.svg
+    :target: http://travis-ci.org/Code4SA/wazimap
 
 Wazimap is a Django application for exploring census and other similar data. It makes it easy to understand a place
 through the eyes of the data, and to explore data across a range of places. It is most suited for census data
