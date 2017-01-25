@@ -26,9 +26,7 @@ install_requires = [
     'unicodecsv>=0.9.4',
     'whitenoise>=1.0.6',
     'wsgiref>=0.1.2',
-    'Shapely>=1.5.13',
 ]
-
 
 setup(
     name='wazimap',
@@ -95,6 +93,6 @@ setup(
     extras_require={
         'dev': ['nose', 'flake8'],
         'test': ['nose', 'flake8'],
-        'gdal': ['GDAL'],
+        'gdal': ['GDAL', 'Shapely>=1.5.13'],
     },
 )
