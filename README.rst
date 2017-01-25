@@ -33,10 +33,14 @@ Read the `full Wazimap documentation <http://wazimap.readthedocs.org/en/latest/>
 Releasing a New Version
 -----------------------
 
-1. Update VERSION appropriately
-2. Update the CHANGES.rst
-3. Commit and push to github
-4. Release to PyPI::
+1. Run the tests::
+
+    python manage.py test
+
+2. Update VERSION appropriately
+3. Update the CHANGES.rst
+4. Commit and push to github
+5. Release to PyPI::
 
     python setup.py sdist bdist_wheel upload
 
