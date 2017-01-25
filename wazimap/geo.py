@@ -15,6 +15,15 @@ from wazimap.models import Geography
 log = logging.getLogger(__name__)
 
 
+# GDAL is difficult to install, so we make it an optional dependency.
+# Here, we check if it's installed and warn if it isn't.
+try:
+    import osgeo.gdal  # noqa
+    HAS_GDAL = True
+except ImportError:
+    HAS_GDAL = False
+
+
 class GeoData(object):
     """ General Wazimap geography helper object.
 
@@ -211,3 +220,12 @@ class GeoData(object):
 
 
 geo_data = import_string(settings.WAZIMAP['geodata'])()
+
+
+def gdal_missing(critical=False):
+    log.warn("NOTE: Wazimap is unable to load GDAL, it's probably not installed. "
+             "Some functionality such as data downloads and geolocation won't work. This is ok in development, but "
+             "is a problem in production. For more information on installing GDAL, see http://wazimap.readthedocs.io/en/latest/")
+
+    if critical:
+        raise StandardError("GDAL must be installed for this functionality to work.")
