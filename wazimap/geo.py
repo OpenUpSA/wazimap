@@ -7,7 +7,6 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 from django.db.models import Q
 from django.contrib.staticfiles.storage import staticfiles_storage
-from shapely.geometry import asShape, Point
 
 from wazimap.data.utils import LocationNotFound
 from wazimap.models import Geography
@@ -105,7 +104,8 @@ class GeoData(object):
                 props = feature['properties']
                 shape = None
 
-                if feature['geometry']:
+                if HAS_GDAL and feature['geometry']:
+                    from shapely.geometry import asShape
                     try:
                         shape = asShape(feature['geometry'])
                     except ValueError as e:
@@ -190,6 +190,10 @@ class GeoData(object):
         """
         Returns a list of geographies containing this point.
         """
+        if not HAS_GDAL:
+            gdal_missing(critical=True)
+
+        from shapely.geometry import Point
         p = Point(float(longitude), float(latitude))
         geos = []
 
