@@ -1,13 +1,13 @@
 Wazimap Version History
 =======================
 
-0.7.0 (25 January 2017)
+0.7.1 (25 January 2017)
 -----------------------
 
 **Important** This version makes GDAL an optional install. You must ensure you add GDAL to your requirements file, or install wazimap using ``wazimap[gdal]]``. See http://wazimap.readthedocs.io/en/latest/deploying.html
 
-* Make GDAL an optional installation. This makes it much easier to get up and running with Wazimap.
-* Support GDAL 1.x or 2.x (2.x not fully test)
+* Make GDAL and Shapely optional. This makes it much easier to get up and running with Wazimap without getting GDAL installed, which can be tricky.
+* Support GDAL 1.x or 2.x (2.x not fully tested).
 
 0.6.1 (11 January 2017)
 -----------------------
