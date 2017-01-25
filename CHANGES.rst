@@ -1,8 +1,16 @@
 Wazimap Version History
 =======================
 
-0.6.0 (?)
-------------------------
+0.7.0 (25 January 2017)
+-----------------------
+
+**Important** This version makes GDAL an optional install. You must ensure you add GDAL to your requirements file, or install wazimap using ``wazimap[gdal]]``. See http://wazimap.readthedocs.io/en/latest/deploying.html
+
+* Make GDAL an optional installation. This makes it much easier to get up and running with Wazimap.
+* Support GDAL 1.x or 2.x (2.x not fully test)
+
+0.6.1 (11 January 2017)
+-----------------------
 
 * Support null values in a table. This allows you to indicate to Wazimap that you don't have data for a particular field/indicator in a particular place. It is still necessary to ensure that all places have an entry in the database for all indicators.
 * Automated build-time testing on `Travis <https://travis-ci.org/Code4SA/wazimap>`_.
