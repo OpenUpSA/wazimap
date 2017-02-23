@@ -1524,7 +1524,7 @@ function Comparison(options) {
 
             _.each(comparison.data.geography, function(v, k) {
                 var thisSumlev = k.split('-')[0];
-                if (v.parent_geoid == parentGeoID && thisSumlev == childSumlev) {
+                if (v.parent_geoid == parentGeoID && thisSumlev == childSumlev && k !== comparison.primaryGeoID) {
                     delete comparison.data.data[k];
                 }
             });
