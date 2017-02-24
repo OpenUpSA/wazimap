@@ -19,6 +19,13 @@ It is maintained by Code for South Africa.
 * Wazimap is on GitHub at `github.com/Code4SA/wazimap <https://github.com/Code4SA/wazimap>`_.
 * Wazimap is on Twitter as `@Wazimap <https://twitter.com/@Wazimap>`_.
 
+Sites using Wazimap
+===================
+
+* `Wazimap South Africa <http://wazimap.co.za/>`_
+* `Nepal Map <http://www.nepalmap.org>`_
+* `Counting India <http://www.countingindia.com/>`_
+
 License and Copyright
 =====================
 
