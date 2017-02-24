@@ -30,6 +30,9 @@ Using Wazimap
 
 Read the `full Wazimap documentation <http://wazimap.readthedocs.org/en/latest/>`_ to get started.
 
+Development
+===========
+
 Releasing a New Version
 -----------------------
 
