@@ -19,12 +19,12 @@ It is maintained by Code for South Africa.
 * Wazimap is on GitHub at `github.com/Code4SA/wazimap <https://github.com/Code4SA/wazimap>`_.
 * Wazimap is on Twitter as `@Wazimap <https://twitter.com/@Wazimap>`_.
 
-License
-=======
+License and Copyright
+=====================
 
-Wazimap code is licensed under the MIT License.
+Wazimap is licensed under the MIT License.
 
-Wazimap branding is copyright Code for South Africa.
+The Wazimap name and branding is Copyright 2013-2017 Media Monitoring Africa (MMA) and may not be used without permission.
 
 Contents
 ========
