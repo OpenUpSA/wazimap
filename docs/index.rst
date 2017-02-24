@@ -33,6 +33,8 @@ Wazimap is licensed under the MIT License.
 
 The Wazimap name and branding is Copyright 2013-2017 Media Monitoring Africa (MMA) and may not be used without permission.
 
+If you use this software, please provide attribution to Wazimap, Media Monitoring Africa and Code for South Africa.
+
 Contents
 ========
 
