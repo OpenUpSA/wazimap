@@ -44,9 +44,9 @@ Releasing a New Version
 
     python setup.py sdist bdist_wheel upload
 
-License
-=======
+License and Copyright
+=====================
 
-Wazimap code is licensed under the MIT License.
+Wazimap is licensed under the MIT License.
 
-Wazimap branding is copyright Media Monitoring Africa (MMA) and cannot be used without permission.
+The Wazimap name and branding is Copyright 2013-2017 Media Monitoring Africa (MMA) and may not be used without permission.
