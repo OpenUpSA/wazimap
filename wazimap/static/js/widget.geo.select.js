@@ -34,7 +34,6 @@ var geocodeAddressEngine = new Bloodhound({
             var coords = [];
             for (var i = 0; i < response.results.length; i++) {
                 var result = response.results[i];
-                if (result.partial_match) continue;
 
                 coords.push({'lat': result.geometry.location.lat, 'lng': result.geometry.location.lng});
             }
