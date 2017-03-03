@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.7.2 (3 March 2017)
+--------------------
+
+* Don't exclude partial matches from google geocoding results
+
 0.7.1 (25 January 2017)
 -----------------------
 
