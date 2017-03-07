@@ -79,10 +79,10 @@
                     {% endblock %}
                 {% endif %}
                 <div class="header-buttons">
+                {% block header_branding %}
                     {% if WAZIMAP.twitter %}
                     <a class="wide-only" href="https://twitter.com/{{ WAZIMAP.twitter }}" title="{{ WAZIMAP.twitter }} on Twitter" target="_blank"><i class="fa fa-2x fa-twitter"></i></a>
                     {% endif %}
-                {% block header_branding %}
                     <a href="http://www.mediamonitoringafrica.org/" target="_blank">
                         <img class="mma-logo" src="{% static 'img/mma.png' %}">
                     </a>
