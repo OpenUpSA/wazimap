@@ -33,6 +33,7 @@ class HomepageView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         return {
             'root_geo': geo_data.root_geography(),
+            'video_links': settings.WAZIMAP.get('video_links', None)
         }
 
 
