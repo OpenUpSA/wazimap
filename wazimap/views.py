@@ -33,7 +33,6 @@ class HomepageView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         return {
             'root_geo': geo_data.root_geography(),
-            'video_links': settings.WAZIMAP.get('video_links', None)
         }
 
 
@@ -271,11 +270,6 @@ class AboutView(TemplateView):
 
 class HelpView(TemplateView):
     template_name = 'help.html'
-
-    def get_context_data(self, *args, **kwargs):
-        return {
-            'video_links': settings.WAZIMAP.get('video_links', None)
-        }
 
 
 class GeographyCompareView(TemplateView):
