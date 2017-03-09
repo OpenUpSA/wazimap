@@ -9,7 +9,7 @@ from django.views.generic.base import RedirectView, TemplateView
 from census.views import HealthcheckView, DataView, ExampleView
 
 from wazimap.views import (HomepageView, GeographyDetailView, GeographyJsonView, PlaceSearchJson,
-                           LocateView, DataAPIView, TableAPIView, AboutView, GeographyCompareView,
+                           LocateView, DataAPIView, TableAPIView, AboutView, HelpView, GeographyCompareView,
                            GeoAPIView, TableDetailView)
 
 
@@ -33,6 +33,12 @@ urlpatterns = patterns('',
         view    = cache_page(STANDARD_CACHE_TIME)(AboutView.as_view()),
         kwargs  = {},
         name    = 'about',
+    ),
+    url(
+        regex   = '^help$',
+        view    = cache_page(STANDARD_CACHE_TIME)(HelpView.as_view()),
+        kwargs  = {},
+        name    = 'help',
     ),
 
     # e.g. /profiles/province-GT/
@@ -199,7 +205,7 @@ urlpatterns = patterns('',
         kwargs  = {},
         name    = 'healthcheck',
     ),
-    
+
     url(
         regex = '^robots.txt$',
         view = lambda r: HttpResponse(

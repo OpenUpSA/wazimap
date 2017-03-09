@@ -45,6 +45,7 @@
 
 <div class="content-container clearfix tan-stripe">
     <article class="wrapper">
+        {% block hero %}
         <section class="column-full clearfix">
             <h1 class="article-header">Discover the story behind the data.</h1>
             <div id="slippy-map"></div>
@@ -72,6 +73,7 @@
                 <p>Pre-computed statistics are presented alongside each data point, so you can see how each place fits into a larger context.</p>
             </div>
         </section>
+        {% endblock %}
     </article>
 </div>
 
@@ -81,6 +83,7 @@
             <h1 class="article-header">Using {{ WAZIMAP.name }}</h1>
         </header>
         <section class="card-container clearfix">
+            {% block tips %}
             <h2 class="column-full subhead">Finding places</h2>
             <span class="column-half card">
                 <img src="{% static 'img/examples/text_search.png' %}">
@@ -99,6 +102,7 @@
                 <img src="{% static 'img/examples/hover_over_graph.png' %}">
                 <span class="caption">Hover over graphs to see comparisons with the province and country averages.</span>
             </span>
+            {% endblock %}
         </section>
     </article>
 </div>
@@ -107,15 +111,18 @@
     <article id="examples" class="clearfix wrapper">
         <header class="column-full">
             <h1 class="article-header">About {{ WAZIMAP.name }}</h1>
+        </header>
 
+        <section class="clearfix">
+            {% block about %}
             <p class="explainer">Wazimap, from the Xhosa word <i>ulwazi</i> for knowledge, is a joint project by <a href="http://www.mediamonitoringafrica.org/" target="_blank">Media Monitoring Africa</a> and <a href="http://www.code4sa.org/" target="_blank">Code for South Africa</a> that provides easy access to <a href="http://www.statssa.gov.za/" target="_blank">South African census</a> and <a href="http://www.elections.org.za/" target="_blank">elections</a> data.</p>
 
             <p>Read more about <a href="/about">who we are and why we built Wazimap</a>.
 
             <h2 class="column-full subhead">Shoulders of Giants</h2>
             <p>Wazimap is based on the amazing <a href="http://censusreporter.org/" target="_blank">Census Reporter</a> and is completely open source. You can <a href="https://wazimap.readthedocs.org/en/latest/index.html" target="_blank">build one for your country</a>.</p>
-
-        </header>
+            {% endblock %}
+        </section>
     </article>
 </div>
 {% endblock %}

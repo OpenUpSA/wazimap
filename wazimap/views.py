@@ -268,6 +268,10 @@ class AboutView(TemplateView):
     template_name = 'about.html'
 
 
+class HelpView(TemplateView):
+    template_name = 'help.html'
+
+
 class GeographyCompareView(TemplateView):
     template_name = 'profile/head2head.html'
 
