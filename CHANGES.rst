@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.7.3 (9 March 2017)
+--------------------
+
+* Add a stub help page at /help
+
 0.7.2 (3 March 2017)
 --------------------
 
