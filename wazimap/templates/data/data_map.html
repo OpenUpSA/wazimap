@@ -12,9 +12,11 @@
 {% block body %}
 <div id="map-controls" class="clearfix">
     <header class="box-header">
+    {% block data_map_header %}
         <a class="title" href="{% url 'homepage' %}">
             <img src="{% static 'img/wazi-logo.png' %}"> {{ WAZIMAP.name }}
         </a>
+    {% endblock %}
     </header>
     <div class="box-content">
         <section class="clearfix">
