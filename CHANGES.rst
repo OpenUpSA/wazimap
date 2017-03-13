@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.7.4 (13 March 2017)
+---------------------
+
+* Allow overriding of header block in map view
+
 0.7.3 (9 March 2017)
 --------------------
 
