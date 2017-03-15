@@ -112,3 +112,13 @@ These settings in particular apply:
 ``CURRENCY_SYMBOL``
   The currency symbol to be used before currency amounts. Not in Django.
   Default: $
+
+Additional Options
+------------------
+
+These options are specific to Wazimap and are set at the top-level of your settings.py file, not in the ``WAZIMAP`` dict.
+
+``STRIP_WWW``
+  Set this to ``True`` to redirect users visiting your site at ``www.example.com`` to ``example.com``. This is the reverse of
+  Django's `PREPEND_WWW <https://docs.djangoproject.com/en/1.10/ref/settings/#prepend-www>`_ setting.
+  Default is ``False``.

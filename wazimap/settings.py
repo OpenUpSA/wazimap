@@ -79,6 +79,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'wazimap.middleware.RedirectMiddleware',
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
@@ -143,6 +144,10 @@ LOGGING = {
 
 
 # Wazimap-specific settings
+
+# Redirect www.foo.com to foo.com? This is the reverse of Django's PREPEND_WWW
+STRIP_WWW = False
+
 WAZIMAP = {
     # The full name of the website
     'name': 'Wazimap',
