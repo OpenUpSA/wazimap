@@ -1,6 +1,12 @@
 Wazimap Version History
 =======================
 
+0.7.5 (15 March 2017)
+---------------------
+
+* Remove unnecessary Auth, Admin, Messages and Sessions middleware. If you need these middleware, add them to your INSTALLED_APPS and MIDDLEWARE_CLASSES in your settings file.
+* New setting ``STRIP_WWW`` to redirect ``www.example.com`` to ``example.com``, turned off by default.
+
 0.7.4 (13 March 2017)
 ---------------------
 
