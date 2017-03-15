@@ -21,12 +21,8 @@ DATABASES = {
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 INSTALLED_APPS = [
-    'django.contrib.auth',
-    'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.humanize',
-    'django.contrib.messages',
-    'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'wazimap.apps.WazimapConfig',
@@ -72,11 +68,9 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.media',
     'django.core.context_processors.request',
     'django.core.context_processors.static',
-    'django.contrib.auth.context_processors.auth',
     'census.context_processors.api_url',
     'wazimap.context_processors.wazimap_settings',
 )
@@ -85,10 +79,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
