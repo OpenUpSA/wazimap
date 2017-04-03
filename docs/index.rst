@@ -36,6 +36,10 @@ Wazimap is licensed under the MIT License.
 The Wazimap name and branding is Copyright 2013-2017 Media Monitoring Africa (MMA) and may not be used without permission.
 
 If you use this software, please provide attribution to Census Reporter, Wazimap, Media Monitoring Africa and Code for South Africa.
+We recommend using this text:
+
+    X is built on `Wazimap <http://wazimap.readthedocs.org/>`_, an open source platform by `Code for South Africa <http://code4sa.org>`_ and `Media Monitoring Africa <http://www.mediamonitoringafrica.org/>`_ for making census data more understandable. Wazimap is based on `Census Reporter <https://censusreporter.org>`_ which was funded by a Knight News Challenge grant.
+
 
 Contents
 ========
