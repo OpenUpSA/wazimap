@@ -209,7 +209,7 @@ urlpatterns = patterns('',
     url(
         regex = '^robots.txt$',
         view = lambda r: HttpResponse(
-            "User-agent: *\n%s: /" % ('Disallow' if getattr(settings, 'BLOCK_ROBOTS', False) else 'Allow') ,
+            "User-agent: *\nDisallow: /api/\n%s: /" % ('Disallow' if getattr(settings, 'BLOCK_ROBOTS', False) else 'Allow') ,
             content_type="text/plain"
         )
     ),
