@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.7.6 (3 April 2017)
+--------------------
+
+* Tell robots not to crawl /api/
+
 0.7.5 (15 March 2017)
 ---------------------
 
