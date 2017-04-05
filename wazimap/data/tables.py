@@ -312,7 +312,7 @@ class FieldTable(SimpleTable):
 
     """
     def __init__(self, fields, id=None, universe='Population', description=None, denominator_key=None,
-                 table_per_level=False, has_total=True, value_type='Integer', stat_type='number', **kwargs):
+                 table_per_level=False, has_total=True, value_type='Integer', stat_type='number', db_table=None, **kwargs):
         """
         Describe a new field table.
 
@@ -336,6 +336,11 @@ class FieldTable(SimpleTable):
         :param str value_type: the data type for the total column (default: 'Integer')
         :param str stat_type: used to determine how the values should be displayed in the templates.
                               'number' or 'percentage'
+        :param str db_table: name of an existing database table to use for this data table.
+                             Used when a model has two fields, e.g. `gender` and `population group`,
+                             and we would like two data tables, with a different ordering of fields,
+                             i.e. `population group` by `gender`, and `gender` by `population group`,
+                             to use the same database table.
         """
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
@@ -346,6 +351,13 @@ class FieldTable(SimpleTable):
         self.table_per_level = table_per_level
         self.has_total = has_total
         self.value_type = getattr(sqlalchemy.types, value_type)
+
+        if db_table:
+            model = get_model_by_name(db_table)
+            if set(fields) != set(model.data_table.fields):
+                raise ValueError("The fields should match those of the existing model you wish to use. The fields are: %s" % (
+                    ', '.join(f for f in model.data_table.fields)))
+        self.db_table = db_table
 
         super(FieldTable, self).__init__(id=id, model=None, universe=universe, description=description, stat_type=stat_type, **kwargs)
 
@@ -364,7 +376,7 @@ class FieldTable(SimpleTable):
                 model.data_table = self
                 self.models[level] = model
         else:
-            self.model = self._build_model_from_fields(self.fields, self.id.lower(), value_type=self.value_type)
+            self.model = self._build_model_from_fields(self.fields, self.id.lower(), value_type=self.value_type, existing_table=self.db_table)
             self.model.data_table = self
 
     def get_model(self, geo_level):
@@ -547,13 +559,15 @@ class FieldTable(SimpleTable):
 
         return data
 
-    def _build_model_from_fields(self, fields, table_name, geo_level=None, value_type=Integer):
+    def _build_model_from_fields(self, fields, table_name, geo_level=None, value_type=Integer, existing_table=None):
         '''
         Generates an ORM model for arbitrary census fields by geography.
 
         :param list fields: the census fields in `api.models.tables.FIELD_TABLE_FIELDS`, e.g. ['highest educational level', 'type of sector']
         :param str table_name: the name of the database table
         :param str geo_level: one of the geographics levels defined in `api.base.geo_levels`, e.g. 'province', or None if the table doesn't use them
+        :param value_type: The value type of the total column.
+        :param existing_table: Name of existing database table to use for this model.
         :return: ORM model class containing the given fields with type String(128), a 'total' field
         with type Integer and '%(geo_level)s_code' with type ForeignKey('%(geo_level)s.code')
         :rtype: Model
@@ -589,7 +603,8 @@ class FieldTable(SimpleTable):
 
         # create the table model
         class Model(Base):
-            __table__ = Table(table_name, Base.metadata, *table_args)
+            table = existing_table or table_name
+            __table__ = Table(table, Base.metadata, *table_args, extend_existing=True)
         _census_table_models[table_name] = Model
 
         # ensure it exists in the DB
