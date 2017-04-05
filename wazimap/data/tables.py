@@ -76,7 +76,7 @@ class SimpleTable(object):
     """
 
     def __init__(self, id, universe, description, model='auto', total_column='total',
-                 year='2011', dataset='Census 2011', stat_type='number'):
+                 year='2011', dataset='Census 2011', stat_type='number', db_table=None):
         """
         Describe a new simple table.
 
@@ -95,11 +95,13 @@ class SimpleTable(object):
         :param str dataset: the name of the dataset the table belongs to
         :param str stat_type: used to determine how the values should be displayed in the templates.
                               'number' or 'percentage'
+        :param str db_table: name of an existing database table to use for this data table.
         """
         self.id = id.upper()
+        self.db_table = db_table or self.id.lower()
 
         if model == 'auto':
-            model = Table(self.id.lower(), Base.metadata, autoload=True)
+            model = Table(self.db_table, Base.metadata, autoload=True)
 
         self.model = model
         self.universe = universe
@@ -357,9 +359,10 @@ class FieldTable(SimpleTable):
             if set(fields) != set(model.data_table.fields):
                 raise ValueError("The fields should match those of the existing model you wish to use. The fields are: %s" % (
                     ', '.join(f for f in model.data_table.fields)))
-        self.db_table = db_table
 
-        super(FieldTable, self).__init__(id=id, model=None, universe=universe, description=description, stat_type=stat_type, **kwargs)
+        super(FieldTable, self).__init__(
+            id=id, model=None, universe=universe, description=description, stat_type=stat_type,
+            db_table=db_table, **kwargs)
 
         FIELD_TABLE_FIELDS.update(self.fields)
         FIELD_TABLES[self.id] = self
@@ -376,7 +379,7 @@ class FieldTable(SimpleTable):
                 model.data_table = self
                 self.models[level] = model
         else:
-            self.model = self._build_model_from_fields(self.fields, self.id.lower(), value_type=self.value_type, existing_table=self.db_table)
+            self.model = self._build_model_from_fields(self.fields, self.db_table, value_type=self.value_type)
             self.model.data_table = self
 
     def get_model(self, geo_level):
@@ -559,7 +562,7 @@ class FieldTable(SimpleTable):
 
         return data
 
-    def _build_model_from_fields(self, fields, table_name, geo_level=None, value_type=Integer, existing_table=None):
+    def _build_model_from_fields(self, fields, table_name, geo_level=None, value_type=Integer):
         '''
         Generates an ORM model for arbitrary census fields by geography.
 
@@ -567,13 +570,12 @@ class FieldTable(SimpleTable):
         :param str table_name: the name of the database table
         :param str geo_level: one of the geographics levels defined in `api.base.geo_levels`, e.g. 'province', or None if the table doesn't use them
         :param value_type: The value type of the total column.
-        :param existing_table: Name of existing database table to use for this model.
         :return: ORM model class containing the given fields with type String(128), a 'total' field
         with type Integer and '%(geo_level)s_code' with type ForeignKey('%(geo_level)s.code')
         :rtype: Model
         '''
-        if table_name in _census_table_models:
-            return _census_table_models[table_name]
+        if table_name in _field_table_models:
+            return _field_table_models[table_name]
 
         # We build this array in a particular order, with the geo-related fields first,
         # to ensure that SQLAlchemy creates the underlying table with the compound primary
@@ -603,9 +605,9 @@ class FieldTable(SimpleTable):
 
         # create the table model
         class Model(Base):
-            table = existing_table or table_name
+            table = table_name
             __table__ = Table(table, Base.metadata, *table_args, extend_existing=True)
-        _census_table_models[table_name] = Model
+        _field_table_models[table_name] = Model
 
         # ensure it exists in the DB
         session = get_session()
@@ -626,16 +628,16 @@ class FieldTable(SimpleTable):
         if self.table_per_level:
             if geo_level is None:
                 raise ValueError('Expected a geo_level')
-            return '%s_%s' % (self.id, geo_level)
+            return '%s_%s' % (self.db_table, geo_level)
 
-        return self.id
+        return self.db_table
 
 
-_census_table_models = {}
+_field_table_models = {}
 
 
 def get_model_by_name(name):
-    return _census_table_models[name]
+    return _field_table_models[name]
 
 
 def get_model_from_fields(fields, geo_level, table_name=None, table_dataset=None):
