@@ -607,8 +607,7 @@ class FieldTable(SimpleTable):
 
         # create the table model
         class Model(Base):
-            table = db_table
-            __table__ = Table(table, Base.metadata, *table_args, extend_existing=True)
+            __table__ = Table(db_table, Base.metadata, *table_args, extend_existing=True)
 
         # ensure it exists in the DB
         session = get_session()
