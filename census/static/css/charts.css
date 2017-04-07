@@ -296,6 +296,28 @@ uncomment for separate inclusion into embed iframes */
     margin: 8px;
     cursor: pointer;
 }
+#profile .data-drawer {
+    position: relative;
+    margin-top: 1.5em !important;
+    padding: 3px 2px 0px 0px;
+    overflow-x: visible;
+    background-color: #f7f8f3;
+    border: 1px solid #eff1e9;
+    border-bottom-color: #cad0b5;
+}
+#profile .data-drawer h3 a {
+    float: right;
+    font-weight: normal;
+}
+#profile .data-drawer th {
+    border-left: 5px solid #f7f8f3;
+}
+#profile .data-drawer a {
+    color: #02aeab;
+}
+#profile .data-drawer a:hover {
+    color: #014948;
+}
 
 .embed-footer {
     clear: both;
