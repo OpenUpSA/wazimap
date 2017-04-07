@@ -868,16 +868,6 @@ function Chart(options) {
             chart.dataDrawer = row.append("div")
                     .attr("class", "data-drawer column-full");
 
-            chart.dataDrawer.append("div")
-                    .attr("class", "tool-group")
-                    .append("ul")
-                    .attr("class", "toggle-set")
-                    .html(function() {
-                        return " <li><a class='smaller' href='" + chart.tableURL + "'>Table</a></li>" +
-                               " <li><a class='smaller' href='" + chart.mapURL + "'>Map</a></li>" +
-                               " <li><a class='smaller' href='" + chart.distributionURL + "'>Distribution</a></li>";
-                    });
-
             chart.dataDrawer.append("h3")
                     .attr("class", "chart-title")
                     .html(function() {
@@ -888,7 +878,10 @@ function Chart(options) {
                             titleText = "Table " + tableID;
                         }
                         return titleText;
-                    });
+                    })
+                    .append("a")
+                    .attr("href", chart.tableURL)
+                    .html("Explore and download this data");
 
             chart.dataTable = chart.dataDrawer.append("table")
                     .attr("id", "data-table")
