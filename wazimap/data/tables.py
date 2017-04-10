@@ -46,6 +46,9 @@ TABLE_BAD_CHARS = re.compile('[ /-]')
 # All SimpleTable and FieldTable instances by id
 DATA_TABLES = {}
 
+# Map from database table to SQLAlchemy model
+DB_MODELS = {}
+
 INT_RE = re.compile("^[0-9]+$")
 
 
@@ -356,9 +359,15 @@ class FieldTable(SimpleTable):
 
         if db_table:
             model = get_model_for_db_table(db_table)
-            if model and set(fields) != set(model.data_table.fields):
+            other_data_table = model.data_tables[0]
+
+            if model and set(fields) != set(other_data_table.fields):
                 raise ValueError("The fields should match those of the existing model you wish to use. The fields are: %s" % (
-                    ', '.join(f for f in model.data_table.fields)))
+                    ', '.join(f for f in other_data_table.fields)))
+
+            if self.table_per_level != other_data_table.table_per_level:
+                raise ValueError("The table_per_level field for this table must match the existing data table for this table: %s" % (
+                                 other_data_table.table_per_level))
 
         super(FieldTable, self).__init__(
             id=id, model=None, universe=universe, description=description, stat_type=stat_type,
@@ -376,11 +385,13 @@ class FieldTable(SimpleTable):
         if self.table_per_level:
             for level in DATASET_GEO_LEVELS[self.dataset_name]:
                 model = self._build_model_from_fields(self.fields, self._table_name(level), level, value_type=self.value_type)
-                model.data_table = self
                 self.models[level] = model
         else:
             self.model = self._build_model_from_fields(self.fields, self.db_table, value_type=self.value_type)
-            self.model.data_table = self
+
+        if not hasattr(self.model, 'data_tables'):
+            self.model.data_tables = []
+        self.model.data_tables.append(self)
 
     def get_model(self, geo_level):
         if self.table_per_level:
@@ -616,6 +627,8 @@ class FieldTable(SimpleTable):
         finally:
             session.close()
 
+        DB_MODELS[db_table] = Model
+
         return Model
 
     def _table_name(self, geo_level=None):
@@ -632,28 +645,15 @@ class FieldTable(SimpleTable):
 
         return self.db_table
 
+    @classmethod
+    def for_fields(cls, fields, table_dataset=None):
+        """ Find a model that can provide us these fields, at this level.
 
-def get_model_for_db_table(db_table):
-    """ Lookup the SQLAlchemy model for a particular database table.
-    """
-    for model in Base._decl_class_registry.values():
-        if hasattr(model, '__tablename__') and model.__tablename__ == db_table:
-            return model
+        :param fields: list of fields to find a table for
+        :param str table_dataset: dataset for the FieldTable, if the fields are ambiguous (optional)
 
-
-def get_model_from_fields(fields, geo_level, table_name=None, table_dataset=None):
-    """ Find a model that can provide us these fields, at this level.
-
-    :param fields: list of fields to find a table for
-    :param str geo_level: geography level required
-    :param str table_name: name of the FieldTable if the fields are ambiguous (optional)
-    :param str table_dataset: dataset for the FieldTable, if the fields are ambiguous (optional)
-
-    :return: SQLAlchemy model
-    """
-    if table_name:
-        table = get_datatable(table_name)
-    else:
+        :return: a FieldTable instance, or None
+        """
         # lookup based on fields
         for field in fields:
             if field not in FIELD_TABLE_FIELDS:
@@ -671,6 +671,33 @@ def get_model_from_fields(fields, geo_level, table_name=None, table_dataset=None
             for t in candidates if len(t.field_set) >= len(field_set) and len(field_set - t.field_set) == 0]
         table, _ = min(possibilities, key=lambda p: p[1])
 
+        return table
+
+    @classmethod
+    def get(cls, table_name):
+        return get_datatable(table_name)
+
+
+def get_model_for_db_table(db_table):
+    """ Lookup the SQLAlchemy model for a particular database table.
+    """
+    return DB_MODELS.get(db_table)
+
+
+def get_model_from_fields(fields, geo_level, table_name=None, table_dataset=None):
+    """ Find a model that can provide us these fields, at this level.
+
+    :param fields: list of fields to find a table for
+    :param str geo_level: geography level required
+    :param str table_name: name of the FieldTable if the fields are ambiguous (optional)
+    :param str table_dataset: dataset for the FieldTable, if the fields are ambiguous (optional)
+
+    :return: SQLAlchemy model
+    """
+    if table_name:
+        table = FieldTable.get(table_name)
+    else:
+        table = FieldTable.for_fields(fields, table_dataset)
         if not table:
             ValueError("Couldn't find a table that covers these fields: %s" % fields)
 
