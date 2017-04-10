@@ -46,6 +46,9 @@ TABLE_BAD_CHARS = re.compile('[ /-]')
 # All SimpleTable and FieldTable instances by id
 DATA_TABLES = {}
 
+# Map from database table to SQLAlchemy model
+DB_MODELS = {}
+
 INT_RE = re.compile("^[0-9]+$")
 
 
@@ -76,7 +79,7 @@ class SimpleTable(object):
     """
 
     def __init__(self, id, universe, description, model='auto', total_column='total',
-                 year='2011', dataset='Census 2011', stat_type='number'):
+                 year='2011', dataset='Census 2011', stat_type='number', db_table=None):
         """
         Describe a new simple table.
 
@@ -95,11 +98,13 @@ class SimpleTable(object):
         :param str dataset: the name of the dataset the table belongs to
         :param str stat_type: used to determine how the values should be displayed in the templates.
                               'number' or 'percentage'
+        :param str db_table: name of an existing database table to use for this data table.
         """
         self.id = id.upper()
+        self.db_table = db_table or self.id.lower()
 
         if model == 'auto':
-            model = Table(self.id.lower(), Base.metadata, autoload=True)
+            model = Table(self.db_table, Base.metadata, autoload=True)
 
         self.model = model
         self.universe = universe
@@ -312,7 +317,7 @@ class FieldTable(SimpleTable):
 
     """
     def __init__(self, fields, id=None, universe='Population', description=None, denominator_key=None,
-                 table_per_level=False, has_total=True, value_type='Integer', stat_type='number', **kwargs):
+                 table_per_level=False, has_total=True, value_type='Integer', stat_type='number', db_table=None, **kwargs):
         """
         Describe a new field table.
 
@@ -336,6 +341,11 @@ class FieldTable(SimpleTable):
         :param str value_type: the data type for the total column (default: 'Integer')
         :param str stat_type: used to determine how the values should be displayed in the templates.
                               'number' or 'percentage'
+        :param str db_table: name of an existing database table to use for this data table.
+                             Used when a model has two fields, e.g. `gender` and `population group`,
+                             and we would like two data tables, with a different ordering of fields,
+                             i.e. `population group` by `gender`, and `gender` by `population group`,
+                             to use the same database table.
         """
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
@@ -347,7 +357,21 @@ class FieldTable(SimpleTable):
         self.has_total = has_total
         self.value_type = getattr(sqlalchemy.types, value_type)
 
-        super(FieldTable, self).__init__(id=id, model=None, universe=universe, description=description, stat_type=stat_type, **kwargs)
+        if db_table:
+            model = get_model_for_db_table(db_table)
+            other_data_table = model.data_tables[0]
+
+            if model and set(fields) != set(other_data_table.fields):
+                raise ValueError("The fields should match those of the existing model you wish to use. The fields are: %s" % (
+                    ', '.join(f for f in other_data_table.fields)))
+
+            if self.table_per_level != other_data_table.table_per_level:
+                raise ValueError("The table_per_level field for this table must match the existing data table for this table: %s" % (
+                                 other_data_table.table_per_level))
+
+        super(FieldTable, self).__init__(
+            id=id, model=None, universe=universe, description=description, stat_type=stat_type,
+            db_table=db_table, **kwargs)
 
         FIELD_TABLE_FIELDS.update(self.fields)
         FIELD_TABLES[self.id] = self
@@ -361,11 +385,13 @@ class FieldTable(SimpleTable):
         if self.table_per_level:
             for level in DATASET_GEO_LEVELS[self.dataset_name]:
                 model = self._build_model_from_fields(self.fields, self._table_name(level), level, value_type=self.value_type)
-                model.data_table = self
                 self.models[level] = model
         else:
-            self.model = self._build_model_from_fields(self.fields, self.id.lower(), value_type=self.value_type)
-            self.model.data_table = self
+            self.model = self._build_model_from_fields(self.fields, self.db_table, value_type=self.value_type)
+
+        if not hasattr(self.model, 'data_tables'):
+            self.model.data_tables = []
+        self.model.data_tables.append(self)
 
     def get_model(self, geo_level):
         if self.table_per_level:
@@ -547,19 +573,22 @@ class FieldTable(SimpleTable):
 
         return data
 
-    def _build_model_from_fields(self, fields, table_name, geo_level=None, value_type=Integer):
+    def _build_model_from_fields(self, fields, db_table, geo_level=None, value_type=Integer):
         '''
         Generates an ORM model for arbitrary census fields by geography.
 
         :param list fields: the census fields in `api.models.tables.FIELD_TABLE_FIELDS`, e.g. ['highest educational level', 'type of sector']
-        :param str table_name: the name of the database table
+        :param str db_table: the name of the database table
         :param str geo_level: one of the geographics levels defined in `api.base.geo_levels`, e.g. 'province', or None if the table doesn't use them
+        :param value_type: The value type of the total column.
         :return: ORM model class containing the given fields with type String(128), a 'total' field
         with type Integer and '%(geo_level)s_code' with type ForeignKey('%(geo_level)s.code')
         :rtype: Model
         '''
-        if table_name in _census_table_models:
-            return _census_table_models[table_name]
+        # does it already exist?
+        model = get_model_for_db_table(db_table)
+        if model:
+            return model
 
         # We build this array in a particular order, with the geo-related fields first,
         # to ensure that SQLAlchemy creates the underlying table with the compound primary
@@ -589,8 +618,7 @@ class FieldTable(SimpleTable):
 
         # create the table model
         class Model(Base):
-            __table__ = Table(table_name, Base.metadata, *table_args)
-        _census_table_models[table_name] = Model
+            __table__ = Table(db_table, Base.metadata, *table_args, extend_existing=True)
 
         # ensure it exists in the DB
         session = get_session()
@@ -598,6 +626,8 @@ class FieldTable(SimpleTable):
             Model.__table__.create(session.get_bind(), checkfirst=True)
         finally:
             session.close()
+
+        DB_MODELS[db_table] = Model
 
         return Model
 
@@ -611,45 +641,65 @@ class FieldTable(SimpleTable):
         if self.table_per_level:
             if geo_level is None:
                 raise ValueError('Expected a geo_level')
-            return '%s_%s' % (self.id, geo_level)
+            return '%s_%s' % (self.db_table, geo_level)
 
-        return self.id
+        return self.db_table
+
+    @classmethod
+    def for_fields(cls, fields, table_dataset=None):
+        """ Find a model that can provide us these fields, at this level.
+
+        :param fields: list of fields to find a table for
+        :param str table_dataset: dataset for the FieldTable, if the fields are ambiguous (optional)
+
+        :return: a FieldTable instance, or None
+        """
+        # lookup based on fields
+        for field in fields:
+            if field not in FIELD_TABLE_FIELDS:
+                raise ValueError('Invalid field: %s' % field)
+
+        # try find it based on fields
+        field_set = set(fields)
+
+        candidates = FIELD_TABLES.values()
+        if table_dataset:
+            candidates = [t for t in candidates if t.dataset_name == table_dataset]
+
+        possibilities = [
+            (t, len(t.field_set - field_set))
+            for t in candidates if len(t.field_set) >= len(field_set) and len(field_set - t.field_set) == 0]
+        table, _ = min(possibilities, key=lambda p: p[1])
+
+        return table
+
+    @classmethod
+    def get(cls, table_name):
+        return get_datatable(table_name)
 
 
-_census_table_models = {}
-
-
-def get_model_by_name(name):
-    return _census_table_models[name]
+def get_model_for_db_table(db_table):
+    """ Lookup the SQLAlchemy model for a particular database table.
+    """
+    return DB_MODELS.get(db_table)
 
 
 def get_model_from_fields(fields, geo_level, table_name=None, table_dataset=None):
-    """
-    Find a model that can provide us these fields, at this level.
-    TODO: If table_name = None, give preference to tables with an
-    autogenerated id.
+    """ Find a model that can provide us these fields, at this level.
+
+    :param fields: list of fields to find a table for
+    :param str geo_level: geography level required
+    :param str table_name: name of the FieldTable if the fields are ambiguous (optional)
+    :param str table_dataset: dataset for the FieldTable, if the fields are ambiguous (optional)
+
+    :return: SQLAlchemy model
     """
     if table_name:
-        return get_model_by_name(table_name)
-
-    for field in fields:
-        if field not in FIELD_TABLE_FIELDS:
-            raise ValueError('Invalid field: %s' % field)
-
-    # try find it based on fields
-    field_set = set(fields)
-
-    candidates = FIELD_TABLES.values()
-    if table_dataset:
-        candidates = [t for t in candidates if t.dataset_name == table_dataset]
-
-    possibilities = [
-        (t, len(t.field_set - field_set))
-        for t in candidates if len(t.field_set) >= len(field_set) and len(field_set - t.field_set) == 0]
-    table, _ = min(possibilities, key=lambda p: p[1])
-
-    if not table:
-        ValueError("Couldn't find a table that covers these fields: %s" % fields)
+        table = FieldTable.get(table_name)
+    else:
+        table = FieldTable.for_fields(fields, table_dataset)
+        if not table:
+            ValueError("Couldn't find a table that covers these fields: %s" % fields)
 
     return table.get_model(geo_level)
 

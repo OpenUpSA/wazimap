@@ -98,8 +98,8 @@ def add_metadata(data, table):
 
     # this might be a SQLAlchemy model that is linked back to
     # a data table
-    if hasattr(table, 'data_table'):
-        table = table.data_table
+    if hasattr(table, 'data_tables'):
+        table = table.data_tables[0]
 
     data['metadata']['table_id'] = table.id
     if table.universe:
@@ -253,12 +253,14 @@ def group_remainder(data, num_items=4, make_percentage=True,
 
 
 def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, order_by=None,
-                       only=None, exclude=None):
+                       only=None, exclude=None, data_table=None):
     """ Get rows of statistics from the stats mode +db_model+ at a particular
     geo_code and geo_level, summing over the 'total' field and grouping by
     +fields+. Filters to include +only+ and ignore +exclude+, if given.
     """
-    if db_model.data_table.table_per_level:
+    data_table = data_table or db_model.data_tables[0]
+
+    if data_table.table_per_level:
         geo_attr = '%s_code' % geo_level
     else:
         geo_attr = 'geo_code'
@@ -281,7 +283,7 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
         for k, v in exclude.iteritems():
             objects = objects.filter(getattr(db_model, k).notin_(v))
 
-    if not db_model.data_table.table_per_level:
+    if not data_table.table_per_level:
         objects = objects.filter(db_model.geo_level == geo_level)
 
     if order_by is not None:
@@ -364,7 +366,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
 
     :return: (data-dictionary, total)
     """
-    from .tables import get_model_from_fields
+    from .tables import FieldTable
 
     if not isinstance(fields, list):
         fields = [fields]
@@ -402,9 +404,19 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         if not isinstance(recode, dict) or not many_fields:
             recode = dict((f, recode) for f in fields)
 
-    model = get_model_from_fields(table_fields or fields, geo_level, table_name, table_dataset)
+    table_fields = table_fields or fields
+
+    # get the table and the model
+    if table_name:
+        data_table = FieldTable.get(table_name)
+    else:
+        data_table = FieldTable.for_fields(table_fields, table_dataset)
+        if not data_table:
+            ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
+
+    model = data_table.get_model(geo_level)
     objects = get_objects_by_geo(model, geo_code, geo_level, session, fields=fields, order_by=order_by,
-                                 only=only, exclude=exclude)
+                                 only=only, exclude=exclude, data_table=data_table)
 
     if total is not None and many_fields:
         raise ValueError("Cannot specify a total if many fields are given")
@@ -412,11 +424,11 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     if total and percent_grouping:
         raise ValueError("Cannot specify a total if percent_grouping is given")
 
-    if total is None and percent and model.data_table.total_column is None:
+    if total is None and percent and data_table.total_column is None:
         # The table doesn't support calculating percentages, but the caller
         # has asked for a percentage without providing a total value to use.
         # Either specify a total, or specify percent=False
-        raise ValueError("Asking for a percent on table %s that doesn't support totals and no total parameter specified." % model.data_table.id)
+        raise ValueError("Asking for a percent on table %s that doesn't support totals and no total parameter specified." % data_table.id)
 
     # sanity check the percent grouping
     if percent:
@@ -429,7 +441,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     else:
         percent_grouping = None
 
-    denominator_key = getattr(model.data_table, 'denominator_key')
+    denominator_key = getattr(data_table, 'denominator_key')
     root_data = OrderedDict()
     running_total = 0
     group_totals = {}
@@ -479,7 +491,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         if not obj.total and exclude_zero:
             continue
 
-        if denominator_key and getattr(obj, model.data_table.fields[-1]) == denominator_key:
+        if denominator_key and getattr(obj, data_table.fields[-1]) == denominator_key:
             grand_total = obj.total
             # don't include the denominator key in the output
             continue
