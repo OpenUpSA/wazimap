@@ -5,7 +5,6 @@ from collections import OrderedDict
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, func
 import sqlalchemy.types
 
-from wazimap.geo import geo_data
 from wazimap.data.base import Base
 from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata
 
@@ -317,7 +316,7 @@ class FieldTable(SimpleTable):
 
     """
     def __init__(self, fields, id=None, universe='Population', description=None, denominator_key=None,
-                 table_per_level=False, has_total=True, value_type='Integer', stat_type='number', db_table=None, **kwargs):
+                 has_total=True, value_type='Integer', stat_type='number', db_table=None, **kwargs):
         """
         Describe a new field table.
 
@@ -334,8 +333,6 @@ class FieldTable(SimpleTable):
                                     total population).
                                     This will be used as the total column once
                                     the id of the column has been calculated.
-        :param bool table_per_level: is there a separate database table for each geo level,
-                                     or are all levels in one table (default: False, one table)
         :param bool has_total: does it make sense to calculate a total column and express percentages
                                   for values in this table? (default: True)
         :param str value_type: the data type for the total column (default: 'Integer')
@@ -353,7 +350,6 @@ class FieldTable(SimpleTable):
         self.fields = fields
         self.field_set = set(fields)
         self.denominator_key = denominator_key
-        self.table_per_level = table_per_level
         self.has_total = has_total
         self.value_type = getattr(sqlalchemy.types, value_type)
 
@@ -364,10 +360,6 @@ class FieldTable(SimpleTable):
             if model and set(fields) != set(other_data_table.fields):
                 raise ValueError("The fields should match those of the existing model you wish to use. The fields are: %s" % (
                     ', '.join(f for f in other_data_table.fields)))
-
-            if self.table_per_level != other_data_table.table_per_level:
-                raise ValueError("The table_per_level field for this table must match the existing data table for this table: %s" % (
-                                 other_data_table.table_per_level))
 
         super(FieldTable, self).__init__(
             id=id, model=None, universe=universe, description=description, stat_type=stat_type,
@@ -380,24 +372,14 @@ class FieldTable(SimpleTable):
         """
         Build models that correspond to the tables underlying this data table.
         """
-        self.models = {}
-
-        if self.table_per_level:
-            for level in DATASET_GEO_LEVELS[self.dataset_name]:
-                model = self._build_model_from_fields(self.fields, self._table_name(level), level, value_type=self.value_type)
-                self.models[level] = model
-        else:
-            self.model = self._build_model_from_fields(self.fields, self.db_table, value_type=self.value_type)
+        self.model = self._build_model_from_fields(self.fields, self.db_table, value_type=self.value_type)
 
         if not hasattr(self.model, 'data_tables'):
             self.model.data_tables = []
         self.model.data_tables.append(self)
 
     def get_model(self, geo_level):
-        if self.table_per_level:
-            return self.models[geo_level]
-        else:
-            return self.model
+        return self.model
 
     def setup_columns(self):
         """
@@ -493,12 +475,6 @@ class FieldTable(SimpleTable):
             model = self.get_model(geo_level)
             geo_codes = [g.geo_code for g in geos]
 
-            if self.table_per_level:
-                code = '%s_code' % geo_level
-            else:
-                code = 'geo_code'
-            code_attr = getattr(model, code)
-
             # initial values
             for geo_code in geo_codes:
                 data['%s-%s' % (geo_level, geo_code)] = {
@@ -510,16 +486,14 @@ class FieldTable(SimpleTable):
                 geo_values = None
                 fields = [getattr(model, f) for f in self.fields]
                 rows = session\
-                    .query(code_attr,
+                    .query(model.geo_code,
                            func.sum(model.total).label('total'),
                            *fields)\
-                    .group_by(code_attr, *fields)\
-                    .order_by(code_attr, *fields)\
-                    .filter(code_attr.in_(geo_codes))
+                    .group_by(model.geo_code, *fields)\
+                    .order_by(model.geo_code, *fields)\
+                    .filter(model.geo_code.in_(geo_codes))
 
-                if not self.table_per_level:
-                    rows = rows.filter(model.geo_level == geo_level)
-
+                rows = rows.filter(model.geo_level == geo_level)
                 rows = rows.all()
 
                 def permute(level, field_keys, rows):
@@ -559,7 +533,7 @@ class FieldTable(SimpleTable):
                     return total
 
                 # rows for each geo
-                for geo_code, geo_rows in groupby(rows, lambda r: getattr(r, code)):
+                for geo_code, geo_rows in groupby(rows, lambda r: r.geo_code):
                     geo_values = data['%s-%s' % (geo_level, geo_code)]
                     total = permute(0, [], geo_rows)
 
@@ -630,20 +604,6 @@ class FieldTable(SimpleTable):
         DB_MODELS[db_table] = Model
 
         return Model
-
-    def _table_name(self, geo_level=None):
-        """ What is the name for the underlying database table for this table,
-        for the given geo_level?
-        """
-        if geo_level is not None and geo_level not in geo_data.geo_levels:
-            raise ValueError('Invalid geo_level: %s' % geo_level)
-
-        if self.table_per_level:
-            if geo_level is None:
-                raise ValueError('Expected a geo_level')
-            return '%s_%s' % (self.db_table, geo_level)
-
-        return self.db_table
 
     @classmethod
     def for_fields(cls, fields, table_dataset=None):

@@ -260,20 +260,15 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
     """
     data_table = data_table or db_model.data_tables[0]
 
-    if data_table.table_per_level:
-        geo_attr = '%s_code' % geo_level
-    else:
-        geo_attr = 'geo_code'
-
     if fields is None:
-        fields = [c.key for c in class_mapper(db_model).attrs if c.key not in [geo_attr, 'geo_level', 'total']]
+        fields = [c.key for c in class_mapper(db_model).attrs if c.key not in ['geo_code', 'geo_level', 'total']]
 
     fields = [getattr(db_model, f) for f in fields]
 
     objects = session\
         .query(func.sum(db_model.total).label('total'), *fields)\
         .group_by(*fields)\
-        .filter(getattr(db_model, geo_attr) == geo_code)
+        .filter(db_model.geo_code == geo_code)
 
     if only:
         for k, v in only.iteritems():
@@ -283,8 +278,7 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
         for k, v in exclude.iteritems():
             objects = objects.filter(getattr(db_model, k).notin_(v))
 
-    if not data_table.table_per_level:
-        objects = objects.filter(db_model.geo_level == geo_level)
+    objects = objects.filter(db_model.geo_level == geo_level)
 
     if order_by is not None:
         attr = order_by
