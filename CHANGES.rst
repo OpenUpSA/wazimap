@@ -1,8 +1,8 @@
 Wazimap Version History
 =======================
 
-0.8.0 (? April 2017)
---------------------
+0.8.0 (12 April 2017)
+---------------------
 
 * Support FieldTables that share a common database table
 * Remove support for ``FieldTable.table_per_level`` parameter.
