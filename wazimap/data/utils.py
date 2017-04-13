@@ -541,7 +541,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         for v in slices:
             root_data = root_data[v]
 
-    add_metadata(root_data, model)
+    add_metadata(root_data, data_table)
 
     return root_data, grand_total
 
