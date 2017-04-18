@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.8.1 (18 April 2017)
+---------------------
+
+* Fix metadata for field tables that re-use db tables
+
 0.8.0 (12 April 2017)
 ---------------------
 
