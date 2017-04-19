@@ -366,6 +366,10 @@ uncomment for separate inclusion into embed iframes */
 .action-links {
     float: right;
     color: #68b3a3;
+    margin-top: -5px;
+}
+.action-links.tool-group {
+    font-size: 100%;
 }
 .action-links a {
     cursor: pointer;
@@ -373,9 +377,6 @@ uncomment for separate inclusion into embed iframes */
 }
 .action-links a:hover {
     color: #014948;
-}
-.action-links span {
-    margin: 0 .33em;
 }
 
 .box-header img {
@@ -585,16 +586,14 @@ section.chart-divider h2 {
 }
 
 @media only screen and (max-width: 640px) {
-    .chart-qualifier,
-    .action-links {
+    .chart-qualifier {
         float: left;
         margin: 1em 0 0;
         display: block;
         position: relative;
         clear: both;
     }
-    .chart-get-data,
-    .action-links a {
+    .chart-get-data {
         display: inline-block;
     }
     .column-chart,
