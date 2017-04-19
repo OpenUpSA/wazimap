@@ -58,6 +58,10 @@
 #page-footer ul.ul-icon-list {
     margin-bottom: 30px;
 }
+#page-footer .attribution {
+  margin-top: 20px;
+  font-size: 0.8em;
+}
 
 #how-to .content-container {
     padding: 2.5em 0;
