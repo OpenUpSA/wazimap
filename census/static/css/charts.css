@@ -308,6 +308,7 @@ uncomment for separate inclusion into embed iframes */
 #profile .data-drawer h3 a {
     float: right;
     font-weight: normal;
+    margin-right: 1px;
 }
 #profile .data-drawer th {
     border-left: 5px solid #f7f8f3;

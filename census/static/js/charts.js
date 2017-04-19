@@ -757,6 +757,10 @@ function Chart(options) {
                 .classed("chart-show-embed", true)
                 .text("Embed")
                 .on("click", chart.showEmbedCode);
+
+        $(chart.actionLinks[0]).hover(function() {
+            $(this).find('.sub-group').toggle();
+        });
     }
 
     chart.fillEmbedCode = function(textarea, align) {
