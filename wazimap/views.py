@@ -31,8 +31,12 @@ class HomepageView(TemplateView):
     template_name = 'homepage.html'
 
     def get_context_data(self, *args, **kwargs):
+        root_geo_dict = geo_data.root_geography().as_dict_deep()
+        root_geo_dict = enhance_api_data(root_geo_dict)
+        root_geo_json = SafeString(json.dumps(root_geo_dict, cls=DjangoJSONEncoder))
         return {
             'root_geo': geo_data.root_geography(),
+            'root_geo_json': root_geo_json
         }
 
 

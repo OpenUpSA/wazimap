@@ -138,6 +138,8 @@
 <script src="{% static 'js/vendor/leaflet.label.js' %}"></script>
 <script src="{% static 'js/maps_static.js' %}"></script>
 <script src="{% static 'js/profile_map.js' %}"></script>
+<script src="{% static 'js/maps_mapit.js' %}"></script>
+<script src="{% static 'js/profile_map_mapit.js' %}"></script>
 {% endblock %}
 
 <script>
@@ -151,7 +153,7 @@ geoSelect.focus()
 var maps = new ProfileMaps();
 var centre = {% if WAZIMAP.map_centre %}{{ WAZIMAP.map_centre }}{% else %}null{% endif %};
 var zoom = {% if WAZIMAP.map_zoom %}{{ WAZIMAP.map_zoom }}{% else %}null{% endif %};
-maps.drawMapForHomepage('{{ geo_data.first_child_level }}', centre, zoom);
+maps.drawMapForHomepage({{ root_geo_json }}, centre, zoom);
 </script>
 <script src="{% static 'js/data.query.builder.js' %}"></script>
 {% endblock %}
