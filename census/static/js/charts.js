@@ -320,6 +320,11 @@ function Chart(options) {
             displayHeight: chart.settings.height - chart.settings.margin.top - chart.settings.margin.bottom
         });
 
+        // add optional title, adjust height available height for columns if necessary
+        if (!!chart.chartChartTitle) {
+            chart.addChartTitle(chart.chartContainer);
+        }
+
         // create the base for upcoming html elements
         chart.htmlBase = chart.chartContainer.append("div")
             .attr("class", "column-set")
@@ -327,12 +332,6 @@ function Chart(options) {
                 return (chart.chartChartShowYAxis) ? -(chart.settings.height) + "px" : "0";
             })
             .style("height", chart.settings.height + "px");
-
-        // add optional title, adjust height available height for columns if necessary
-        if (!!chart.chartChartTitle) {
-            chart.addChartTitle(chart.htmlBase);
-            chart.settings.displayHeight -= 20;
-        }
 
         // narrow padding for histograms
         if (chart.chartType == 'histogram') {
@@ -731,22 +730,37 @@ function Chart(options) {
 
     chart.addActionLinks = function() {
         chart.actionLinks = chart.chartContainer
-            .append("div")
-            .classed("action-links", true);
+            .insert("div", ":first-child")
+            .classed("action-links tool-group toggle-sub-group", true);
 
-        chart.getData = chart.actionLinks
+        chart.actionLinks
+            .append("a")
+            .text("Chart Options")
+            .append("i")
+            .classed("fa fa-chevron-circle-down", true);
+
+        var links = chart.actionLinks
+            .append("ul")
+            .classed("sub-group", true)
+            .attr("style", "display: none");
+            
+        chart.getData = links
+            .append("li")
             .append("a")
                 .classed("chart-get-data", true)
                 .text("Show data")
                 .on("click", chart.toggleDataDrawer);
 
-        chart.actionLinks.append("span").text("/");
-
-        chart.showEmbed = chart.actionLinks
+        chart.showEmbed = links
+            .append("li")
             .append("a")
                 .classed("chart-show-embed", true)
                 .text("Embed")
                 .on("click", chart.showEmbedCode);
+
+        $(chart.actionLinks[0]).hover(function() {
+            $(this).find('.sub-group').toggle();
+        });
     }
 
     chart.fillEmbedCode = function(textarea, align) {

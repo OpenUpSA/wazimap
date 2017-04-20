@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+0.8.2 (? April 2017)
+---------------------
+
+* Make the 'show data / embed' links for charts more visible
+
 0.8.1 (18 April 2017)
 ---------------------
 
