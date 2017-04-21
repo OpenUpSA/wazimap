@@ -147,14 +147,13 @@ class GeoData(object):
         return self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level).first()
 
     def get_geography(self, geo_code, geo_level, version=None):
-        """
-        Get a geography object for this geography, or
-        raise LocationNotFound if it doesn't exist.
+        """ Get a geography object for this geography, or raise LocationNotFound if it doesn't exist.
+        If a version is given, find a geography with that version. Otherwise find the most recent version.
         """
         query = self.geo_model.objects.filter(geo_level=geo_level, geo_code=geo_code) \
                                       .order_by('-version')
         if version is not None:
-            query.filter(version=version)
+            query = query.filter(version=version)
         geo = query.first()
         if not geo:
             raise LocationNotFound('Invalid level and code: %s-%s' % (geo_level, geo_code))
@@ -183,8 +182,8 @@ class GeoData(object):
         if levels:
             query = query.filter(geo_level__in=levels)
 
-        if year is not None:
-            query = query.filter(year=year)
+        if version is not None:
+            query = query.filter(version=version)
 
         # TODO: order by level?
         objects = sorted(query[:10], key=lambda o: [o.geo_level, o.name, o.geo_code])

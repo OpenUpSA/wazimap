@@ -18,6 +18,7 @@ class GeoMixin(object):
             'child_level': self.child_level,
             'parent_geoid': self.parent_geoid,
             'square_kms': self.square_kms,
+            'version': self.version,
         }
 
     def as_dict_deep(self):
