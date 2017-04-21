@@ -209,14 +209,13 @@ class GeoData(object):
                         geos.append(geo)
         return geos
 
-    def get_summary_geo_info(self, geo_code=None, geo_level=None, version=None):
+    def get_summary_geo_info(self, geo):
         """ Get a list of (level, code) tuples of geographies that
         this geography should be compared against.
 
         This is the intersection of +comparative_levels+ and the
         ancestors of the geography.
         """
-        geo = self.get_geography(geo_code, geo_level)
         ancestors = {g.geo_level: g for g in geo.ancestors()}
 
         return [(lev, ancestors[lev].geo_code) for lev in self.comparative_levels if lev in ancestors]
