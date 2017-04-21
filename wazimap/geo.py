@@ -163,7 +163,7 @@ class GeoData(object):
         """
         return self.geometry.get(geo_level, {}).get(geo_code)
 
-    def get_locations(self, search_term, levels=None, year=None):
+    def get_locations(self, search_term, levels=None, version=None):
         """
         Try to find locations based on a search term, possibly limited
         to +levels+.
