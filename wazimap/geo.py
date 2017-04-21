@@ -142,21 +142,25 @@ class GeoData(object):
 
         return None, None
 
-    def root_geography(self):
+    def root_geography(self, version=None):
         """ First geography with no parents. """
         return self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level).first()
 
-    def get_geography(self, geo_code, geo_level):
+    def get_geography(self, geo_code, geo_level, version=None):
         """
         Get a geography object for this geography, or
         raise LocationNotFound if it doesn't exist.
         """
-        geo = self.geo_model.objects.filter(geo_level=geo_level, geo_code=geo_code).first()
+        query = self.geo_model.objects.filter(geo_level=geo_level, geo_code=geo_code) \
+                                      .order_by('-version')
+        if version is not None:
+            query.filter(version=version)
+        geo = query.first()
         if not geo:
             raise LocationNotFound('Invalid level and code: %s-%s' % (geo_level, geo_code))
         return geo
 
-    def get_geometry(self, geo_level, geo_code):
+    def get_geometry(self, geo_level, geo_code, version):
         """ Get the geometry description for a geography. This is a dict
         with two keys, 'properties' which is a dict of properties,
         and 'shape' which is a shapely shape (may be None).
@@ -186,7 +190,7 @@ class GeoData(object):
         objects = sorted(query[:10], key=lambda o: [o.geo_level, o.name, o.geo_code])
         return objects
 
-    def get_locations_from_coords(self, longitude, latitude, levels=None):
+    def get_locations_from_coords(self, longitude, latitude, levels=None, version=None):
         """
         Returns a list of geographies containing this point.
         """
@@ -206,7 +210,7 @@ class GeoData(object):
                         geos.append(geo)
         return geos
 
-    def get_summary_geo_info(self, geo_code=None, geo_level=None):
+    def get_summary_geo_info(self, geo_code=None, geo_level=None, version=None):
         """ Get a list of (level, code) tuples of geographies that
         this geography should be compared against.
 
