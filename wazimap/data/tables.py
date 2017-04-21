@@ -378,7 +378,7 @@ class FieldTable(SimpleTable):
             self.model.data_tables = []
         self.model.data_tables.append(self)
 
-    def get_model(self, geo_level):
+    def get_model(self):
         return self.model
 
     def setup_columns(self):
@@ -423,7 +423,7 @@ class FieldTable(SimpleTable):
 
         session = get_session()
         try:
-            model = self.get_model('country')
+            model = self.get_model()
             fields = [getattr(model, f) for f in self.fields]
 
             # get distinct permutations for all fields
@@ -472,7 +472,7 @@ class FieldTable(SimpleTable):
         # group by geo level
         geos = sorted(geos, key=lambda g: g.geo_level)
         for geo_level, geos in groupby(geos, lambda g: g.geo_level):
-            model = self.get_model(geo_level)
+            model = self.get_model()
             geo_codes = [g.geo_code for g in geos]
 
             # initial values
@@ -663,7 +663,7 @@ def get_model_from_fields(fields, geo_level, table_name=None, table_dataset=None
         if not table:
             ValueError("Couldn't find a table that covers these fields: %s" % fields)
 
-    return table.get_model(geo_level)
+    return table.get_model()
 
 
 def get_table_id(fields):
