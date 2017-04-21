@@ -41,7 +41,7 @@ class GeographyDetailView(BaseGeographyDetailView):
 
     def dispatch(self, *args, **kwargs):
         request = args[0]
-        version = request.GET.get('version', None)
+        version = request.GET.get('geo_version', None)
         self.geo_id = self.kwargs.get('geography_id', None)
 
         try:
