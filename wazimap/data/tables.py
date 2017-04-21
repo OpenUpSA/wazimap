@@ -585,6 +585,8 @@ class FieldTable(SimpleTable):
             table_args.append(Column('geo_level', String(15), nullable=False, primary_key=True))
             table_args.append(Column('geo_code', String(10), nullable=False, primary_key=True))
 
+        table_args.append(Column('geo_version', String(100), nullable=True, primary_key=True))
+
         # Now add the columns
         table_args.extend(Column(field, String(128), primary_key=True) for field in fields)
         # and the value column
