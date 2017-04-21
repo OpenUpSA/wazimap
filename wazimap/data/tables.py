@@ -128,7 +128,7 @@ class SimpleTable(object):
         if self.total_column:
             indent = 1
 
-        for col in (c.name for c in self.model.columns if c.name not in ['geo_code', 'geo_level']):
+        for col in (c.name for c in self.model.columns if c.name not in ['geo_code', 'geo_level', 'geo_version']):
             self.columns[col] = {
                 'name': capitalize(col.replace('_', ' ')),
                 'indent': 0 if col == self.total_column else indent
