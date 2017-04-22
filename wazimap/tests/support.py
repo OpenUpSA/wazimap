@@ -14,11 +14,11 @@ class WazimapTestCase(TestCase):
         self.load_data(table, data_str)
 
     def load_data(self, table, data_str):
-        model = table.get_model('lev')
+        model = table.get_model()
 
         for row in data_str.strip().split("\n"):
             parts = row.strip().split(",")
-            entry = model(geo_level=parts[0], geo_code=parts[1])
+            entry = model(geo_level=parts[0], geo_code=parts[1], geo_version='')
 
             # set fields
             for i, field in enumerate(table.fields):
