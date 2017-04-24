@@ -407,8 +407,7 @@ def get_stat_data(fields, geo, session, order_by=None,
         if not data_table:
             ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
 
-    model = data_table.get_model()
-    objects = get_objects_by_geo(model, geo, session, fields=fields, order_by=order_by,
+    objects = get_objects_by_geo(data_table.model, geo, session, fields=fields, order_by=order_by,
                                  only=only, exclude=exclude, data_table=data_table)
 
     if total is not None and many_fields:
