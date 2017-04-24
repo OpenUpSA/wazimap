@@ -5,20 +5,34 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 
+from sqlalchemy import inspect
+from sqlalchemy.schema import AddConstraint
 from wazimap.data.utils import get_session
-from wazimap.data.tables import DATA_TABLES, FieldTable
+from wazimap.data.tables import DATA_TABLES
+
 
 def forwards(apps, schema_editor):
-    # TODO: SimpleTable
+    """
+    Ensure all data tables have the new geo_version column, with a default of ''
+    """
     session = get_session()
+    inspector = inspect(session.bind)
+
     try:
-        for data_table in (x for x in DATA_TABLES.itervalues() if isinstance(x, FieldTable)):
-            db_model = data_table.get_model()
-            session.execute("ALTER TABLE %s ADD COLUMN geo_version VARCHAR(100) DEFAULT ''" % db_model.__table__.name)
-            session.execute("ALTER TABLE %s DROP CONSTRAINT %s_pkey" % (db_model.__table__.name, db_model.__table__.name[:58]))
-            columns = set([c.name for c in db_model.__table__.primary_key.columns] + ['geo_version'])
-            columns_string = '"' + '", "'.join(columns) + '"'
-            session.execute("ALTER TABLE %s ADD PRIMARY KEY (%s)" % (db_model.__table__.name, columns_string))
+        for data_table in DATA_TABLES.itervalues():
+            db_model = data_table.model
+            table = db_model.__table__
+
+            # remove the old primary key constraint, if any
+            pk = inspector.get_pk_constraint(table.name)['name']
+            if pk:
+                session.execute("ALTER TABLE %s DROP CONSTRAINT %s" % (table.name, pk))
+
+            # add the new column
+            session.execute("ALTER TABLE %s ADD COLUMN geo_version VARCHAR(100) DEFAULT ''" % table.name)
+
+            # add the correct new constraint
+            session.execute(AddConstraint(table.primary_key))
 
         session.commit()
     finally:
@@ -26,17 +40,29 @@ def forwards(apps, schema_editor):
 
 
 def reverse(apps, schema_editor):
-    # TODO: SimpleTable
+    """
+    Drop the new geo_version column from all data tables
+    """
     session = get_session()
+    inspector = inspect(session.bind)
+
     try:
-        for data_table in (x for x in DATA_TABLES.itervalues() if isinstance(x, FieldTable)):
-            db_model = data_table.get_model()
-            session.execute("ALTER TABLE %s DROP CONSTRAINT %s_pkey" % (db_model.__table__.name, db_model.__table__.name))
-            columns = set([c.name for c in db_model.__table__.primary_key.columns])
-            columns = columns -'geo_version'
-            columns_string = '"' + '", "'.join(columns) + '"'
-            session.execute("ALTER TABLE %s ADD PRIMARY KEY (%s)" % (db_model.__table__.name, column_string[:58]))
-            session.execute("ALTER TABLE %s DROP COLUMN geo_version" % db_model.__table__.name)
+        for data_table in DATA_TABLES.itervalues():
+            db_model = data_table.model
+            table = db_model.__table__
+
+            # remove the primary key constraint, if any
+            pk = inspector.get_pk_constraint(table.name)['name']
+            if pk:
+                session.execute("ALTER TABLE %s DROP CONSTRAINT %s" % (table.name, pk))
+
+            # drop the new column
+            session.execute("ALTER TABLE %s DROP COLUMN geo_version" % table.name)
+
+            # add the old pk constraint
+            pk = table.primary_key
+            pk.columns.remove(table.c.geo_version)
+            session.execute(AddConstraint(pk))
 
         session.commit()
     finally:
