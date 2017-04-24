@@ -8,14 +8,17 @@ from django.db import migrations
 from wazimap.data.utils import get_session
 from wazimap.data.tables import DATA_TABLES, FieldTable
 
-
 def forwards(apps, schema_editor):
     # TODO: SimpleTable
     session = get_session()
     try:
         for data_table in (x for x in DATA_TABLES.itervalues() if isinstance(x, FieldTable)):
             db_model = data_table.get_model()
-            session.execute("ALTER TABLE %s ADD COLUMN geo_version VARCHAR(100) NULL" % db_model.__table__.name)
+            session.execute("ALTER TABLE %s ADD COLUMN geo_version VARCHAR(100) DEFAULT ''" % db_model.__table__.name)
+            session.execute("ALTER TABLE %s DROP CONSTRAINT %s_pkey" % (db_model.__table__.name, db_model.__table__.name[:58]))
+            columns = set([c.name for c in db_model.__table__.primary_key.columns] + ['geo_version'])
+            columns_string = '"' + '", "'.join(columns) + '"'
+            session.execute("ALTER TABLE %s ADD PRIMARY KEY (%s)" % (db_model.__table__.name, columns_string))
 
         session.commit()
     finally:
@@ -28,6 +31,11 @@ def reverse(apps, schema_editor):
     try:
         for data_table in (x for x in DATA_TABLES.itervalues() if isinstance(x, FieldTable)):
             db_model = data_table.get_model()
+            session.execute("ALTER TABLE %s DROP CONSTRAINT %s_pkey" % (db_model.__table__.name, db_model.__table__.name))
+            columns = set([c.name for c in db_model.__table__.primary_key.columns])
+            columns = columns -'geo_version'
+            columns_string = '"' + '", "'.join(columns) + '"'
+            session.execute("ALTER TABLE %s ADD PRIMARY KEY (%s)" % (db_model.__table__.name, column_string[:58]))
             session.execute("ALTER TABLE %s DROP COLUMN geo_version" % db_model.__table__.name)
 
         session.commit()
