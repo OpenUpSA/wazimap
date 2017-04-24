@@ -93,14 +93,14 @@ class GeographyBase(models.Model, GeoMixin):
     #: The code for this geography which must be unique for this level.
     #: Together with `geo_level`, this makes up the unique geo id.
     geo_code = models.CharField(max_length=10, null=False)
+    #: Demarcation version of this geography. (advanced).
+    version = models.CharField(max_length=100, db_index=True, null=False, default='')
 
     #: Name of this geography.
     name = models.CharField(max_length=100, null=False, db_index=True)
     #: Long name of this geography, giving it context (such as a city or province)
     #: If this is null, it is computed based on the place's ancestors.
     long_name = models.CharField(max_length=100, null=True, db_index=True)
-    #: Demarcation version of this geography. (advanced).
-    version = models.CharField(max_length=100, db_index=True, null=True)
 
     #: Area in square kilometers. Optional.
     square_kms = models.FloatField(null=True)
