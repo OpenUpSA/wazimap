@@ -37,8 +37,15 @@ class GeoData(object):
     """
     def __init__(self):
         self.geo_model = Geography
+        self.setup_versions()
         self.setup_levels()
         self.setup_geometry()
+
+    def setup_versions(self):
+        """ Find all the geography versions.
+        """
+        self.versions = [x['version'] for x in self.geo_model.objects.values('version').distinct().all()]
+        self.latest_version = sorted(self.versions)[-1]
 
     def setup_levels(self):
         """ Setup the summary level hierarchy from the `WAZIMAP['levels']` and
@@ -144,7 +151,10 @@ class GeoData(object):
 
     def root_geography(self, version=None):
         """ First geography with no parents. """
-        return self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level).first()
+        query = self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level)
+        if version is not None:
+            query = query.filter(version=version)
+        return query.first()
 
     def get_geography(self, geo_code, geo_level, version=None):
         """ Get a geography object for this geography, or raise LocationNotFound if it doesn't exist.
@@ -177,7 +187,7 @@ class GeoData(object):
 
         query = self.geo_model.objects\
             .filter(Q(name__icontains=search_term) |
-                    Q(geo_code=search_term.upper()))\
+                    Q(geo_code=search_term.upper()))
 
         if levels:
             query = query.filter(geo_level__in=levels)
@@ -204,7 +214,8 @@ class GeoData(object):
             for feature in features.itervalues():
                 if feature['shape'] and feature['shape'].contains(p):
                     geo = self.get_geography(feature['properties']['code'],
-                                             feature['properties']['level'])
+                                             feature['properties']['level'],
+                                             version)
                     if not levels or geo.geo_level in levels:
                         geos.append(geo)
         return geos

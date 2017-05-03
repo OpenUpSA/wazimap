@@ -108,13 +108,14 @@ class GeographyJsonView(GeographyDetailView):
 class PlaceSearchJson(View):
     def get(self, request, *args, **kwargs):
         geo_levels = request.GET.get('geolevels', None)
+        geo_version = request.GET.get('geo_version', geo_data.latest_version)
         if geo_levels:
             geo_levels = [lev.strip() for lev in geo_levels.split(',')]
             geo_levels = [lev for lev in geo_levels if lev]
 
         if 'q' in request.GET:
             search_term = request.GET['q']
-            places = geo_data.get_locations(search_term, geo_levels)
+            places = geo_data.get_locations(search_term, geo_levels, geo_version)
             return render_json_to_response(
                 {'results': [p.as_dict() for p in places]}
             )
@@ -127,7 +128,7 @@ class PlaceSearchJson(View):
             except ValueError as e:
                 return HttpResponseBadRequest('bad parameter: %s' % e.message)
 
-            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon, levels=geo_levels)
+            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon, levels=geo_levels, version=geo_version)
             return render_json_to_response({'results': [p.as_dict() for p in places]})
 
         else:
@@ -141,7 +142,8 @@ class LocateView(BaseLocateView):
         lon = self.request.GET.get('lon', None)
 
         if lat and lon:
-            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon)
+            version = self.request.GET.get('geo_version', geo_data.latest_version)
+            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon, version=version)
             page_context.update({
                 'location': {
                     'lat': lat,
