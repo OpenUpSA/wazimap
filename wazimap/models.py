@@ -32,7 +32,8 @@ class GeoMixin(object):
         """
         return self.__class__.objects\
             .filter(parent_level=self.geo_level,
-                    parent_code=self.geo_code)\
+                    parent_code=self.geo_code,
+                    version=self.version)\
             .all()
 
     def split_into(self, level):
@@ -124,7 +125,7 @@ class GeographyBase(models.Model, GeoMixin):
         """
         if not hasattr(self, '_parent'):
             if self.parent_level and self.parent_code:
-                self._parent = self.__class__.objects.filter(geo_level=self.parent_level, geo_code=self.parent_code).first()
+                self._parent = self.__class__.objects.filter(geo_level=self.parent_level, geo_code=self.parent_code, version=self.version).first()
             else:
                 self._parent = None
 

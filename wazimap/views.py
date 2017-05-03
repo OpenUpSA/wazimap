@@ -168,7 +168,8 @@ class DataAPIView(View):
     def get(self, request, *args, **kwargs):
         try:
             self.geo_ids = request.GET.get('geo_ids', '').split(',')
-            self.data_geos, self.info_geos = self.get_geos(self.geo_ids)
+            geo_version = request.GET.get('geo_version', geo_data.latest_version)
+            self.data_geos, self.info_geos = self.get_geos(self.geo_ids, geo_version)
         except LocationNotFound as e:
             return render_json_error(e.message, 404)
 
@@ -217,7 +218,7 @@ class DataAPIView(View):
 
         return response
 
-    def get_geos(self, geo_ids):
+    def get_geos(self, geo_ids, geo_version):
         """
         Return a tuple (data_geos, info_geos) of geo objects,
         where data_geos or geos we should get data for, and info_geos
@@ -237,7 +238,7 @@ class DataAPIView(View):
             if '|' in level:
                 # break geo down further
                 split_level, level = level.split('|', 1)
-                geo = geo_data.get_geography(code, level)
+                geo = geo_data.get_geography(code, level, geo_version)
                 info_geos.append(geo)
                 try:
                     data_geos.extend(geo.split_into(split_level))
@@ -246,7 +247,7 @@ class DataAPIView(View):
 
             else:
                 # normal geo
-                data_geos.append(geo_data.get_geography(code, level))
+                data_geos.append(geo_data.get_geography(code, level, geo_version))
 
         return data_geos, info_geos
 
