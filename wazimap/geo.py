@@ -46,6 +46,9 @@ class GeoData(object):
         """
         self.versions = [x['version'] for x in self.geo_model.objects.values('version').distinct().all()]
         self.latest_version = sorted(self.versions)[-1]
+        self.default_version = settings.WAZIMAP['default_geo_version']
+        if self.default_version is None:
+            self.default_version = self.latest_version
 
     def setup_levels(self):
         """ Setup the summary level hierarchy from the `WAZIMAP['levels']` and
@@ -151,25 +154,24 @@ class GeoData(object):
 
     def root_geography(self, version=None):
         """ First geography with no parents. """
-        query = self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level)
-        if version is not None:
-            query = query.filter(version=version)
+        if version is None:
+            version = self.default_version
+        query = self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level, version=version)
         return query.first()
 
     def get_geography(self, geo_code, geo_level, version=None):
         """ Get a geography object for this geography, or raise LocationNotFound if it doesn't exist.
         If a version is given, find a geography with that version. Otherwise find the most recent version.
         """
-        query = self.geo_model.objects.filter(geo_level=geo_level, geo_code=geo_code) \
-                                      .order_by('-version')
-        if version is not None:
-            query = query.filter(version=version)
+        if version is None:
+            version = self.default_version
+        query = self.geo_model.objects.filter(geo_level=geo_level, geo_code=geo_code, version=version)
         geo = query.first()
         if not geo:
-            raise LocationNotFound('Invalid level and code: %s-%s' % (geo_level, geo_code))
+            raise LocationNotFound("Invalid level, code and version: %s-%s '%s'" % (geo_level, geo_code, version))
         return geo
 
-    def get_geometry(self, geo_level, geo_code, version):
+    def get_geometry(self, geo_level, geo_code, version=None):
         """ Get the geometry description for a geography. This is a dict
         with two keys, 'properties' which is a dict of properties,
         and 'shape' which is a shapely shape (may be None).
@@ -185,15 +187,15 @@ class GeoData(object):
         """
         search_term = search_term.strip()
 
+        if version is None:
+            version = self.default_version
         query = self.geo_model.objects\
             .filter(Q(name__icontains=search_term) |
-                    Q(geo_code=search_term.upper()))
+                    Q(geo_code=search_term.upper())) \
+            .filter(version=version)
 
         if levels:
             query = query.filter(geo_level__in=levels)
-
-        if version is not None:
-            query = query.filter(version=version)
 
         # TODO: order by level?
         objects = sorted(query[:10], key=lambda o: [o.geo_level, o.name, o.geo_code])
@@ -209,6 +211,9 @@ class GeoData(object):
         from shapely.geometry import Point
         p = Point(float(longitude), float(latitude))
         geos = []
+
+        if version is None:
+            version = self.default_version
 
         for features in self.geometry.itervalues():
             for feature in features.itervalues():

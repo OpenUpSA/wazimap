@@ -228,5 +228,8 @@ WAZIMAP = {
     'embed_url': None,
 
     # Label to display if data is not available.
-    'na_label': 'N/A'
+    'na_label': 'N/A',
+
+    # If None, the the GeoData class should set it to the latest_version
+    'default_geo_version': os.environ.get('DEFAULT_GEO_VERSION', None),
 }
