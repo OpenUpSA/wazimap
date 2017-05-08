@@ -309,8 +309,8 @@ def get_objects_by_geo(db_model, geo, session, fields=None, order_by=None,
 
     objects = objects.all()
     if len(objects) == 0:
-        raise LocationNotFound("%s for geography %s not found"
-                               % (db_model.__table__.name, geo.geoid))
+        raise LocationNotFound("%s for geography %s version '%s' not found"
+                               % (db_model.__table__.name, geo.geoid, geo.version))
     return objects
 
 
