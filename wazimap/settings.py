@@ -230,6 +230,14 @@ WAZIMAP = {
     # Label to display if data is not available.
     'na_label': 'N/A',
 
-    # If None, the the GeoData class should set it to the latest_version
-    'default_geo_version': os.environ.get('DEFAULT_GEO_VERSION', None),
+    # Default geo version to use when loading geographies. If None,
+    # uses the most recent version in the Geography's table (``geo_data.latest_version``).
+    'default_geo_version': None,
+
+    # The geo version to use for legacy embeds that don't specify a geo version.
+    # If None, uses the latest version.
+    # If your users have already used embeds and you're introducing versioned
+    # geographies, you probably want to set this to your earliest version, so
+    # that embeds continue to show the original data.
+    'legacy_embed_geo_version': None,
 }

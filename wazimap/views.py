@@ -38,10 +38,11 @@ class HomepageView(TemplateView):
 
 class GeographyDetailView(BaseGeographyDetailView):
     adjust_slugs = True
+    default_geo_version = None
 
     def dispatch(self, *args, **kwargs):
         request = args[0]
-        version = request.GET.get('geo_version', None)
+        version = request.GET.get('geo_version', self.default_geo_version)
         self.geo_id = self.kwargs.get('geography_id', None)
 
         try:
@@ -99,6 +100,10 @@ class GeographyDetailView(BaseGeographyDetailView):
 class GeographyJsonView(GeographyDetailView):
     """ Return geo profile data as json. """
     adjust_slugs = False
+    default_geo_version = settings.WAZIMAP.get('legacy_embed_geo_version')
+
+    def dispatch(self, *args, **kwargs):
+        return super(GeographyJsonView, self).dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)

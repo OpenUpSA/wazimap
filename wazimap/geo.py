@@ -35,20 +35,42 @@ class GeoData(object):
     new class in your `settings.py`. Wazimap will then load that class and make
     it available as `wazimap.geo.geo_data`.
     """
+    _versions = None
+
     def __init__(self):
         self.geo_model = Geography
-        self.setup_versions()
         self.setup_levels()
         self.setup_geometry()
 
-    def setup_versions(self):
+    def _setup_versions(self):
         """ Find all the geography versions.
         """
-        self.versions = [x['version'] for x in self.geo_model.objects.values('version').distinct().all()]
-        self.latest_version = sorted(self.versions)[-1]
-        self.default_version = settings.WAZIMAP['default_geo_version']
-        if self.default_version is None:
-            self.default_version = self.latest_version
+        self._versions = [x['version'] for x in self.geo_model.objects.values('version').distinct().all()]
+        self._latest_version = sorted(self.versions)[-1]
+        self._default_version = settings.WAZIMAP['default_geo_version']
+        if self._default_version is None:
+            self._default_version = self._latest_version
+
+    @property
+    def versions(self):
+        if self._versions is None:
+            self._setup_versions()
+
+        return self._versions
+
+    @property
+    def latest_version(self):
+        if self._versions is None:
+            self._setup_versions()
+
+        return self._latest_version
+
+    @property
+    def default_version(self):
+        if self._versions is None:
+            self._setup_versions()
+
+        return self._default_version
 
     def setup_levels(self):
         """ Setup the summary level hierarchy from the `WAZIMAP['levels']` and
