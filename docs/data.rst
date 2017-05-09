@@ -59,20 +59,20 @@ French   Female  779
 
 Most census Field Tables describe a **partitioning** of the population: the population is broken into groups (such as by language or gender) and every person is counted exactly once. If we added up all the values for all key combinations, we'd get the total population. That's useful because it means we can express the value for each combination of keys as a percentage of the total.
 
-Each Field Table is stored in a physical PostgreSQL database table. Each entry in a Field Table is linked to a geography, since a row is a statistic about a place, and so each row has the geography level and code associated with it.
+Each Field Table is stored in a physical PostgreSQL database table. Each entry in a Field Table is linked to a geography, since a row is a statistic about a place, and so each row has the geography level, code and version associated with it.
 
-========= ======== ========= ======= =====
-geo_level geo_code language  gender  total
-========= ======== ========= ======= =====
-province  WC       English   Male    283
-province  WC       English   Female  199
-province  WC       French    Male    324
-province  WC       French    Female  287
-province  GT       English   Male    298
-province  GT       English   Female  312
-province  GT       French    Male    128
-province  GT       French    Female  779
-========= ======== ========= ======= =====
+========= ======== =========== ========= ======= =====
+geo_level geo_code geo_version language  gender  total
+========= ======== =========== ========= ======= =====
+province  WC                   English   Male    283
+province  WC                   English   Female  199
+province  WC                   French    Male    324
+province  WC                   French    Female  287
+province  GT                   English   Male    298
+province  GT                   English   Female  312
+province  GT                   French    Male    128
+province  GT                   French    Female  779
+========= ======== =========== ========= ======= =====
 
 Adding a Field Table
 ....................
@@ -93,12 +93,12 @@ a name and the cell values are the numerical statistics for that row's geography
 
 For example, here is a Simple Table with two columns, ``votes_cast`` and ``registered_voters``.
 
-========= ======== ========== =================
-geo_level geo_code votes_cast registered_voters
-========= ======== ========== =================
-province  WC       829        1024
-province  GT       773        990
-========= ======== ========== =================
+========= ======== =========== ========== =================
+geo_level geo_code geo_version votes_cast registered_voters
+========= ======== =========== ========== =================
+province  WC                   829        1024
+province  GT                   773        990
+========= ======== =========== ========== =================
 
 You can see that in contrast with a Field Table, a Simple Table can have multiple statistics per geography.
 
