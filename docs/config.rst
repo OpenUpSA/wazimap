@@ -96,6 +96,16 @@ set in ``settings.py`` in the ``WAZIMAP`` dict.
   The label to display for stats which have no data available.
   The default is N/A.
 
+``default_geo_version``
+  Default geo version to use when loading geographies. If ``None``,
+  the most recent version in the Geography's table (``geo_data.latest_version``) is used.
+
+``legacy_embed_geo_version``
+  The geo version to use for legacy embeds that don't specify a geo version.
+  If ``None``, uses the latest version (``geo_data.latest_version``).
+  If you're introducing versioned geographies and your users have already embedded charts,
+  you probably want to set this to your earliest version so that embeds continue showing the original data.
+
 Localisation
 ------------
 
