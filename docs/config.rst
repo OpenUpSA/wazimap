@@ -73,12 +73,17 @@ set in ``settings.py`` in the ``WAZIMAP`` dict.
   and specify the `.topojson` version here. Wazimap will look for geojson equivalents
   of topojson files.
 
+  The top level of this dict MUST be the geo version. If you're not using versioned
+  geographies, use the empty string.
+
   If a level isn't specified here, Wazimap will try to find a file under the key ``''``.
 
   Default: ::
 
       {
-        '': 'geo/all.geojson',
+        '': {
+          '': 'geo/all.geojson',
+        }
       }
 
 ``map_centre``, ``map_zoom``

@@ -71,7 +71,7 @@ class DownloadManager(object):
                 out_feat = ogr.Feature(out_layer.GetLayerDefn())
 
                 if format['geometry']:
-                    geom = self.get_geometry(geo.geo_level, geo.geo_code)
+                    geom = self.get_geometry(geo)
                     if geom:
                         out_feat.SetGeometry(geom)
 
@@ -122,8 +122,8 @@ class DownloadManager(object):
         finally:
             shutil.rmtree(temp_path)
 
-    def get_geometry(self, geo_level, geo_code):
-        details = geo_data.get_geometry(geo_level, geo_code)
+    def get_geometry(self, geo):
+        details = geo_data.get_geometry(geo)
         shape = details['shape']
 
         if shape:

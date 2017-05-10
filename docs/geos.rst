@@ -72,12 +72,14 @@ either have one big file, or one file for each geo level.
 2. Store this file in your Django app's ``static`` folder, such as ``wazimap_ke/static/geo/``.
 
 3. Set the ``geometry_data`` :ref:`configuration option <config>` in your ``settings.py`` to indicate
-   where each level's geojson file is stored, relative to you ``static`` folder. For example::
+   where each version and level's geojson file is stored, relative to you ``static`` folder. 
+   Note that the first key in the dict is a geo version -- the default geo version is the
+   empty string. For example::
 
-       geometry_data = {
+       geometry_data = {'': {
          'country': 'geo/country.geojson',
          'province': 'geo/province.geojson',
-       }
+       }}
 
 4. GeoJSON files can be quite big for geographies that share lots of boundaries. If you want an
    improvement in speed and size, **also** convert each file to a TopoJSON file using the

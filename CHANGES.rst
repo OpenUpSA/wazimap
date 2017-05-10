@@ -10,6 +10,7 @@ This release of Wazimap introduces some backwards compatible changes.
 * BREAKING: The Geography model has changed. You must run ``python manage.py migrate`` when updating.
 * BREAKING: The method signature of the ``profile_builder`` function has changed. It is now called as ``get_profile(geo, profile_name, request)``. You will need to update your profile methods to work with a ``geo`` object rather than a ``level`` and a ``code``. Use ``geo.geo_level`` and ``geo.geo_code`` instead.
 * BREAKING: Some methods on the ``GeoData`` object now take a ``Geography`` object rather than a ``geo_level`` and a ``geo_code``.
+* BREAKING: The ``geography_data`` setting must include a geography version at the top of the dict. Use ``''`` by default. eg: ``{'': {'country': 'geo/country.geojson'}}``
 * Some methods on the ``GeoData`` object now take an optional ``version`` parameter.
 * A new method ``GeoData.get_comparative_geos`` makes it easier to build the profile page for comparative geographies.
 
