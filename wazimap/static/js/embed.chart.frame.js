@@ -22,7 +22,9 @@ function makeEmbedFrame() {
         embedFrame.parentContainerID = 'cr-embed-'+embedFrame.params.geoID+'-'+embedFrame.params.chartDataID;
         embedFrame.params.chartDataID = embedFrame.params.chartDataID.split('-');
         embedFrame.params.chartDataYearDir = (!!embedFrame.params.dataYear) ? embedFrame.params.dataYear+'/' : '';
-        embedFrame.dataSource = '/profiles/'+embedFrame.params.geoID+'.json?geo_version=' + (embedFrame.params.geoVersion || '');
+        embedFrame.dataSource = '/profiles/'+embedFrame.params.geoID+'.json';
+        if (embedFrame.params.geoVersion) embedFrame.dataSource += '?geo_version=' + embedFrame.params.geoVersion;
+
         // avoid css media-query caching issues with multiple embeds on same page
         $('#chart-styles').attr('href','css/charts.css?'+embedFrame.parentContainerID);
 
