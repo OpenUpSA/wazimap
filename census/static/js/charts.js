@@ -757,6 +757,7 @@ function Chart(options) {
             embedID = 'cr-embed-'+chart.primaryGeoID+'-'+embedKey,
             embedParams = {
                 geoID: chart.primaryGeoID,
+                geoVersion: chart.thisGeo.version,
                 chartDataID: embedKey,
                 dataYear: embedDataYear,
                 chartType: chart.chartType,
@@ -767,8 +768,6 @@ function Chart(options) {
                 statType: (chart.chartStatType || '')
             };
             embedAlign = (align == 'left' || align == 'right') ? ' float: ' + align + ';' : '';
-        if (chart.thisGeo.version === undefined)
-          embedParams.geoVersion = chart.thisGeo.version;
 
         var querystring = $.param(embedParams);
 
