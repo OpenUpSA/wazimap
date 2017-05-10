@@ -1,6 +1,7 @@
 from django.test import TestCase
+from django.conf import settings
 
-from wazimap.geo import geo_data
+from wazimap.geo import geo_data, GeoData
 
 
 class GeoTestCase(TestCase):
@@ -12,3 +13,16 @@ class GeoTestCase(TestCase):
         self.assertEquals(cpt16, geo_data.get_geography('cpt', 'municipality'))
         self.assertEquals(cpt11, geo_data.get_geography('cpt', 'municipality', '2011'))
         self.assertEquals(cpt16, geo_data.get_geography('cpt', 'municipality', '2016'))
+
+    def test_geometry(self):
+        # if the geometry_data is missing the version, we should raise an error
+        settings.WAZIMAP['geometry_data'] = {'country': 'geo/country.geojson'}
+
+        with self.assertRaises(ValueError):
+            GeoData()
+
+        # if the geometry_data is missing the version, we should raise an error
+        settings.WAZIMAP['geometry_data'] = {'': 'geo/country.geojson'}
+
+        with self.assertRaises(ValueError):
+            GeoData()

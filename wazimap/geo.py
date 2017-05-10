@@ -123,35 +123,65 @@ class GeoData(object):
         self.geometry_files = settings.WAZIMAP.get('geometry_data', {})
 
         for level in self.geo_levels.iterkeys():
-            fname, js = self.load_geojson_for_level(level)
-            if not js:
-                continue
+            # sanity check for geo version
+            if level in self.geometry_files or self.geometry_files.keys() == [''] and isinstance(self.geometry_files[''], basestring):
+                # The geometry_data must include a version key. For example:
+                #
+                # geometry_data = {
+                #   '2011': {
+                #     'province': 'geo/2011/country.geojson',
+                #     'country': 'geo/2011/country.geojson',
+                #   }, {
+                #   '2016': {
+                #     'province': 'geo/2016/country.geojson',
+                #     'country': 'geo/2016/country.geojson',
+                #   }
+                # }
+                #
+                # If you aren't using geo versioning, then use the default geo
+                # version '' as the first key:
+                #
+                # geometry_data = {
+                #   '': {
+                #     'province': 'geo/2011/country.geojson',
+                #     'country': 'geo/2011/country.geojson',
+                #   }
+                # }
+                suggestion = {'': self.geometry_files}
+                raise ValueError("The geometry_data setting is missing a geometry version key. You probably aren't using geometry versions just need to " +
+                                 "change WAZIMAP['geometry_data'] to be: %s" % suggestion)
 
-            if js['type'] != 'FeatureCollection':
-                raise ValueError("GeoJSON files must contain a FeatureCollection. The file %s has type %s" % (fname, js['type']))
+            for version in self.geometry_files.iterkeys():
+                fname, js = self.load_geojson_for_level(level, version)
+                if not js:
+                    continue
 
-            level_detail = self.geometry.setdefault(level, {})
+                if js['type'] != 'FeatureCollection':
+                    raise ValueError("GeoJSON files must contain a FeatureCollection. The file %s has type %s" % (fname, js['type']))
 
-            for feature in js['features']:
-                props = feature['properties']
-                shape = None
+                level_detail = self.geometry.setdefault(version, {}).setdefault(level, {})
 
-                if HAS_GDAL and feature['geometry']:
-                    from shapely.geometry import asShape
-                    try:
-                        shape = asShape(feature['geometry'])
-                    except ValueError as e:
-                        log.error("Error parsing geometry for %s-%s from %s: %s. Feature: %s"
-                                  % (level, props['code'], fname, e.message, feature), exc_info=e)
-                        raise e
+                for feature in js['features']:
+                    props = feature['properties']
+                    shape = None
 
-                level_detail[props['code']] = {
-                    'properties': props,
-                    'shape': shape
-                }
+                    if HAS_GDAL and feature['geometry']:
+                        from shapely.geometry import asShape
+                        try:
+                            shape = asShape(feature['geometry'])
+                        except ValueError as e:
+                            log.error("Error parsing geometry for %s-%s from %s: %s. Feature: %s"
+                                      % (level, props['code'], fname, e.message, feature), exc_info=e)
+                            raise e
 
-    def load_geojson_for_level(self, level):
-        fname = self.geometry_files.get(level, self.geometry_files.get(''))
+                    level_detail[props['code']] = {
+                        'properties': props,
+                        'shape': shape
+                    }
+
+    def load_geojson_for_level(self, level, version):
+        files = self.geometry_files[version]
+        fname = files.get(level, files.get(''))
         if not fname:
             return None, None
 
@@ -168,7 +198,7 @@ class GeoData(object):
                 return fname, json.load(f)
         except IOError as e:
             if e.errno == 2:
-                log.warn("Couldn't open geometry file %s -- no geometry will be available for level %s" % (fname, level))
+                log.warn("Couldn't open geometry file %s -- no geometry will be available for level %s and version '%s'" % (fname, level, version))
             else:
                 raise e
 
@@ -193,12 +223,12 @@ class GeoData(object):
             raise LocationNotFound("Invalid level, code and version: %s-%s '%s'" % (geo_level, geo_code, version))
         return geo
 
-    def get_geometry(self, geo_level, geo_code, version=None):
+    def get_geometry(self, geo):
         """ Get the geometry description for a geography. This is a dict
         with two keys, 'properties' which is a dict of properties,
         and 'shape' which is a shapely shape (may be None).
         """
-        return self.geometry.get(geo_level, {}).get(geo_code)
+        return self.geometry.get(geo.version, {}).get(geo.geo_level, {}).get(geo.geo_code)
 
     def get_locations(self, search_term, levels=None, version=None):
         """

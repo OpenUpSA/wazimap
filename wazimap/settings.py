@@ -212,7 +212,9 @@ WAZIMAP = {
     #
     # If a level isn't specified here, Wazimap will try to find a file under the key `''`.
     'geometry_data': {
-        '': 'geo/all.geojson',
+        '': {
+            '': 'geo/all.geojson',
+        },
     },
 
     # centre coordinates and zoom level defaults for maps. Centre must be a ``[lat, long]`` pair
