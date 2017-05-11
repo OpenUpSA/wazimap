@@ -58,6 +58,10 @@
 #page-footer ul.ul-icon-list {
     margin-bottom: 30px;
 }
+#page-footer .attribution {
+  margin-top: 20px;
+  font-size: 0.8em;
+}
 
 #how-to .content-container {
     padding: 2.5em 0;
@@ -79,10 +83,6 @@
 
 .data-drawer h3.chart-title {
     margin-top: 6px;
-}
-
-.chart .action-links a {
-    text-decoration: underline;
 }
 
 .tool-group a i {

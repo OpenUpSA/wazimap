@@ -13,6 +13,11 @@ This release of Wazimap introduces some backwards compatible changes.
 * BREAKING: The ``geography_data`` setting must include a geography version at the top of the dict. Use ``''`` by default. eg: ``{'': {'country': 'geo/country.geojson'}}``
 * Some methods on the ``GeoData`` object now take an optional ``version`` parameter.
 * A new method ``GeoData.get_comparative_geos`` makes it easier to build the profile page for comparative geographies.
+t
+0.8.2 (20 April 2017)
+---------------------
+
+* Make the 'show data / embed' links for charts more visible
 
 0.8.1 (18 April 2017)
 ---------------------
