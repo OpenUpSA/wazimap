@@ -1291,6 +1291,7 @@ form label {
     font-weight: bold;
 }
 input[type="text"],
+input[type="email"],
 select,
 .select-wrapper,
 .filter-group,
