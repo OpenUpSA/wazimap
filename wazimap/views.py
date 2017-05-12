@@ -113,7 +113,7 @@ class GeographyJsonView(GeographyDetailView):
 class PlaceSearchJson(View):
     def get(self, request, *args, **kwargs):
         geo_levels = request.GET.get('geolevels', None)
-        geo_version = request.GET.get('geo_version', geo_data.default_version)
+        geo_version = request.GET.get('geo_version', None)
         if geo_levels:
             geo_levels = [lev.strip() for lev in geo_levels.split(',')]
             geo_levels = [lev for lev in geo_levels if lev]
@@ -147,7 +147,7 @@ class LocateView(BaseLocateView):
         lon = self.request.GET.get('lon', None)
 
         if lat and lon:
-            version = self.request.GET.get('geo_version', geo_data.default_version)
+            version = self.request.GET.get('geo_version', None)
             places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon, version=version)
             page_context.update({
                 'location': {
@@ -173,7 +173,7 @@ class DataAPIView(View):
     def get(self, request, *args, **kwargs):
         try:
             self.geo_ids = request.GET.get('geo_ids', '').split(',')
-            geo_version = request.GET.get('geo_version', geo_data.default_version)
+            geo_version = request.GET.get('geo_version', None)
             self.data_geos, self.info_geos = self.get_geos(self.geo_ids, geo_version)
         except LocationNotFound as e:
             return render_json_error(e.message, 404)

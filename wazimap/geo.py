@@ -41,15 +41,17 @@ class GeoData(object):
         self.geo_model = Geography
         self.setup_levels()
         self.setup_geometry()
+        self._default_version = None
+        self._versions = None
+        self._global_latest_version = None
 
     def _setup_versions(self):
         """ Find all the geography versions.
         """
         self._versions = [x['version'] for x in self.geo_model.objects.values('version').distinct().all()]
-        self._latest_version = sorted(self.versions)[-1]
+        self._global_latest_version = sorted(self.versions)[-1]
+        # _default_version = None means fall back to whatever is latest for geography
         self._default_version = settings.WAZIMAP['default_geo_version']
-        if self._default_version is None:
-            self._default_version = self._latest_version
 
     @property
     def versions(self):
@@ -59,17 +61,16 @@ class GeoData(object):
         return self._versions
 
     @property
-    def latest_version(self):
-        if self._versions is None:
+    def global_latest_version(self):
+        if self._global_latest_version is None:
             self._setup_versions()
 
-        return self._latest_version
+        return self._global_latest_version
 
     @property
     def default_version(self):
-        if self._versions is None:
+        if self._default_version is None:
             self._setup_versions()
-
         return self._default_version
 
     def setup_levels(self):
@@ -206,18 +207,26 @@ class GeoData(object):
 
     def root_geography(self, version=None):
         """ First geography with no parents. """
+        query = self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level)
         if version is None:
             version = self.default_version
-        query = self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level, version=version)
+        if version is None:
+            query = query.order_by("-version")
+        else:
+            query = query.filter(version=version)
         return query.first()
 
     def get_geography(self, geo_code, geo_level, version=None):
         """ Get a geography object for this geography, or raise LocationNotFound if it doesn't exist.
         If a version is given, find a geography with that version. Otherwise find the most recent version.
         """
+        query = self.geo_model.objects.filter(geo_level=geo_level, geo_code=geo_code)
         if version is None:
             version = self.default_version
-        query = self.geo_model.objects.filter(geo_level=geo_level, geo_code=geo_code, version=version)
+        if version is None:
+            query = query.order_by("-version")
+        else:
+            query = query.filter(version=version)
         geo = query.first()
         if not geo:
             raise LocationNotFound("Invalid level, code and version: %s-%s '%s'" % (geo_level, geo_code, version))
@@ -239,12 +248,14 @@ class GeoData(object):
         """
         search_term = search_term.strip()
 
-        if version is None:
-            version = self.default_version
         query = self.geo_model.objects\
             .filter(Q(name__icontains=search_term) |
-                    Q(geo_code=search_term.upper())) \
-            .filter(version=version)
+                    Q(geo_code=search_term.upper()))
+
+        if version is None:
+            version = self.default_version
+        if version is None:
+            version = self.global_latest_version
 
         if levels:
             query = query.filter(geo_level__in=levels)
@@ -266,6 +277,8 @@ class GeoData(object):
 
         if version is None:
             version = self.default_version
+        if version is None:
+            version = self.global_latest_version
 
         for features in self.geometry.itervalues():
             for feature in features.itervalues():
