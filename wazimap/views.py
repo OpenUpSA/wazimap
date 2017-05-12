@@ -38,13 +38,16 @@ class HomepageView(TemplateView):
 
 class GeographyDetailView(BaseGeographyDetailView):
     adjust_slugs = True
+    default_geo_version = None
 
     def dispatch(self, *args, **kwargs):
+        request = args[0]
+        version = request.GET.get('geo_version', self.default_geo_version)
         self.geo_id = self.kwargs.get('geography_id', None)
 
         try:
             self.geo_level, self.geo_code = self.geo_id.split('-', 1)
-            self.geo = geo_data.get_geography(self.geo_code, self.geo_level)
+            self.geo = geo_data.get_geography(self.geo_code, self.geo_level, version)
         except (ValueError, LocationNotFound):
             raise Http404
 
@@ -68,7 +71,7 @@ class GeographyDetailView(BaseGeographyDetailView):
         if not profile_method:
             raise ValueError("You must define WAZIMAP.profile_builder in settings.py")
         profile_method = import_string(profile_method)
-        profile_data = profile_method(self.geo_code, self.geo_level, self.profile_name)
+        profile_data = profile_method(self.geo, self.profile_name, self.request)
 
         profile_data['geography'] = self.geo.as_dict_deep()
 
@@ -97,6 +100,10 @@ class GeographyDetailView(BaseGeographyDetailView):
 class GeographyJsonView(GeographyDetailView):
     """ Return geo profile data as json. """
     adjust_slugs = False
+    default_geo_version = settings.WAZIMAP.get('legacy_embed_geo_version')
+
+    def dispatch(self, *args, **kwargs):
+        return super(GeographyJsonView, self).dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
@@ -106,13 +113,14 @@ class GeographyJsonView(GeographyDetailView):
 class PlaceSearchJson(View):
     def get(self, request, *args, **kwargs):
         geo_levels = request.GET.get('geolevels', None)
+        geo_version = request.GET.get('geo_version', None)
         if geo_levels:
             geo_levels = [lev.strip() for lev in geo_levels.split(',')]
             geo_levels = [lev for lev in geo_levels if lev]
 
         if 'q' in request.GET:
             search_term = request.GET['q']
-            places = geo_data.get_locations(search_term, geo_levels)
+            places = geo_data.get_locations(search_term, geo_levels, geo_version)
             return render_json_to_response(
                 {'results': [p.as_dict() for p in places]}
             )
@@ -125,7 +133,7 @@ class PlaceSearchJson(View):
             except ValueError as e:
                 return HttpResponseBadRequest('bad parameter: %s' % e.message)
 
-            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon, levels=geo_levels)
+            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon, levels=geo_levels, version=geo_version)
             return render_json_to_response({'results': [p.as_dict() for p in places]})
 
         else:
@@ -139,7 +147,8 @@ class LocateView(BaseLocateView):
         lon = self.request.GET.get('lon', None)
 
         if lat and lon:
-            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon)
+            version = self.request.GET.get('geo_version', None)
+            places = geo_data.get_locations_from_coords(latitude=lat, longitude=lon, version=version)
             page_context.update({
                 'location': {
                     'lat': lat,
@@ -164,7 +173,8 @@ class DataAPIView(View):
     def get(self, request, *args, **kwargs):
         try:
             self.geo_ids = request.GET.get('geo_ids', '').split(',')
-            self.data_geos, self.info_geos = self.get_geos(self.geo_ids)
+            geo_version = request.GET.get('geo_version', None)
+            self.data_geos, self.info_geos = self.get_geos(self.geo_ids, geo_version)
         except LocationNotFound as e:
             return render_json_error(e.message, 404)
 
@@ -213,7 +223,7 @@ class DataAPIView(View):
 
         return response
 
-    def get_geos(self, geo_ids):
+    def get_geos(self, geo_ids, geo_version):
         """
         Return a tuple (data_geos, info_geos) of geo objects,
         where data_geos or geos we should get data for, and info_geos
@@ -233,7 +243,7 @@ class DataAPIView(View):
             if '|' in level:
                 # break geo down further
                 split_level, level = level.split('|', 1)
-                geo = geo_data.get_geography(code, level)
+                geo = geo_data.get_geography(code, level, geo_version)
                 info_geos.append(geo)
                 try:
                     data_geos.extend(geo.split_into(split_level))
@@ -242,7 +252,7 @@ class DataAPIView(View):
 
             else:
                 # normal geo
-                data_geos.append(geo_data.get_geography(code, level))
+                data_geos.append(geo_data.get_geography(code, level, geo_version))
 
         return data_geos, info_geos
 

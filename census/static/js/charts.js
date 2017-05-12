@@ -771,6 +771,7 @@ function Chart(options) {
             embedID = 'cr-embed-'+chart.primaryGeoID+'-'+embedKey,
             embedParams = {
                 geoID: chart.primaryGeoID,
+                geoVersion: chart.thisGeo.version,
                 chartDataID: embedKey,
                 dataYear: embedDataYear,
                 chartType: chart.chartType,

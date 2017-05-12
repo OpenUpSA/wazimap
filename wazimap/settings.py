@@ -212,7 +212,9 @@ WAZIMAP = {
     #
     # If a level isn't specified here, Wazimap will try to find a file under the key `''`.
     'geometry_data': {
-        '': 'geo/all.geojson',
+        '': {
+            '': 'geo/all.geojson',
+        },
     },
 
     # centre coordinates and zoom level defaults for maps. Centre must be a ``[lat, long]`` pair
@@ -228,5 +230,18 @@ WAZIMAP = {
     'embed_url': None,
 
     # Label to display if data is not available.
-    'na_label': 'N/A'
+    'na_label': 'N/A',
+
+    # Default geo version to use when loading geographies. If None,
+    # uses the most recent version of the Geography. This is useful if your
+    # geography table contains more recent geographies, but you don't want
+    # to use the latest when the request doesn't specifify a version.
+    'default_geo_version': None,
+
+    # The geo version to use for legacy embeds that don't specify a geo version.
+    # If None, uses the latest version.
+    # If your users have already used embeds and you're introducing versioned
+    # geographies, you probably want to set this to your earliest version, so
+    # that embeds continue to show the original data.
+    'legacy_embed_geo_version': None,
 }

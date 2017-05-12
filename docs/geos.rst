@@ -15,27 +15,42 @@ Some example geoids are:
 Geographies are stored in the ``wazimap_geographies`` table using the ``Geography`` Django model.
 
 .. autoclass:: wazimap.models.Geography
-    :members: geo_level, geo_code, name, square_kms, parent_level, parent_code
+    :members: geo_level, geo_code, name, square_kms, parent_level, parent_code, geo_version
 
 Adding Geographies
 ------------------
 
 The geography database table looks something like the following. It's generally easiest to import this data using PostgreSQL's CSV import support.
 
-========= ======== ======= ==== ============ ===========
-geo_level geo_code name    year parent_level parent_code
-========= ======== ======= ==== ============ ===========
-country   KE       Kenya   2009
-county    1        Mombasa 2009 country      KE
-county    2        Kwale   2009 country      KE
-county    3        Kilifi  2009 country      KE
-========= ======== ======= ==== ============ ===========
+========= ======== ======= ======= ==== ============ ===========
+geo_level geo_code version name    year parent_level parent_code
+========= ======== ======= ======= ==== ============ ===========
+country   KE               Kenya   2009
+county    1                Mombasa 2009 country      KE
+county    2                Kwale   2009 country      KE
+county    3                Kilifi  2009 country      KE
+========= ======== ======= ======= ==== ============ ===========
 
 Level Hierarchy
 ---------------
 
 The geography levels form a hierarchy with a single root geography (generally a country).
 The ``levels`` :ref:`configuration option <config>` describes each level in the hierarchy.
+
+Geography Versions
+------------------
+
+Wazimap supports geographies that may change over time. For instance, a municipality's boundaries
+may change while it's code and name stay the same.
+
+Every Geography has a version linked to it, even if it's just an empty string (the default). The
+version can be anything that is sortable. By default, Wazimap will show data
+linked to the most recent version of a geography, if there are multiple
+versions.
+
+We recommend using the year as the geography version.
+
+.. note:: If you don't need versioned geographies, you can simply use an empty string as the version, wherever it is needed.
 
 Maps and boundary data
 ----------------------
@@ -57,12 +72,14 @@ either have one big file, or one file for each geo level.
 2. Store this file in your Django app's ``static`` folder, such as ``wazimap_ke/static/geo/``.
 
 3. Set the ``geometry_data`` :ref:`configuration option <config>` in your ``settings.py`` to indicate
-   where each level's geojson file is stored, relative to you ``static`` folder. For example::
+   where each version and level's geojson file is stored, relative to you ``static`` folder. 
+   Note that the first key in the dict is a geo version -- the default geo version is the
+   empty string. For example::
 
-       geometry_data = {
+       geometry_data = {'': {
          'country': 'geo/country.geojson',
          'province': 'geo/province.geojson',
-       }
+       }}
 
 4. GeoJSON files can be quite big for geographies that share lots of boundaries. If you want an
    improvement in speed and size, **also** convert each file to a TopoJSON file using the

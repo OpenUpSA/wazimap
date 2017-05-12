@@ -35,10 +35,43 @@ class GeoData(object):
     new class in your `settings.py`. Wazimap will then load that class and make
     it available as `wazimap.geo.geo_data`.
     """
+    _versions = None
+
     def __init__(self):
         self.geo_model = Geography
         self.setup_levels()
         self.setup_geometry()
+        self._default_version = None
+        self._versions = None
+        self._global_latest_version = None
+
+    def _setup_versions(self):
+        """ Find all the geography versions.
+        """
+        self._versions = [x['version'] for x in self.geo_model.objects.values('version').distinct().all()]
+        self._global_latest_version = sorted(self.versions)[-1]
+        # _default_version = None means fall back to whatever is latest for geography
+        self._default_version = settings.WAZIMAP['default_geo_version']
+
+    @property
+    def versions(self):
+        if self._versions is None:
+            self._setup_versions()
+
+        return self._versions
+
+    @property
+    def global_latest_version(self):
+        if self._global_latest_version is None:
+            self._setup_versions()
+
+        return self._global_latest_version
+
+    @property
+    def default_version(self):
+        if self._default_version is None:
+            self._setup_versions()
+        return self._default_version
 
     def setup_levels(self):
         """ Setup the summary level hierarchy from the `WAZIMAP['levels']` and
@@ -91,35 +124,65 @@ class GeoData(object):
         self.geometry_files = settings.WAZIMAP.get('geometry_data', {})
 
         for level in self.geo_levels.iterkeys():
-            fname, js = self.load_geojson_for_level(level)
-            if not js:
-                continue
+            # sanity check for geo version
+            if level in self.geometry_files or self.geometry_files.keys() == [''] and isinstance(self.geometry_files[''], basestring):
+                # The geometry_data must include a version key. For example:
+                #
+                # geometry_data = {
+                #   '2011': {
+                #     'province': 'geo/2011/country.geojson',
+                #     'country': 'geo/2011/country.geojson',
+                #   }, {
+                #   '2016': {
+                #     'province': 'geo/2016/country.geojson',
+                #     'country': 'geo/2016/country.geojson',
+                #   }
+                # }
+                #
+                # If you aren't using geo versioning, then use the default geo
+                # version '' as the first key:
+                #
+                # geometry_data = {
+                #   '': {
+                #     'province': 'geo/2011/country.geojson',
+                #     'country': 'geo/2011/country.geojson',
+                #   }
+                # }
+                suggestion = {'': self.geometry_files}
+                raise ValueError("The geometry_data setting is missing a geometry version key. You probably aren't using geometry versions just need to " +
+                                 "change WAZIMAP['geometry_data'] to be: %s" % suggestion)
 
-            if js['type'] != 'FeatureCollection':
-                raise ValueError("GeoJSON files must contain a FeatureCollection. The file %s has type %s" % (fname, js['type']))
+            for version in self.geometry_files.iterkeys():
+                fname, js = self.load_geojson_for_level(level, version)
+                if not js:
+                    continue
 
-            level_detail = self.geometry.setdefault(level, {})
+                if js['type'] != 'FeatureCollection':
+                    raise ValueError("GeoJSON files must contain a FeatureCollection. The file %s has type %s" % (fname, js['type']))
 
-            for feature in js['features']:
-                props = feature['properties']
-                shape = None
+                level_detail = self.geometry.setdefault(version, {}).setdefault(level, {})
 
-                if HAS_GDAL and feature['geometry']:
-                    from shapely.geometry import asShape
-                    try:
-                        shape = asShape(feature['geometry'])
-                    except ValueError as e:
-                        log.error("Error parsing geometry for %s-%s from %s: %s. Feature: %s"
-                                  % (level, props['code'], fname, e.message, feature), exc_info=e)
-                        raise e
+                for feature in js['features']:
+                    props = feature['properties']
+                    shape = None
 
-                level_detail[props['code']] = {
-                    'properties': props,
-                    'shape': shape
-                }
+                    if HAS_GDAL and feature['geometry']:
+                        from shapely.geometry import asShape
+                        try:
+                            shape = asShape(feature['geometry'])
+                        except ValueError as e:
+                            log.error("Error parsing geometry for %s-%s from %s: %s. Feature: %s"
+                                      % (level, props['code'], fname, e.message, feature), exc_info=e)
+                            raise e
 
-    def load_geojson_for_level(self, level):
-        fname = self.geometry_files.get(level, self.geometry_files.get(''))
+                    level_detail[props['code']] = {
+                        'properties': props,
+                        'shape': shape
+                    }
+
+    def load_geojson_for_level(self, level, version):
+        files = self.geometry_files[version]
+        fname = files.get(level, files.get(''))
         if not fname:
             return None, None
 
@@ -136,34 +199,47 @@ class GeoData(object):
                 return fname, json.load(f)
         except IOError as e:
             if e.errno == 2:
-                log.warn("Couldn't open geometry file %s -- no geometry will be available for level %s" % (fname, level))
+                log.warn("Couldn't open geometry file %s -- no geometry will be available for level %s and version '%s'" % (fname, level, version))
             else:
                 raise e
 
         return None, None
 
-    def root_geography(self):
+    def root_geography(self, version=None):
         """ First geography with no parents. """
-        return self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level).first()
+        query = self.geo_model.objects.filter(parent_level=None, parent_code=None, geo_level=self.root_level)
+        if version is None:
+            version = self.default_version
+        if version is None:
+            query = query.order_by("-version")
+        else:
+            query = query.filter(version=version)
+        return query.first()
 
-    def get_geography(self, geo_code, geo_level):
+    def get_geography(self, geo_code, geo_level, version=None):
+        """ Get a geography object for this geography, or raise LocationNotFound if it doesn't exist.
+        If a version is given, find a geography with that version. Otherwise find the most recent version.
         """
-        Get a geography object for this geography, or
-        raise LocationNotFound if it doesn't exist.
-        """
-        geo = self.geo_model.objects.filter(geo_level=geo_level, geo_code=geo_code).first()
+        query = self.geo_model.objects.filter(geo_level=geo_level, geo_code=geo_code)
+        if version is None:
+            version = self.default_version
+        if version is None:
+            query = query.order_by("-version")
+        else:
+            query = query.filter(version=version)
+        geo = query.first()
         if not geo:
-            raise LocationNotFound('Invalid level and code: %s-%s' % (geo_level, geo_code))
+            raise LocationNotFound("Invalid level, code and version: %s-%s '%s'" % (geo_level, geo_code, version))
         return geo
 
-    def get_geometry(self, geo_level, geo_code):
+    def get_geometry(self, geo):
         """ Get the geometry description for a geography. This is a dict
         with two keys, 'properties' which is a dict of properties,
         and 'shape' which is a shapely shape (may be None).
         """
-        return self.geometry.get(geo_level, {}).get(geo_code)
+        return self.geometry.get(geo.version, {}).get(geo.geo_level, {}).get(geo.geo_code)
 
-    def get_locations(self, search_term, levels=None, year=None):
+    def get_locations(self, search_term, levels=None, version=None):
         """
         Try to find locations based on a search term, possibly limited
         to +levels+.
@@ -174,19 +250,21 @@ class GeoData(object):
 
         query = self.geo_model.objects\
             .filter(Q(name__icontains=search_term) |
-                    Q(geo_code=search_term.upper()))\
+                    Q(geo_code=search_term.upper()))
+
+        if version is None:
+            version = self.default_version
+        if version is None:
+            version = self.global_latest_version
 
         if levels:
             query = query.filter(geo_level__in=levels)
-
-        if year is not None:
-            query = query.filter(year=year)
 
         # TODO: order by level?
         objects = sorted(query[:10], key=lambda o: [o.geo_level, o.name, o.geo_code])
         return objects
 
-    def get_locations_from_coords(self, longitude, latitude, levels=None):
+    def get_locations_from_coords(self, longitude, latitude, levels=None, version=None):
         """
         Returns a list of geographies containing this point.
         """
@@ -197,26 +275,36 @@ class GeoData(object):
         p = Point(float(longitude), float(latitude))
         geos = []
 
+        if version is None:
+            version = self.default_version
+        if version is None:
+            version = self.global_latest_version
+
         for features in self.geometry.itervalues():
             for feature in features.itervalues():
                 if feature['shape'] and feature['shape'].contains(p):
                     geo = self.get_geography(feature['properties']['code'],
-                                             feature['properties']['level'])
+                                             feature['properties']['level'],
+                                             version)
                     if not levels or geo.geo_level in levels:
                         geos.append(geo)
         return geos
 
-    def get_summary_geo_info(self, geo_code=None, geo_level=None):
+    def get_summary_geo_info(self, geo):
         """ Get a list of (level, code) tuples of geographies that
         this geography should be compared against.
 
         This is the intersection of +comparative_levels+ and the
         ancestors of the geography.
         """
-        geo = self.get_geography(geo_code, geo_level)
         ancestors = {g.geo_level: g for g in geo.ancestors()}
 
         return [(lev, ancestors[lev].geo_code) for lev in self.comparative_levels if lev in ancestors]
+
+    def get_comparative_geos(self, geo):
+        """ Get a list of geographies to be used as comparisons for +geo+.
+        """
+        return [self.get_geography(code, level, geo.version) for level, code in self.get_summary_geo_info(geo)]
 
     def first_child_level(self):
         # first child level in the hierarchy

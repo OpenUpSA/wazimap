@@ -1,5 +1,5 @@
 @import 'charts.css';
-@import url(//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css);
+@import url(//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css);
 @import url(//fonts.googleapis.com/css?family=Lato:400,700);
 @import url(//fonts.googleapis.com/css?family=Merriweather);
 
@@ -1291,6 +1291,7 @@ form label {
     font-weight: bold;
 }
 input[type="text"],
+input[type="email"],
 select,
 .select-wrapper,
 .filter-group,

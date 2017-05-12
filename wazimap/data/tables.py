@@ -2,7 +2,7 @@ import re
 from itertools import groupby
 from collections import OrderedDict
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, func
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, func, or_, and_
 import sqlalchemy.types
 
 from wazimap.data.base import Base
@@ -103,7 +103,7 @@ class SimpleTable(object):
         self.db_table = db_table or self.id.lower()
 
         if model == 'auto':
-            model = Table(self.db_table, Base.metadata, autoload=True)
+            model = self._build_model(self.db_table)
 
         self.model = model
         self.universe = universe
@@ -128,56 +128,50 @@ class SimpleTable(object):
         if self.total_column:
             indent = 1
 
-        for col in (c.name for c in self.model.columns if c.name not in ['geo_code', 'geo_level']):
+        for col in (c.name for c in self.model.__table__.columns if c.name not in ['geo_code', 'geo_level', 'geo_version']):
             self.columns[col] = {
                 'name': capitalize(col.replace('_', ' ')),
                 'indent': 0 if col == self.total_column else indent
             }
 
     def raw_data_for_geos(self, geos):
-        data = {}
+        # initial values
+        data = {('%s-%s' % (geo.geo_level, geo.geo_code)): {
+                'estimate': {},
+                'error': {}}
+                for geo in geos}
 
-        # group by geo level
-        geos = sorted(geos, key=lambda g: g.geo_level)
-        for geo_level, geos in groupby(geos, lambda g: g.geo_level):
-            geo_codes = [g.geo_code for g in geos]
+        session = get_session()
+        try:
+            geo_values = None
+            rows = session\
+                .query(self.model)\
+                .filter(or_(and_(
+                    self.model.geo_level == g.geo_level,
+                    self.model.geo_code == g.geo_code,
+                    self.model.geo_version == g.version)
+                    for g in geos))\
+                .all()
 
-            # initial values
-            for geo_code in geo_codes:
-                data['%s-%s' % (geo_level, geo_code)] = {
-                    'estimate': {},
-                    'error': {}}
+            for row in rows:
+                geo_values = data['%s-%s' % (row.geo_level, row.geo_code)]
 
-            session = get_session()
-            try:
-                geo_values = None
-                rows = session\
-                    .query(self.model)\
-                    .filter(self.model.c.geo_level == geo_level)\
-                    .filter(self.model.c.geo_code.in_(geo_codes))\
-                    .all()
+                for col in self.columns.iterkeys():
+                    geo_values['estimate'][col] = getattr(row, col)
+                    geo_values['error'][col] = 0
 
-                for row in rows:
-                    geo_values = data['%s-%s' % (geo_level, row.geo_code)]
-
-                    for col in self.columns.iterkeys():
-                        geo_values['estimate'][col] = getattr(row, col)
-                        geo_values['error'][col] = 0
-
-            finally:
-                session.close()
+        finally:
+            session.close()
 
         return data
 
-    def get_stat_data(self, geo_level, geo_code, fields=None, key_order=None,
-                      percent=True, total=None, recode=None):
+    def get_stat_data(self, geo, fields=None, key_order=None, percent=True, total=None, recode=None):
         """ Get a data dictionary for a place from this table.
 
         This fetches the values for each column in this table and returns a data
         dictionary for those values, with appropriate names and metadata.
 
-        :param str geo_level: the geographical level
-        :param str geo_code: the geographical code
+        :param geo: the geography
         :param str or list fields: the columns to fetch stats for. By default, all columns except
                                    geo-related and the total column (if any) are used.
         :param str key_order: explicit ordering of (recoded) keys, or None for the default order.
@@ -218,7 +212,7 @@ class SimpleTable(object):
                     total, self.id, ', '.join(self.columns.keys())))
 
             # table columns to fetch
-            cols = [self.model.columns[c] for c in fields]
+            cols = [self.model.__table__.columns[c] for c in fields]
 
             if total is not None and isinstance(total, basestring) and total not in cols:
                 cols.append(total)
@@ -226,8 +220,9 @@ class SimpleTable(object):
             # do the query. If this returns no data, row is None
             row = session\
                 .query(*cols)\
-                .filter(self.model.c.geo_level == geo_level,
-                        self.model.c.geo_code == geo_code)\
+                .filter(self.model.geo_level == geo.geo_level,
+                        self.model.geo_code == geo.geo_code,
+                        self.model.geo_version == geo.version)\
                 .first()
 
             if row is None:
@@ -281,6 +276,38 @@ class SimpleTable(object):
             'table_id': self.id.upper(),
             'stat_type': self.stat_type,
         }
+
+    def _build_model(self, db_table):
+        # does it already exist?
+        model = get_model_for_db_table(db_table)
+        if model:
+            return model
+
+        columns = self._build_model_columns()
+
+        class Model(Base):
+            __table__ = Table(db_table, Base.metadata, *columns, autoload=True, extend_existing=True)
+
+        return Model
+
+    def _build_model_columns(self):
+        # We build this array in a particular order, with the geo-related fields first,
+        # to ensure that SQLAlchemy creates the underlying table with the compound primary
+        # key columns in the correct order:
+        #
+        #  geo_level, geo_code, geo_version, field, [field, field, ...]
+        #
+        # This means postgresql will use the first two elements of the compound primary
+        # key -- geo_level and geo_code -- when looking up values for a particular
+        # geograhy. This saves us from having to create a secondary index.
+        columns = []
+
+        # will form a compound primary key on the fields, and the geo id
+        columns.append(Column('geo_level', String(15), nullable=False, primary_key=True))
+        columns.append(Column('geo_code', String(10), nullable=False, primary_key=True))
+        columns.append(Column('geo_version', String(100), nullable=False, primary_key=True, server_default=''))
+
+        return columns
 
 
 FIELD_TABLE_FIELDS = set()
@@ -378,9 +405,6 @@ class FieldTable(SimpleTable):
             self.model.data_tables = []
         self.model.data_tables.append(self)
 
-    def get_model(self, geo_level):
-        return self.model
-
     def setup_columns(self):
         """
         Prepare our columns for use by +as_dict+ and the data API.
@@ -423,8 +447,7 @@ class FieldTable(SimpleTable):
 
         session = get_session()
         try:
-            model = self.get_model('country')
-            fields = [getattr(model, f) for f in self.fields]
+            fields = [getattr(self.model, f) for f in self.fields]
 
             # get distinct permutations for all fields
             rows = session\
@@ -467,96 +490,88 @@ class FieldTable(SimpleTable):
 
         Returns a dict mapping the geo ids to table data.
         """
-        data = {}
+        data = {('%s-%s' % (geo.geo_level, geo.geo_code)): {
+                'estimate': {},
+                'error': {}}
+                for geo in geos}
 
-        # group by geo level
-        geos = sorted(geos, key=lambda g: g.geo_level)
-        for geo_level, geos in groupby(geos, lambda g: g.geo_level):
-            model = self.get_model(geo_level)
-            geo_codes = [g.geo_code for g in geos]
+        session = get_session()
+        try:
+            geo_values = None
+            fields = [getattr(self.model, f) for f in self.fields]
+            rows = session\
+                .query(self.model.geo_level,
+                       self.model.geo_code,
+                       func.sum(self.model.total).label('total'),
+                       *fields)\
+                .group_by(self.model.geo_level, self.model.geo_code, *fields)\
+                .order_by(self.model.geo_level, self.model.geo_code, *fields)\
+                .filter(or_(and_(
+                    self.model.geo_level == geo.geo_level,
+                    self.model.geo_code == geo.geo_code,
+                    self.model.geo_version == geo.version)
+                    for geo in geos))\
+                .all()
 
-            # initial values
-            for geo_code in geo_codes:
-                data['%s-%s' % (geo_level, geo_code)] = {
-                    'estimate': {},
-                    'error': {}}
+            def permute(level, field_keys, rows):
+                field = self.fields[level]
+                total = None
+                denominator = 0
 
-            session = get_session()
-            try:
-                geo_values = None
-                fields = [getattr(model, f) for f in self.fields]
-                rows = session\
-                    .query(model.geo_code,
-                           func.sum(model.total).label('total'),
-                           *fields)\
-                    .group_by(model.geo_code, *fields)\
-                    .order_by(model.geo_code, *fields)\
-                    .filter(model.geo_code.in_(geo_codes))
+                for key, rows in groupby(rows, lambda r: getattr(r, field)):
+                    new_keys = field_keys + [key]
+                    col_id = self.column_id(new_keys)
 
-                rows = rows.filter(model.geo_level == geo_level)
-                rows = rows.all()
+                    if level + 1 < len(self.fields):
+                        value = permute(level + 1, new_keys, rows)
+                    else:
+                        # we've bottomed out
 
-                def permute(level, field_keys, rows):
-                    field = self.fields[level]
-                    total = None
-                    denominator = 0
-
-                    for key, rows in groupby(rows, lambda r: getattr(r, field)):
-                        new_keys = field_keys + [key]
-                        col_id = self.column_id(new_keys)
-
-                        if level + 1 < len(self.fields):
-                            value = permute(level + 1, new_keys, rows)
+                        rows = list(rows)
+                        if all(row.total is None for row in rows):
+                            value = None
                         else:
-                            # we've bottomed out
+                            value = sum(row.total or 0 for row in rows)
 
-                            rows = list(rows)
-                            if all(row.total is None for row in rows):
-                                value = None
-                            else:
-                                value = sum(row.total or 0 for row in rows)
+                        if self.denominator_key and self.denominator_key == key:
+                            # this row must be used as the denominator total,
+                            # rather than as an entry in the table
+                            denominator = value
+                            continue
 
-                            if self.denominator_key and self.denominator_key == key:
-                                # this row must be used as the denominator total,
-                                # rather than as an entry in the table
-                                denominator = value
-                                continue
+                    if value is not None:
+                        total = (total or 0) + value
+                    geo_values['estimate'][col_id] = value
+                    geo_values['error'][col_id] = 0
 
-                        if value is not None:
-                            total = (total or 0) + value
-                        geo_values['estimate'][col_id] = value
-                        geo_values['error'][col_id] = 0
+                if self.denominator_key:
+                    total = denominator
 
-                    if self.denominator_key:
-                        total = denominator
+                return total
 
-                    return total
+            # rows for each geo
+            for geo_id, geo_rows in groupby(rows, lambda r: (r.geo_level, r.geo_code)):
+                geo_values = data['%s-%s' % geo_id]
+                total = permute(0, [], geo_rows)
 
-                # rows for each geo
-                for geo_code, geo_rows in groupby(rows, lambda r: r.geo_code):
-                    geo_values = data['%s-%s' % (geo_level, geo_code)]
-                    total = permute(0, [], geo_rows)
+                # total
+                if self.total_column:
+                    geo_values['estimate'][self.total_column] = total
+                    geo_values['error'][self.total_column] = 0
 
-                    # total
-                    if self.total_column:
-                        geo_values['estimate'][self.total_column] = total
-                        geo_values['error'][self.total_column] = 0
-
-            finally:
-                session.close()
+        finally:
+            session.close()
 
         return data
 
-    def _build_model_from_fields(self, fields, db_table, geo_level=None, value_type=Integer):
+    def _build_model_from_fields(self, fields, db_table, value_type=Integer):
         '''
         Generates an ORM model for arbitrary census fields by geography.
 
-        :param list fields: the census fields in `api.models.tables.FIELD_TABLE_FIELDS`, e.g. ['highest educational level', 'type of sector']
+        :param list fields: the table fields e.g. ['highest educational level', 'type of sector']
         :param str db_table: the name of the database table
-        :param str geo_level: one of the geographics levels defined in `api.base.geo_levels`, e.g. 'province', or None if the table doesn't use them
         :param value_type: The value type of the total column.
-        :return: ORM model class containing the given fields with type String(128), a 'total' field
-        with type Integer and '%(geo_level)s_code' with type ForeignKey('%(geo_level)s.code')
+        :return: ORM model class
         :rtype: Model
         '''
         # does it already exist?
@@ -564,35 +579,11 @@ class FieldTable(SimpleTable):
         if model:
             return model
 
-        # We build this array in a particular order, with the geo-related fields first,
-        # to ensure that SQLAlchemy creates the underlying table with the compound primary
-        # key columns in the correct order:
-        #
-        #  geo_level, geo_code, field, [field, field, ...]
-        #
-        # This means postgresql will use the first two elements of the compound primary
-        # key -- geo_level and geo_code -- when looking up values for a particular
-        # geograhy. This saves us from having to create a secondary index.
-        table_args = []
-
-        if geo_level:
-            # primary/foreign keys
-            table_args.append(Column('%s_code' % geo_level, String(10),
-                                     ForeignKey('%s.code' % geo_level),
-                                     primary_key=True, index=True))
-        else:
-            # will form a compound primary key on the fields, and the geo id
-            table_args.append(Column('geo_level', String(15), nullable=False, primary_key=True))
-            table_args.append(Column('geo_code', String(10), nullable=False, primary_key=True))
-
-        # Now add the columns
-        table_args.extend(Column(field, String(128), primary_key=True) for field in fields)
-        # and the value column
-        table_args.append(Column('total', value_type, nullable=True))
+        columns = self._build_model_columns(fields, value_type)
 
         # create the table model
         class Model(Base):
-            __table__ = Table(db_table, Base.metadata, *table_args, extend_existing=True)
+            __table__ = Table(db_table, Base.metadata, *columns, extend_existing=True)
 
         # ensure it exists in the DB
         session = get_session()
@@ -604,6 +595,21 @@ class FieldTable(SimpleTable):
         DB_MODELS[db_table] = Model
 
         return Model
+
+        # Now add the field columns
+        columns.extend(Column(field, String(128), primary_key=True) for field in fields)
+        # and the value column
+        columns.append(Column('total', value_type, nullable=True))
+
+    def _build_model_columns(self, fields, value_type):
+        columns = super(FieldTable, self)._build_model_columns()
+
+        # field columns
+        columns.extend(Column(field, String(128), primary_key=True) for field in fields)
+        # total column
+        columns.append(Column('total', value_type, nullable=True))
+
+        return columns
 
     @classmethod
     def for_fields(cls, fields, table_dataset=None):
@@ -661,7 +667,7 @@ def get_model_from_fields(fields, geo_level, table_name=None, table_dataset=None
         if not table:
             ValueError("Couldn't find a table that covers these fields: %s" % fields)
 
-    return table.get_model(geo_level)
+    return table.model
 
 
 def get_table_id(fields):
