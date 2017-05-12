@@ -233,7 +233,9 @@ WAZIMAP = {
     'na_label': 'N/A',
 
     # Default geo version to use when loading geographies. If None,
-    # uses the most recent version in the Geography's table (``geo_data.latest_version``).
+    # uses the most recent version of the Geography. This is useful if your
+    # geography table contains more recent geographies, but you don't want
+    # to use the latest when the request doesn't specifify a version.
     'default_geo_version': None,
 
     # The geo version to use for legacy embeds that don't specify a geo version.
