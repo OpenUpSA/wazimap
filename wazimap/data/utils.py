@@ -449,6 +449,13 @@ def get_stat_data(fields, geo, session, order_by=None,
     group_totals = {}
     grand_total = -1
 
+    def get_recoded_key(recode, field, key):
+        recoder = recode[field]
+        if isinstance(recoder, dict):
+            return recoder.get(key, key)
+        else:
+            return recoder(field, key)
+
     def get_data_object(obj):
         """ Recurse down the list of fields and return the
         final resting place for data for this stat. """
@@ -458,11 +465,7 @@ def get_stat_data(fields, geo, session, order_by=None,
             key = getattr(obj, field)
 
             if recode and field in recode:
-                recoder = recode[field]
-                if isinstance(recoder, dict):
-                    key = recoder.get(key, key)
-                else:
-                    key = recoder(field, key)
+                key = get_recoded_key(recode, field, key)
             else:
                 key = capitalize(key)
 
@@ -514,9 +517,16 @@ def get_stat_data(fields, geo, session, order_by=None,
 
         if percent_grouping:
             if obj.total is not None:
-                key = tuple(getattr(obj, field) for field in percent_grouping)
-                data['_group_key'] = key
-                group_totals[key] = group_totals.get(key, 0) + obj.total
+                group_key = tuple()
+                for field in percent_grouping:
+                    key = getattr(obj, field)
+                    if recode and field in recode:
+                        # Group by recoded keys
+                        key = get_recoded_key(recode, field, key)
+                    group_key = group_key + (key,)
+
+                data['_group_key'] = group_key
+                group_totals[group_key] = group_totals.get(group_key, 0) + obj.total
 
     if grand_total == -1:
         grand_total = running_total if total is None else total
