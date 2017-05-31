@@ -43,8 +43,8 @@ setup(
     url='https://github.com/Code4SA/wazimap',
 
     # Author details
-    author='Code for South Africa',
-    author_email='greg@code4sa.org',
+    author='OpenUp',
+    author_email='greg@openup.org.za',
 
     # Choose your license
     license='MIT',

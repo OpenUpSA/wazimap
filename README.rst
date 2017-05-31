@@ -19,8 +19,8 @@ Wazimap is a fork of the excellent `Censusreporter <https://censusreporter.org>`
 You can also find `Censusreporter on GitHub <https://github.com/censusreporter/censusreporter>`_.
 
 Wazimap builds on Censusreporter and makes it easier to re-use. Wazimap was originally built by
-`Code for South Africa <http://code4sa.org>`_ with the support of `Media Monitoring Africa <http://www.mediamonitoringafrica.org/>`_.
-It is maintained by Code for South Africa.
+`OpenUp <https://openup.org.za>`_ with the support of `Media Monitoring Africa <http://www.mediamonitoringafrica.org/>`_.
+It is maintained by OpenUp.
 
 * Wazimap is on Twitter as `@Wazimap <https://twitter.com/@Wazimap>`_.
 * Read the `full Wazimap documentation <http://wazimap.readthedocs.org/en/latest/>`_.
@@ -56,4 +56,4 @@ Wazimap is licensed under the MIT License.
 
 The Wazimap name and branding is Copyright 2013-2017 Media Monitoring Africa (MMA) and may not be used without permission.
 
-If you use this software, please provide attribution to Census Reporter, Wazimap, Media Monitoring Africa and Code for South Africa.
+If you use this software, please provide attribution to Census Reporter, Wazimap, Media Monitoring Africa and OpenUp.
