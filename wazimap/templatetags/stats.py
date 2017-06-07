@@ -2,6 +2,7 @@ from django import template
 from django.utils import formats
 from django.template.defaultfilters import floatformat
 from django.contrib.humanize.templatetags.humanize import intcomma
+from django.conf import settings
 
 register = template.Library()
 
@@ -15,6 +16,9 @@ DOT_ZERO = DECIMAL_SEPARATOR + "0"
 
 @register.simple_tag(takes_context=True)
 def statvalue(context, value, decimals=None, stat_type=None, isnumerator=False):
+    if value is None:
+        return settings.WAZIMAP.get('na_label', '')
+
     if decimals is None:
         decimals = context.get('decimals', -1)
     if stat_type is None:
