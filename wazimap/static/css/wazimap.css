@@ -116,6 +116,19 @@ ul#site-menu li a:hover {
     text-decoration: none;
 }
 
+.chart .action-links ul.sub-group {
+  background-color: #1a9d95;
+}
+
+.chart .action-links ul.sub-group a {
+  color: white;
+}
+
+.chart .action-links ul.sub-group a:hover {
+  color: #1a9d95;
+  background-color: white;
+}
+
 .data-drawer .tool-group {
     float: right;
     margin-right: 0px;

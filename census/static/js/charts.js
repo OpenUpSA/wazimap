@@ -758,6 +758,27 @@ function Chart(options) {
                 .text("Embed")
                 .on("click", chart.showEmbedCode);
 
+        chart.showEmbed = links
+            .append("li")
+            .append("a")
+                .classed("chart-show-embed", true)
+                .text("Explore data")
+                .attr("href", chart.tableURL);
+
+        chart.showEmbed = links
+            .append("li")
+            .append("a")
+                .classed("chart-show-embed", true)
+                .text("Map data")
+                .attr("href", chart.mapURL);
+
+        chart.showEmbed = links
+            .append("li")
+            .append("a")
+                .classed("chart-show-embed", true)
+                .text("Compare")
+                .attr("href", chart.distributionURL);
+
         $(chart.actionLinks[0]).hover(function() {
             $(this).find('.sub-group').toggle();
         });
