@@ -58,6 +58,12 @@
                     {% endblock %}
                     {{ WAZIMAP.name }}
                 </a>
+                <ul id="site-menu">
+                    {% block header_menu %}
+                    <li><a href="/about">About</a></li>
+                    {% endblock header_menu %}
+                </ul>
+
                 {% if not hide_nav_tools %}
                     {% block nav_tools %}
                     <div id="menu" class="tool-set clearfix">
