@@ -13,8 +13,8 @@ Wazimap is a fork of the excellent `Censusreporter <https://censusreporter.org>`
 You can also find `Censusreporter on GitHub <https://github.com/censusreporter/censusreporter>`_.
 
 Wazimap builds on Censusreporter and makes it easier to re-use. Wazimap was originally built by
-`Code for South Africa <http://code4sa.org>`_ with the support of `Media Monitoring Africa <http://www.mediamonitoringafrica.org/>`_.
-It is maintained by Code for South Africa.
+`OpenUp <https://openup.org.za>`_ with the support of `Media Monitoring Africa <http://www.mediamonitoringafrica.org/>`_.
+It is maintained by OpenUp.
 
 * Wazimap is on GitHub at `github.com/Code4SA/wazimap <https://github.com/Code4SA/wazimap>`_.
 * Wazimap is on Twitter as `@Wazimap <https://twitter.com/@Wazimap>`_.
@@ -35,10 +35,10 @@ Wazimap is licensed under the MIT License.
 
 The Wazimap name and branding is Copyright 2013-2017 Media Monitoring Africa (MMA) and may not be used without permission.
 
-If you use this software, please provide attribution to Census Reporter, Wazimap, Media Monitoring Africa and Code for South Africa.
+If you use this software, please provide attribution to Census Reporter, Wazimap, Media Monitoring Africa and OpenUp.
 We recommend using this text:
 
-    X is built on `Wazimap <http://wazimap.readthedocs.org/>`_, an open source platform by `Code for South Africa <http://code4sa.org>`_ and `Media Monitoring Africa <http://www.mediamonitoringafrica.org/>`_ for making census data more understandable. Wazimap is based on `Census Reporter <https://censusreporter.org>`_ which was funded by a Knight News Challenge grant.
+    X is built on `Wazimap <http://wazimap.readthedocs.org/>`_, an open source platform by `OpenUp <https://openup.org.za>`_ and `Media Monitoring Africa <http://www.mediamonitoringafrica.org/>`_ for making census data more understandable. Wazimap is based on `Census Reporter <https://censusreporter.org>`_ which was funded by a Knight News Challenge grant.
 
 
 Contents
