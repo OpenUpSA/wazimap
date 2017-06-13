@@ -32,7 +32,7 @@ button,
 input,
 select,
 textarea {
-    color: #222;
+    color: $grey-darkest;
 }
 menu,
 ol,
@@ -288,10 +288,10 @@ a.action-button,
     float: right;
     font-size: 18px;
     margin-top: 2px;
-    color: #67b3a3;
+    color: $brand-secondary-darker-color;
     line-height: 1;
     padding: .25em .33em .2em;
-    background-color: #001716;
+    background-color: $grey-darkest;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -600,7 +600,7 @@ aside#facets {
 .zoom-to-layer {
     background-color: $brand-secondary-lightest-color;
     text-decoration: none;
-    color: #888;
+    color: $grey-darker;
     margin-left: .67em;
     padding: .33em .4em;
     font-size: .9em;
@@ -1193,7 +1193,7 @@ table {
     font-size: .8em;
 }
 thead {
-    border-bottom: 1px solid #d9ddca;
+    border-bottom: 1px solid $border-color;
 }
 th {
     background-color: $tan;
@@ -1583,9 +1583,9 @@ ul.toggle-set li {
 }
 .toggle-set a {
     background-color: $brand-secondary-lightest-color;
-    border-bottom: 1px solid #67b3a3;
+    border-bottom: 1px solid $brand-secondary-darker-color;
     text-decoration: none;
-    color: #888;
+    color: $grey-darker;
     margin-right: 1px;
 }
 .toggle-set a,
@@ -1621,7 +1621,7 @@ ul.toggle-set li {
 }
 .toggle-set a.unhovered {
     background-color: $brand-secondary-lightest-color;
-    color: #888;
+    color: $grey-darker;
 }
 ul.toggle-set .toggle-sub-group a:hover {
     -webkit-border-bottom-right-radius: 0;
@@ -1719,7 +1719,7 @@ section.chart-divider h2 {
     position: relative;
     height: 11px;
     width: 11px;
-    color: #222;
+    color: $grey-darkest;
     background-color: $tan;
     border: 1px solid #acb58c;
     -webkit-border-radius: 50%;
@@ -1728,8 +1728,8 @@ section.chart-divider h2 {
 }
 .coal-chart li .point:hover,
 .coal-chart li .point.hovered {
-    background-color: #42472e;
-    border-color: #42472e;
+    background-color: $grey-darker;
+    border-color: $grey-darker;
     z-index: 3;
 }
 .coal-chart li .point.selected {
@@ -1927,8 +1927,8 @@ section.chart-divider h2 {
 }
 #query-builder-bar .query-chosen.go:hover,
 .go-button:hover {
-    border-color: #f54814;
-    background-color: #f54814;
+    border-color: $brand-primary-color;
+    background-color: $brand-primary-color;
 }
 #query-builder-bar .query-chosen.tabbed {
     -webkit-border-bottom-right-radius: 0;
@@ -1977,7 +1977,7 @@ section.chart-divider h2 {
     display: none;
     z-index: 99;
     padding: 2% 0 2% 2%;
-    border: 1px solid #001716;
+    border: 1px solid $grey-darkest;
     -webkit-border-bottom-right-radius: 4px;
     -webkit-border-bottom-left-radius: 4px;
     -moz-border-radius-bottomright: 4px;
@@ -2005,7 +2005,7 @@ section.chart-divider h2 {
 }
 .release-option a:hover,
 .release-option a.active {
-    background-color: #d9ddca;
+    background-color: $border-color;
     color: #111;
 }
 .release-option a.disabled {
