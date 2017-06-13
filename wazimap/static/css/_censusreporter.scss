@@ -382,7 +382,7 @@ article .section-container,
     border-radius: 4px;
 }
 .card:hover {
-    color: #111;
+    color: $grey-darkest;
 }
 .card .caption {
     font-size: 1em;
@@ -887,12 +887,12 @@ h1.article-header-right {
 /* STATS */
 .stat {
     width: 100%;
-    color: #111;
+    color: $grey-darkest;
     margin: 0;
     padding: 0;
 }
 .stat:hover {
-    color: #111;
+    color: $grey-darkest;
 }
 .context,
 .context-phrases {
@@ -2006,7 +2006,7 @@ section.chart-divider h2 {
 .release-option a:hover,
 .release-option a.active {
     background-color: $border-color;
-    color: #111;
+    color: $grey-darkest;
 }
 .release-option a.disabled {
     cursor: default;
@@ -2406,7 +2406,7 @@ aside .search .result-type {
     margin-left: .67em;
 }
 .location-list a:hover .identifier {
-    color: #111;
+    color: $grey-darkest;
 }
 
 #body-spinner {
