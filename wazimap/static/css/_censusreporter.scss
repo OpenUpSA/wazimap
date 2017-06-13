@@ -21,8 +21,8 @@ body {
     padding: 0;
     background-color: $background-bg-color;
     line-height: 1.4;
-    font-size: 14px;
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: $font-size-base;
+    font-family: $font-family;
 }
 html {
     background-color: $footer-bg-color;
@@ -58,7 +58,7 @@ hr {
     display: block;
     height: 1px;
     border: 0;
-    border-top: 1px solid #fff;
+    border-top: 1px solid $white;
     margin: 1em 0;
     padding: 0;
 }
@@ -97,7 +97,7 @@ a:hover {
 }
 a.permalink span,
 a.permalink i {
-    color: #777;
+    color: $grey-darker;
     display: none;
 }
 a.permalink:hover {
@@ -108,14 +108,14 @@ a.permalink:hover i {
     display: inherit;
 }
 p, .serif {
-    font-family: "Merriweather", Georgia, serif;
+    font-family: $font-family-secondary;
     margin: 0 0 1em;
 }
 .caption {
     margin-top: .25em;
     padding-top: .25em;
     font-size: .83em;
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: $font-family;
 }
 .caption-group {
     margin-right: 1em;
@@ -123,7 +123,7 @@ p, .serif {
 
 .display-type,
 .leader {
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: $font-family;
 }
 .leader {
     font-weight: bold;
@@ -195,14 +195,14 @@ img.screenshot {
 /* LAYOUT */
 #page-header,
 .box-header {
-    background-color: $brand-secondary-color;
+    background-color: $brand-secondary-darkest-color;
 }
 #page-header .wrapper {
     padding: .5em 0;
 }
 #page-header-title a,
 .box-header a {
-    color: $tan-light;
+    color: $tan-lighter;
     text-decoration: none;
 }
 #page-header-title a.title {
@@ -245,7 +245,7 @@ img.screenshot {
 }
 #menu .separator {
     float:left;
-    color: #fff;
+    color: $white;
     font-size: .83em;
     width: 3em;
     text-align: center;
@@ -262,13 +262,13 @@ img.screenshot {
 #menu a.button,
 a.action-button,
 .big-action .with-submit input[type="submit"] {
-    color: #fff;
+    color: $white;
     display: block;
     margin-top: 0;
     padding: 0 9px;
     height: 2em;
     line-height: 1.9em;
-    background-color: #1a9d95;
+    background-color: $brand-secondary-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -354,7 +354,7 @@ header.section-contents h1 {
     border-bottom-left-radius: 4px;
 }
 article .section-container {
-    background-color: #fff;
+    background-color: $white;
     margin-left: 13em;
     padding: .6em 1.2em 1.2em;
     -webkit-border-radius: 4px;
@@ -598,7 +598,7 @@ aside#facets {
 }
 
 .zoom-to-layer {
-    background-color: #a1d0c6;
+    background-color: $brand-secondary-lightest-color;
     text-decoration: none;
     color: #888;
     margin-left: .67em;
@@ -612,8 +612,8 @@ aside#facets {
 }
 .zoom-to-layer.active,
 .zoom-to-layer:hover {
-    background-color: #1a9d95;
-    color: #fff;
+    background-color: $brand-secondary-color;
+    color: $white;
 }
 
 #address-search-content.no-map .zoom-to-layer, #address-search-content.no-map .no-map-hide {
@@ -625,7 +625,7 @@ aside#facets {
 }
 #cover-profile article {
     margin-top: 3em;
-    background-color: #fff;
+    background-color: $white;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
@@ -696,7 +696,7 @@ aside#facets {
     padding: 2.5em 0;
 }
 .white-stripe {
-    background-color: #fff;
+    background-color: $white;
 }
 .tan-stripe {
     background-color: $tan;
@@ -751,7 +751,7 @@ h1.article-header-right {
     display: inline-block;
     height: 2.6em;
     font-size: 1.3em;
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: $font-family;
 }
 
 #profile #query-topic-picker input,
@@ -817,7 +817,7 @@ h1.article-header-right {
     font-style: italic;
 }
 .or {
-    font-family: "Merriweather", Georgia, serif;
+    font-family: $font-family-secondary;
     font-size: 1.1em;
     line-height: 1;
     padding: .7em 0;
@@ -843,10 +843,10 @@ h1.article-header-right {
     text-align: center;
     width: 28px;
     height: 28px;
-    font-size: 14px;
+    font-size: $font-size-base;
     line-height: 28px;
-    color: #fff;
-    background-color: $brand-secondary-color;
+    color: $white;
+    background-color: $brand-secondary-darkest-color;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
@@ -857,9 +857,9 @@ h1.article-header-right {
 }
 .tag {
     text-transform: uppercase;
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: $font-family;
     font-style: normal;
-    color: #fff;
+    color: $white;
     font-size: .8em;
     padding: .15em .33em;
     background-color: #555c3b;
@@ -898,7 +898,7 @@ h1.article-header-right {
 .context-phrases {
     font-size: .9em;
     font-weight: 500;
-    color: #777;
+    color: $grey-darker;
 }
 .data-drawer.grid {
     font-size: .83em;
@@ -1012,24 +1012,24 @@ h1.article-header-right {
     position: relative;
 }
 .svg-map .outline {
-    fill: $tan-light;
+    fill: $tan-lighter;
     stroke: $border-color;
     stroke-width: 1.5px;
 }
 .svg-map .feature,
 .svg-map .point {
     stroke: #001b1b;
-    fill: $brand-secondary-color;
+    fill: $brand-secondary-darkest-color;
 }
 .svg-map .mesh {
     fill: none;
-    stroke: #fff;
+    stroke: $white;
     stroke-width: .5px;
     stroke-linejoin: round;
 }
 .svg-map .geographies {
     fill: #e5e5e5;
-    stroke: #fff;
+    stroke: $white;
     stroke-linejoin: round;
 }
 .push-right {
@@ -1054,11 +1054,11 @@ h1.article-header-right {
     z-index: 49;
     top: 10px;
     left: 10px;
-    background-color: #fff;
+    background-color: $white;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
-    border: 1px solid $brand-secondary-color;
+    border: 1px solid $brand-secondary-darkest-color;
     width: 450px;
     overflow-y: auto;
 }
@@ -1150,7 +1150,7 @@ h1.article-header-right {
 }
 .leaflet-label.hovercard {
     font-size: 13px;
-    font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: $font-family;
     padding: .83em 1em;
 }
 
@@ -1183,7 +1183,7 @@ ul.quantile-legend span.quantile-label {
 .map-layer path {
     fill: #000;
     fill-opacity: .2;
-    stroke: #fff;
+    stroke: $white;
     stroke-width: 1.5px;
 }
 
@@ -1298,7 +1298,7 @@ select,
 .select-wrapper,
 .filter-group,
 .item-chosen {
-    background-color: #fff;
+    background-color: $white;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -1339,7 +1339,7 @@ form select {
     top: 0;
     right: 0;
     padding: .5em .5em .25em;
-    background-color: #fff;
+    background-color: $white;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -1397,8 +1397,8 @@ h3.item-chosen-title {
     border-radius: 4px;
 }
 .filter-list a.option-selected {
-    color: #fff;
-    background-color: $brand-secondary-color;
+    color: $white;
+    background-color: $brand-secondary-darkest-color;
 }
 .filter-list {
     list-style: none;
@@ -1444,7 +1444,7 @@ p.filter-list a {
     text-transform: uppercase;
     font-size: .75em;
     font-weight: bold;
-    color: #aaa;
+    color: $text-muted-color;
 }
 .select2-result:hover .topic-type {
     color: #eee;
@@ -1522,7 +1522,7 @@ textarea#results {
 }
 .tool-group .label {
     font-size: 1em;
-    color: #aaa;
+    color: $text-muted-color;
     font-weight: bold;
 }
 
@@ -1532,7 +1532,7 @@ textarea#results {
 .item-chosen,
 .item-choices {
     position: relative;
-    background-color: #fff;
+    background-color: $white;
 }
 .item-choices {
     max-height: 200px;
@@ -1582,7 +1582,7 @@ ul.toggle-set li {
     position: relative;
 }
 .toggle-set a {
-    background-color: #a1d0c6;
+    background-color: $brand-secondary-lightest-color;
     border-bottom: 1px solid #67b3a3;
     text-decoration: none;
     color: #888;
@@ -1616,11 +1616,11 @@ ul.toggle-set li {
 .toggle-set a.active,
 .toggle-set a:hover,
 .toggle-set a.hovered {
-    background-color: #1a9d95;
-    color: #fff;
+    background-color: $brand-secondary-color;
+    color: $white;
 }
 .toggle-set a.unhovered {
-    background-color: #a1d0c6;
+    background-color: $brand-secondary-lightest-color;
     color: #888;
 }
 ul.toggle-set .toggle-sub-group a:hover {
@@ -1629,14 +1629,14 @@ ul.toggle-set .toggle-sub-group a:hover {
     border-bottom-right-radius: 0;
 }
 .toggle-sub-group a:hover {
-    color: #1a9d95;
+    color: $brand-secondary-color;
 }
 ul.sub-group {
     display: none;
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: #fff;
+    background-color: $white;
     width: 100%;
     z-index: 99;
     -webkit-border-radius: 4px;
@@ -1674,9 +1674,9 @@ ul.sub-group a {
 ul.sub-group a:hover {
     text-decoration: none;
     padding: .33em .5em;
-    color: #fff;
-    background-color: #1a9d95;
-    border-color: #1a9d95;
+    color: $white;
+    background-color: $brand-secondary-color;
+    border-color: $brand-secondary-color;
 }
 
 /* CHARTS */
@@ -1757,7 +1757,7 @@ section.chart-divider h2 {
 .coal-chart li .point.hovered .hovercard,
 .coal-chart li .point.selected .hovercard {
     display: block;
-    background-color: #fff;
+    background-color: $white;
 }
 .coal-chart li.tick-mark {
     height: 26px;
@@ -1790,11 +1790,11 @@ section.chart-divider h2 {
 
 .placeholder {
     background-color: #f5f5f5;
-    color: #777;
+    color: $grey-darker;
     text-align: center;
     height: 200px;
     padding-top: 75px;
-    border: 1px solid #777;
+    border: 1px solid $grey-darker;
 }
 
 .comparison-builder {
@@ -1810,13 +1810,13 @@ section.chart-divider h2 {
 .change-button,
 .go-button,
 .action-button {
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: $font-family;
     line-height: 1;
     cursor: pointer;
     text-align: center;
     padding: .7em 0;
-    background-color: #1a9d95;
-    color: #fff;
+    background-color: $brand-secondary-color;
+    color: $white;
     text-decoration: none;
     font-size: 1.2em;
     -webkit-border-radius: 4px;
@@ -1834,7 +1834,7 @@ section.chart-divider h2 {
 .change-button:hover,
 .action-button:hover {
     background-color: $brand-primary-color;
-    color: #fff;
+    color: $white;
 }
 
 #topic-picker [class^="column-"],
@@ -1860,7 +1860,7 @@ section.chart-divider h2 {
     margin-bottom: 1em;
 }
 #query-builder-bar h4 {
-    color: #aaa;
+    color: $text-muted-color;
     margin-bottom: .5em;
 }
 
@@ -1890,7 +1890,7 @@ section.chart-divider h2 {
     text-align: center;
     height: 31px;
     padding: .5em 0 0;
-    background-color: #fff;
+    background-color: $white;
     border: 1px solid $border-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -1915,9 +1915,9 @@ section.chart-divider h2 {
 #query-builder-bar .query-chosen.hovered,
 #query-builder-bar .query-chosen.go,
 .go-button {
-    border-color: $brand-secondary-color;
-    background-color: $brand-secondary-color;
-    color: #fff;
+    border-color: $brand-secondary-darkest-color;
+    background-color: $brand-secondary-darkest-color;
+    color: $white;
     font-weight: 400;
 }
 #query-builder-bar .query-chosen.go,
@@ -1965,7 +1965,7 @@ section.chart-divider h2 {
     cursor: default;
     border-color: #baccc9;
     background-color: #baccc9;
-    color: #fff;
+    color: $white;
 }
 
 #query-builder-bar section[id$="-picker"] {
@@ -1973,7 +1973,7 @@ section.chart-divider h2 {
     top: 30px;
     left: 0;
     width: 100%;
-    background-color: #fff;
+    background-color: $white;
     display: none;
     z-index: 99;
     padding: 2% 0 2% 2%;
@@ -2051,7 +2051,7 @@ section.chart-divider h2 {
     margin-bottom: 0;
 }
 .glossary-term {
-    border-bottom: 1px dashed #777;
+    border-bottom: 1px dashed $grey-darker;
     cursor: help;
 }
 #glossary header,
@@ -2066,7 +2066,7 @@ section.chart-divider h2 {
     float: right;
     margin: 0 0 2em 2em;
     padding: 1em;
-    background-color: #fff;
+    background-color: $white;
     -webkit-border-bottom-right-radius: 4px;
     -webkit-border-bottom-left-radius: 4px;
     -moz-border-radius-bottomright: 4px;
@@ -2110,7 +2110,7 @@ dd {
 }
 .topic table {
     font-size: 1em;
-    background-color: #fff;
+    background-color: $white;
     margin: 2em 0;
 }
 .topic table td {
@@ -2172,8 +2172,8 @@ dd {
 }
 
 code, pre {
-    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal;
-    font-size: 14px;
+    font-family: $font-family-monospace;
+    font-size: $font-size-base;
 }
 code {
     background-color: #f7f7f7;
@@ -2271,7 +2271,7 @@ dl#racial-iteration dt {
     width: 100%;
     margin-top: 2px;
     padding: 0;
-    background-color: #fff;
+    background-color: $white;
     border: 1px solid #ccc;
     *border-right-width: 2px;
     *border-bottom-width: 2px;
@@ -2283,8 +2283,8 @@ dl#racial-iteration dt {
     font-size: 1.2em;
     padding: .83em;
     margin-bottom: 0;
-    background-color: $brand-secondary-color;
-    color: #fff;
+    background-color: $brand-secondary-darkest-color;
+    color: $white;
 }
 .tt-suggestion {
   display: block;
@@ -2294,7 +2294,7 @@ dl#racial-iteration dt {
 }
 
 .tt-suggestion.tt-cursor {
-  color: #fff;
+  color: $white;
   background-color: $brand-secondary-darker-color;
   cursor: pointer;
 }
@@ -2366,7 +2366,7 @@ aside .search .result-type {
 /* !importants make me a little sad, but they're better than monkey-patching third-party code */
 .twitter-typeahead .tt-query,
 .twitter-typeahead .tt-hint {
-    background-color: #fff !important;
+    background-color: $white !important;
     margin-bottom: 0;
 }
 .autocomplete-widget .tt-dropdown-menu {
@@ -2389,7 +2389,7 @@ aside .search .result-type {
 
 .location-list a {
     text-decoration: none;
-    background-color: #fff;
+    background-color: $white;
     display: block;
     font-weight: bold;
     padding: .67em .2em;
@@ -2440,13 +2440,13 @@ aside .search .result-type {
 }
 .message-help {
     padding: .67em 1em;
-    background-color: #fff;
+    background-color: $white;
     border: 1px solid $tan-darker;
 }
 blockquote {
     margin: 1em 0 2em;
     padding: 1em;
-    background-color: #fff;
+    background-color: $white;
     border: 1px solid $border-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -2484,7 +2484,7 @@ blockquote {
 }
 .inactive,
 .inactive a {
-    color: #aaa;
+    color: $text-muted-color;
 }
 .clear {
     clear: both;

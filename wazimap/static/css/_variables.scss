@@ -1,32 +1,52 @@
+// --- 
 // colours
 // primary brand color
 $orange: #f55b2c !default;
 
 // secondary color and shades
-$teal: #02aeab !default; 
+$teal-lightest: #a1d0c6 !default;
+$teal-lighter: #02aeab !default; 
+$teal: #1a9d95 !default;
 $teal-darker: #027b7a !default;
 $teal-darkest: #014948 !default;
 
-$tan-light: #f7f8f3 !default;
+$tan-lighter: #f7f8f3 !default;
 $tan: #eff1e9 !default;
 $tan-darker: #e0e4d4 !default;
 $tan-darkest: #cad0b5 !default;
+
+$grey: #aaa !default;
+$grey-darker: #777 !default;
+
+$white: #fff;
 
 
 // these two colours should complement each other:
 //   - primary should be bright
 //   - secondary should be darker and contrast with primary
 $brand-primary-color: $orange !default;
-$brand-secondary-color: $teal-darkest !default;
+
+$brand-secondary-lightest-color: $teal-lightest !default;
+$brand-secondary-lighter-color: $teal-lighter !default;
+$brand-secondary-color: $teal !default;
 $brand-secondary-darker-color: $teal-darker !default;
+$brand-secondary-darkest-color: $teal-darkest !default;
 
 
-$background-bg-color: $tan-light !default;
+$background-bg-color: $tan-lighter !default;
 $footer-bg-color: $tan-darker !default;
 $border-color: $tan-darkest !default;
 $border-color-light: $tan-darker !default;  // often used at the top of elements with $border-color at the bottom to create a shadow effect
 
 $link-color: $teal-darkest !default;
-$link-active-color: $teal !default;
+$link-active-color: $teal-lighter !default;
 
-$text-highlight-color: $teal !default;
+$text-highlight-color: $teal-lighter !default;
+$text-muted-color: $grey !default;
+// ---
+
+// --- typography
+$font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$font-family-secondary: "Merriweather", Georgia, serif !default;
+$font-family-monospace: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal !default;
+$font-size-base: 14px !default;
