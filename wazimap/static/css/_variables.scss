@@ -1,0 +1,32 @@
+// colours
+// primary brand color
+$orange: #f55b2c !default;
+
+// secondary color and shades
+$teal: #02aeab !default; 
+$teal-darker: #027b7a !default;
+$teal-darkest: #014948 !default;
+
+$tan-light: #f7f8f3 !default;
+$tan: #eff1e9 !default;
+$tan-darker: #e0e4d4 !default;
+$tan-darkest: #cad0b5 !default;
+
+
+// these two colours should complement each other:
+//   - primary should be bright
+//   - secondary should be darker and contrast with primary
+$brand-primary-color: $orange !default;
+$brand-secondary-color: $teal-darkest !default;
+$brand-secondary-darker-color: $teal-darker !default;
+
+
+$background-bg-color: $tan-light !default;
+$footer-bg-color: $tan-darker !default;
+$border-color: $tan-darkest !default;
+$border-color-light: $tan-darker !default;  // often used at the top of elements with $border-color at the bottom to create a shadow effect
+
+$link-color: $teal-darkest !default;
+$link-active-color: $teal !default;
+
+$text-highlight-color: $teal !default;

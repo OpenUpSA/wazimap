@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django.contrib.sites',
     'django.contrib.staticfiles',
+    'sass_processor',
     'wazimap.apps.WazimapConfig',
     'census',
 ]
@@ -58,8 +59,12 @@ STATIC_URL = '/static/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'sass_processor.finders.CssFinder',
 )
-# STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineCachedStorage'
+
+# Simplified static file serving.
+# https://warehouse.python.org/project/whitenoise/
+#STATICFILES_STORAGE = 'wazimap.pipeline.GzipManifestPipelineStorage'
 
 
 # Templates

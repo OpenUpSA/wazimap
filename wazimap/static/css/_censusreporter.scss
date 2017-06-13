@@ -1,4 +1,6 @@
-@import 'charts.css';
+@import "css/charts";
+
+// client-side imports
 @import url(//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css);
 @import url(//fonts.googleapis.com/css?family=Lato:400,700);
 @import url(//fonts.googleapis.com/css?family=Merriweather);
@@ -17,13 +19,13 @@ html,
 body {
     margin: 0;
     padding: 0;
-    background-color: #f7f8f3;
+    background-color: $background-bg-color;
     line-height: 1.4;
     font-size: 14px;
     font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 html {
-    background-color: #e0e4d4;
+    background-color: $footer-bg-color;
 }
 html,
 button,
@@ -38,17 +40,17 @@ ul {
     padding: 0 0 0 2em;
 }
 input:focus {
-    border: 1px solid #02aeab;
+    border: 1px solid $text-highlight-color;
     -webkit-box-shadow: 0px 0px 2px rgba(1, 73, 72, 0.5);
     -moz-box-shadow: 0px 0px 2px rgba(1, 73, 72, 0.5);
     box-shadow: 0px 0px 2px rgba(1, 73, 72, 0.5);
 }
 ::-moz-selection {
-    background: #02aeab;
+    background: $text-highlight-color;
     text-shadow: none;
 }
 ::selection {
-    background: #02aeab;
+    background: $text-highlight-color;
     text-shadow: none;
 }
 
@@ -84,14 +86,14 @@ textarea {
 
 /* BASIC ELEMENTS */
 a {
-    color: #014948;
+    color: $link-color;
 }
 a.permalink {
     text-decoration: none;
     color: inherit;
 }
 a:hover {
-    color: #02aeab;
+    color: $link-active-color;
 }
 a.permalink span,
 a.permalink i {
@@ -186,21 +188,21 @@ footer ul a:hover {
     margin-bottom: .25em;
 }
 img.screenshot {
-    border: 1px solid #cad0b5;
+    border: 1px solid $border-color;
     width: 100%;
 }
 
 /* LAYOUT */
 #page-header,
 .box-header {
-    background-color: #014948;
+    background-color: $brand-secondary-color;
 }
 #page-header .wrapper {
     padding: .5em 0;
 }
 #page-header-title a,
 .box-header a {
-    color: #f7f8f3;
+    color: $tan-light;
     text-decoration: none;
 }
 #page-header-title a.title {
@@ -280,7 +282,7 @@ a.action-button,
     display: none;
 }
 #menu a.button:hover {
-    background-color: #f55b2c;
+    background-color: $brand-primary-color;
 }
 #menu-toggle {
     float: right;
@@ -301,8 +303,8 @@ a.action-button,
 }
 
 #page-footer {
-    background-color: #e0e4d4;
-    border-top: 1px solid #cad0b5;
+    background-color: $footer-bg-color;
+    border-top: 1px solid $border-color;
     padding: 1.5em 0 4.5em;
 }
 #page-footer ul {
@@ -343,7 +345,7 @@ header.section-contents h1 {
     font-size: 1em;
     margin: 0;
     padding: .6em 0 .55em .8em;
-    background-color: #eff1e9;
+    background-color: $tan;
     -webkit-border-top-left-radius: 4px;
     -moz-border-radius-topleft: 4px;
     border-top-left-radius: 4px;
@@ -365,8 +367,8 @@ article .section-container {
 header.section-contents h1,
 article .section-container,
 .card {
-    border-top: 1px solid #e8eadf;
-    border-bottom: 1px solid #cad0b5;
+    border-top: 1px solid $border-color-light;
+    border-bottom: 1px solid $border-color;
 }
 .card {
     display: block;
@@ -374,7 +376,7 @@ article .section-container,
     margin: 0;
     padding: 0;
     text-decoration: none;
-    background-color: #e0e4d4;
+    background-color: $tan-darker;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -396,7 +398,7 @@ article .section-container,
     white-space: nowrap;
 }
 .card:hover .more {
-    color: #f55b2c;
+    color: $brand-primary-color;
 }
 .card-container .card {
     margin-bottom: 1.5em;
@@ -450,7 +452,7 @@ article .section-container,
     font-size: .83em;
     font-weight: bold;
     padding: .33em 0;
-    border-top: 1px solid #E8EADF;
+    border-top: 1px solid $border-color-light;
 }
 
 section {
@@ -627,7 +629,7 @@ aside#facets {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
-    border: 1px solid #02aeab;
+    border: 1px solid $text-highlight-color;
     padding: .67em 1.25em .33em;
 }
 #cover-profile ul {
@@ -697,7 +699,7 @@ aside#facets {
     background-color: #fff;
 }
 .tan-stripe {
-    background-color: #eff1e9;
+    background-color: $tan;
 }
 h1.article-header {
     font-size: 3em;
@@ -844,7 +846,7 @@ h1.article-header-right {
     font-size: 14px;
     line-height: 28px;
     color: #fff;
-    background-color: #014948;
+    background-color: $brand-secondary-color;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
@@ -993,7 +995,7 @@ h1.article-header-right {
     font-size: .8em;
 }
 .stat-row {
-    border-top: 1px solid #eff1e9;
+    border-top: 1px solid $tan;
     padding-top: 2em;
 }
 .stat-row.grouped-row {
@@ -1010,14 +1012,14 @@ h1.article-header-right {
     position: relative;
 }
 .svg-map .outline {
-    fill: #f7f8f3;
-    stroke: #cad0b5;
+    fill: $tan-light;
+    stroke: $border-color;
     stroke-width: 1.5px;
 }
 .svg-map .feature,
 .svg-map .point {
     stroke: #001b1b;
-    fill: #014948;
+    fill: $brand-secondary-color;
 }
 .svg-map .mesh {
     fill: none;
@@ -1056,7 +1058,7 @@ h1.article-header-right {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
-    border: 1px solid #014948;
+    border: 1px solid $brand-secondary-color;
     width: 450px;
     overflow-y: auto;
 }
@@ -1194,7 +1196,7 @@ thead {
     border-bottom: 1px solid #d9ddca;
 }
 th {
-    background-color: #eff1e9;
+    background-color: $tan;
     min-width: 7em;
     vertical-align: bottom;
 }
@@ -1229,7 +1231,7 @@ tr:hover td,
 tr.highlight td,
 .grid .highlight,
 .grid .hover {
-    background-color: #e0e4d4;
+    background-color: $tan-darker;
 }
 table .percentage, table .raw-number {
     display: block
@@ -1300,7 +1302,7 @@ select,
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    border: 1px solid #cad0b5;
+    border: 1px solid $border-color;
     height: 2.2em;
     line-height: 1em;
     padding: .5em;
@@ -1396,7 +1398,7 @@ h3.item-chosen-title {
 }
 .filter-list a.option-selected {
     color: #fff;
-    background-color: #014948;
+    background-color: $brand-secondary-color;
 }
 .filter-list {
     list-style: none;
@@ -1495,7 +1497,7 @@ textarea#results {
     text-decoration: underline;
 }
 .tool-group a:hover {
-    color: #f55b2c;
+    color: $brand-primary-color;
 }
 .tool-group .filter-list a {
     text-decoration: none;
@@ -1640,7 +1642,7 @@ ul.sub-group {
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    border: 1px solid #e8eadf;
+    border: 1px solid $border-color-light;
 }
 ul.sub-group li,
 ul.sub-group a {
@@ -1667,7 +1669,7 @@ ul.sub-group li:last-child a {
 ul.sub-group a {
     text-decoration: none;
     padding: .33em .5em;
-    border-bottom: 1px solid #e8eadf;
+    border-bottom: 1px solid $border-color-light;
 }
 ul.sub-group a:hover {
     text-decoration: none;
@@ -1686,12 +1688,12 @@ section.coal-chart-container {
 section.chart-divider {
     margin: 1em 0 0;
     padding: 0.6em 0.75em;
-    background-color: #f7f8f3;
+    background-color: $background-bg-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    border-top: 1px solid #e8eadf;
-    border-bottom: 1px solid #cad0b5;
+    border-top: 1px solid $border-color-light;
+    border-bottom: 1px solid $border-color;
 }
 section.chart-divider h2 {
     margin: 0;
@@ -1718,7 +1720,7 @@ section.chart-divider h2 {
     height: 11px;
     width: 11px;
     color: #222;
-    background-color: #eff1e9;
+    background-color: $tan;
     border: 1px solid #acb58c;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
@@ -1731,8 +1733,8 @@ section.chart-divider h2 {
     z-index: 3;
 }
 .coal-chart li .point.selected {
-    background-color: #027b7a;
-    border-color: #027b7a;
+    background-color: $brand-secondary-darker-color;
+    border-color: $brand-secondary-darker-color;
     z-index: 2;
 }
 .coal-chart li .point.selected.hovered {
@@ -1831,7 +1833,7 @@ section.chart-divider h2 {
 }
 .change-button:hover,
 .action-button:hover {
-    background-color: #f55b2c;
+    background-color: $brand-primary-color;
     color: #fff;
 }
 
@@ -1889,7 +1891,7 @@ section.chart-divider h2 {
     height: 31px;
     padding: .5em 0 0;
     background-color: #fff;
-    border: 1px solid #cad0b5;
+    border: 1px solid $border-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -1913,15 +1915,15 @@ section.chart-divider h2 {
 #query-builder-bar .query-chosen.hovered,
 #query-builder-bar .query-chosen.go,
 .go-button {
-    border-color: #014948;
-    background-color: #014948;
+    border-color: $brand-secondary-color;
+    background-color: $brand-secondary-color;
     color: #fff;
     font-weight: 400;
 }
 #query-builder-bar .query-chosen.go,
 .go-button {
-    border-color: #f55b2c;
-    background-color: #f55b2c;
+    border-color: $brand-primary-color;
+    background-color: $brand-primary-color;
 }
 #query-builder-bar .query-chosen.go:hover,
 .go-button:hover {
@@ -1994,9 +1996,9 @@ section.chart-divider h2 {
 .release-option a {
     text-decoration: none;
     padding: .33em 1em;
-    background-color: #eff1e9;
-    border-top: 1px solid #e8eadf;
-    border-bottom: 1px solid #cad0b5;
+    background-color: $tan;
+    border-top: 1px solid $border-color-light;
+    border-bottom: 1px solid $border-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -2071,8 +2073,8 @@ section.chart-divider h2 {
     -moz-border-radius-bottomleft: 4px;
     border-bottom-right-radius: 4px;
     border-bottom-left-radius: 4px;
-    border-top: 1px solid #e8eadf;
-    border-bottom: 1px solid #cad0b5;
+    border-top: 1px solid $border-color-light;
+    border-bottom: 1px solid $border-color;
 }
 #glossary aside h3,
 .topic aside h3 {
@@ -2281,7 +2283,7 @@ dl#racial-iteration dt {
     font-size: 1.2em;
     padding: .83em;
     margin-bottom: 0;
-    background-color: #014948;
+    background-color: $brand-secondary-color;
     color: #fff;
 }
 .tt-suggestion {
@@ -2293,7 +2295,7 @@ dl#racial-iteration dt {
 
 .tt-suggestion.tt-cursor {
   color: #fff;
-  background-color: #027b7a;
+  background-color: $brand-secondary-darker-color;
   cursor: pointer;
 }
 
@@ -2393,7 +2395,7 @@ aside .search .result-type {
     padding: .67em .2em;
 }
 .location-list a:hover {
-    color: #f55b2c;
+    color: $brand-primary-color;
 }
 .location-list .identifier {
     float: right;
@@ -2439,13 +2441,13 @@ aside .search .result-type {
 .message-help {
     padding: .67em 1em;
     background-color: #fff;
-    border: 1px solid #e0e4d4;
+    border: 1px solid $tan-darker;
 }
 blockquote {
     margin: 1em 0 2em;
     padding: 1em;
     background-color: #fff;
-    border: 1px solid #CAD0B5;
+    border: 1px solid $border-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
