@@ -12,8 +12,9 @@
         <meta name="description" content="{% block head_meta_description %}{% endblock %}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {% block head_css %}
-        <link rel="stylesheet" href="{% sass_src 'css/main.scss' %}">
-        {% block head_css_extra %}{% endblock %}{% endblock head_css %}
+        <link rel="stylesheet" href="{% sass_src 'css/wazimap.scss' %}">
+        {% endblock head_css %}
+        {% block head_css_extra %}{% endblock %}
         {% block head_javascript %}
         <script src="//cdn.jsdelivr.net/g/modernizr@2.7,respond@1.4"></script>
         {% block head_javascript_extra %}{% endblock %}{% endblock %}

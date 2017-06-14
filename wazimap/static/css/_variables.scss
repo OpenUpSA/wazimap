@@ -39,10 +39,10 @@ $footer-bg-color: $tan-darker !default;
 $border-color: $tan-darkest !default;
 $border-color-light: $tan-darker !default;  // often used at the top of elements with $border-color at the bottom to create a shadow effect
 
-$link-color: $teal-darkest !default;
-$link-active-color: $teal-lighter !default;
+$link-color: $brand-secondary-darkest-color !default;
+$link-active-color: $brand-secondary-lighter-color !default;
 
-$text-highlight-color: $teal-lighter !default;
+$text-highlight-color: $brand-secondary-lighter-color !default;
 $text-muted-color: $grey !default;
 // ---
 
