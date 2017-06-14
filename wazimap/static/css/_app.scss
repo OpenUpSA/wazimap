@@ -117,7 +117,7 @@ ul#site-menu li a:hover {
 }
 
 .chart .action-links ul.sub-group {
-  background-color: #1a9d95;
+  background-color: $brand-secondary-color;
 }
 
 .chart .action-links ul.sub-group a {
@@ -125,7 +125,7 @@ ul#site-menu li a:hover {
 }
 
 .chart .action-links ul.sub-group a:hover {
-  color: #1a9d95;
+  color: $brand-secondary-color;
   background-color: white;
 }
 
@@ -207,7 +207,7 @@ header.section-contents h1 a {
 }
 
 .head2head-wrapper {
-  background-color: #e0e4d4;
+  background-color: $footer-bg-color;
 }
 
 .profile-head2head-view #uvTab {

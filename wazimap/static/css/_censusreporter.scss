@@ -204,7 +204,7 @@ img.screenshot {
 }
 #page-header-title a,
 .box-header a {
-    color: $tan-lighter;
+    color: $header-fg-color;
     text-decoration: none;
 }
 #page-header-title a.title {
@@ -264,7 +264,7 @@ img.screenshot {
 #menu a.button,
 a.action-button,
 .big-action .with-submit input[type="submit"] {
-    color: $white;
+    color: $brand-primary-fg-color;
     display: block;
     margin-top: 0;
     padding: 0 9px;
@@ -284,7 +284,7 @@ a.action-button,
     display: none;
 }
 #menu a.button:hover {
-    background-color: $brand-primary-color;
+    background-color: $brand-primary-bg-color;
 }
 #menu-toggle {
     float: right;
@@ -400,7 +400,7 @@ article .section-container,
     white-space: nowrap;
 }
 .card:hover .more {
-    color: $brand-primary-color;
+    color: $brand-primary-bg-color;
 }
 .card-container .card {
     margin-bottom: 1.5em;
@@ -1499,7 +1499,7 @@ textarea#results {
     text-decoration: underline;
 }
 .tool-group a:hover {
-    color: $brand-primary-color;
+    color: $brand-primary-bg-color;
 }
 .tool-group .filter-list a {
     text-decoration: none;
@@ -1681,115 +1681,6 @@ ul.sub-group a:hover {
     border-color: $brand-secondary-color;
 }
 
-/* CHARTS */
-
-section.coal-chart-container {
-    padding: 2em 0 4em;
-    margin-bottom: 0;
-}
-section.chart-divider {
-    margin: 1em 0 0;
-    padding: 0.6em 0.75em;
-    background-color: $background-bg-color;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    border-top: 1px solid $border-color-light;
-    border-bottom: 1px solid $border-color;
-}
-section.chart-divider h2 {
-    margin: 0;
-    line-height: 1;
-}
-.coal-chart-container h2 {}
-.coal-chart {
-    list-style: none;
-    position: relative;
-    height: 10px;
-    border-bottom: 1px solid #e5e5e5;
-    margin: 0 1.5em;
-}
-.coal-chart li {
-    display: inline;
-    position: absolute;
-    bottom: -6px;
-    margin-left: -5px;
-}
-.coal-chart li .point {
-    display: block;
-    cursor: pointer;
-    position: relative;
-    height: 11px;
-    width: 11px;
-    color: $grey-darkest;
-    background-color: $tan;
-    border: 1px solid #acb58c;
-    -webkit-border-radius: 50%;
-    -moz-border-radius: 50%;
-    border-radius: 50%;
-}
-.coal-chart li .point:hover,
-.coal-chart li .point.hovered {
-    background-color: $grey-darker;
-    border-color: $grey-darker;
-    z-index: 3;
-}
-.coal-chart li .point.selected {
-    background-color: $brand-secondary-darker-color;
-    border-color: $brand-secondary-darker-color;
-    z-index: 2;
-}
-.coal-chart li .point.selected.hovered {
-    z-index: 4;
-}
-.coal-chart li .point .hovercard {
-    position: absolute;
-    width: 15em;
-    bottom: 1.5em;
-    right: -7.5em;
-    font-size: .83em;
-    line-height: 1.3;
-    text-align: center;
-    display: none;
-    padding: .5em;
-    border: 1px solid #e0e0e0;
-    pointer-events: auto;
-}
-.coal-chart li .point:hover .hovercard,
-.coal-chart li .point.hovered .hovercard,
-.coal-chart li .point.selected .hovercard {
-    display: block;
-    background-color: $white;
-}
-.coal-chart li.tick-mark {
-    height: 26px;
-    bottom: -13px;
-    margin-left: 0;
-    border-left: 1px solid #d5d5d5;
-}
-.coal-chart li.tick-mark.tick-mark-min {
-    left: 0;
-}
-.coal-chart li.tick-mark.tick-mark-max {
-    left: 100%;
-}
-.coal-chart li.tick-mark span {
-    position: relative;
-    font-size: .75em;
-    display: block;
-    color: #606060;
-    padding: 0;
-    margin-top: 26px;
-    margin-left: -50%;
-    white-space: nowrap;
-}
-.coal-chart li.tick-mark-min span {
-    margin-left: -1px;
-}
-.coal-chart li.tick-mark-max span {
-    margin-left: -99%;
-}
-
 .placeholder {
     background-color: #f5f5f5;
     color: $grey-darker;
@@ -1835,8 +1726,8 @@ section.chart-divider h2 {
 }
 .change-button:hover,
 .action-button:hover {
-    background-color: $brand-primary-color;
-    color: $white;
+    background-color: $brand-primary-bg-color;
+    color: $brand-primary-fg-color;
 }
 
 #topic-picker [class^="column-"],
@@ -1924,13 +1815,13 @@ section.chart-divider h2 {
 }
 #query-builder-bar .query-chosen.go,
 .go-button {
-    border-color: $brand-primary-color;
-    background-color: $brand-primary-color;
+    border-color: $brand-primary-bg-color;
+    background-color: $brand-primary-bg-color;
 }
 #query-builder-bar .query-chosen.go:hover,
 .go-button:hover {
-    border-color: $brand-primary-color;
-    background-color: $brand-primary-color;
+    border-color: $brand-primary-bg-color;
+    background-color: $brand-primary-bg-color;
 }
 #query-builder-bar .query-chosen.tabbed {
     -webkit-border-bottom-right-radius: 0;
@@ -2397,7 +2288,7 @@ aside .search .result-type {
     padding: .67em .2em;
 }
 .location-list a:hover {
-    color: $brand-primary-color;
+    color: $brand-primary-bg-color;
 }
 .location-list .identifier {
     float: right;

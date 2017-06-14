@@ -26,6 +26,8 @@ $white: #fff;
 //   - primary should be bright
 //   - secondary should be darker and contrast with primary
 $brand-primary-color: $orange !default;
+$brand-primary-fg-color: $white !default;
+$brand-primary-bg-color: $brand-primary-color !default;
 
 $brand-secondary-lightest-color: $teal-lightest !default;
 $brand-secondary-lighter-color: $teal-lighter !default;
@@ -33,7 +35,8 @@ $brand-secondary-color: $teal !default;
 $brand-secondary-darker-color: $teal-darker !default;
 $brand-secondary-darkest-color: $teal-darkest !default;
 
-
+$header-bg-color: $brand-secondary-darkest-color !default;
+$header-fg-color: $tan-lighter !default;
 $background-bg-color: $tan-lighter !default;
 $footer-bg-color: $tan-darker !default;
 $border-color: $tan-darkest !default;
