@@ -51,6 +51,7 @@ Create a new file in your project called ``static/css/_custom.scss``. In it, ove
 
 These are the most important ones:
 
-* ``brand-primary-color``: a bright primary colour
-* ``brand-secondary-color``: a darker, secondary colour. Variations on this colour are used throughout the site.
-* ``brand-secondary-{lightest, lighter, darkest, darker}-color``: lighter and darker shades of the secondary colour. We recommend simply lightening or darkening your ``brand-secondary-color`` by 10% and 20%.
+* ``$brand-primary-color``: a bright primary colour
+* ``$brand-secondary-color``: a darker, secondary colour. Variations on this colour are used throughout the site.
+* ``$brand-secondary-{lightest, lighter, darkest, darker}-color``: lighter and darker shades of the secondary colour. We recommend simply lightening or darkening your ``$brand-secondary-color`` by 10% and 20%.
+* ``$general-bg-color`` and ``$general-bg-{lightest, lighter, darkest, darker}-color``: general background colours and lighter and darker shades. We recommend simply lightening or darkening your ``$general-bg-color`` by 10% and 20%.
