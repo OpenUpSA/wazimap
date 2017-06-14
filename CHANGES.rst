@@ -15,6 +15,7 @@ This release of Wazimap introduces some backwards compatible changes.
 * A new method ``GeoData.get_comparative_geos`` makes it easier to build the profile page for comparative geographies.
 * FIX: load streetmap tiles over https if necessary
 * FEATURE: site menu
+* FEATURE: use SCSS stylesheets, support customising using SCSS variables.
 
 0.8.2 (20 April 2017)
 ---------------------
