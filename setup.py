@@ -17,6 +17,7 @@ install_requires = [
     'boto>=2.27.0',
     'dj-database-url>=0.4.0',
     'django-cors-headers>=1.1.0',
+    'django-compressor>=2.1.1',
     'django-pipeline>=1.6.4',
     'django-sass-processor>=0.5.4',
     'ecdsa>=0.11',
