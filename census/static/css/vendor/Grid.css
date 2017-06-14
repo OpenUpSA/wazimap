@@ -118,10 +118,7 @@
 .g_HR {
     /* Grid header cell */
     padding : .5em 1em !important;
-    border: none !important;
-    border-bottom: 1px solid #d9ddca !important;
     zoom : 1;
-    background-color : #eff1e9;
     background-position : 0px 0px;
     background-repeat: repeat-x;
     font-weight : bold;

@@ -19,7 +19,7 @@ $grey: #aaa !default;
 $grey-darker: #777 !default;
 $grey-darkest: #222 !default;
 
-$white: #fff;
+$white: #fff !default;
 
 
 // these two colours should complement each other:
@@ -35,12 +35,19 @@ $brand-secondary-color: $teal !default;
 $brand-secondary-darker-color: $teal-darker !default;
 $brand-secondary-darkest-color: $teal-darkest !default;
 
+$general-bg-lighter-color: $tan-lighter !default;
+$general-bg-color: $tan !default;
+$general-bg-darker-color: $tan-darker !default;
+$general-bg-darkest-color: $tan-darkest !default;
+
+$background-bg-color: $general-bg-lighter-color !default;
+
 $header-bg-color: $brand-secondary-darkest-color !default;
-$header-fg-color: $tan-lighter !default;
-$background-bg-color: $tan-lighter !default;
-$footer-bg-color: $tan-darker !default;
-$border-color: $tan-darkest !default;
-$border-color-light: $tan-darker !default;  // often used at the top of elements with $border-color at the bottom to create a shadow effect
+$header-fg-color: $white !default;
+$footer-bg-color: $general-bg-darker-color !default;
+
+$border-color: $general-bg-darkest-color !default;
+$border-lighter-color: $general-bg-darker-color !default;  // often used at the top of elements with $border-color at the bottom to create a shadow effect
 
 $link-color: $brand-secondary-darkest-color !default;
 $link-active-color: $brand-secondary-lighter-color !default;
