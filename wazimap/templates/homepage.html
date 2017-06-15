@@ -108,7 +108,14 @@
 </div>
 
 <div class="content-container clearfix tan-stripe">
-    <article id="examples" class="clearfix wrapper">
+    <article id="showcase" class="clearfix wrapper">
+        {% block showcase %}
+        {% endblock %}
+    </article>
+</div>
+
+<div class="content-container clearfix">
+    <article id="about" class="clearfix wrapper">
         <header class="column-full">
             <h1 class="article-header">About {{ WAZIMAP.name }}</h1>
         </header>
