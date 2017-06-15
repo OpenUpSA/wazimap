@@ -116,20 +116,6 @@ ul#site-menu li a:hover {
     text-decoration: none;
 }
 
-.chart .action-links ul.sub-group {
-  background-color: $btn-active-bg-color;
-  color: $btn-active-fg-color;
-}
-
-.chart .action-links ul.sub-group a {
-  color: white;
-}
-
-.chart .action-links ul.sub-group a:hover {
-  color: $btn-active-bg-color;
-  background-color: $btn-active-fg-color;
-}
-
 .data-drawer .tool-group {
     float: right;
     margin-right: 0px;
