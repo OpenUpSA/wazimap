@@ -25,6 +25,7 @@ To deploy on Heroku on Dokku, create your application in the normal way. Then se
 * ``DJANGO_SECRET_KEY=<a random secret key>``
 * ``DJANGO_DEBUG=False``
 * ``DJANGO_SETTINGS_MODULE=<your settings module>``
+* ``DISABLE_COLLECTSTATIC=1=``
 
 You'll need a Procfile, too: ::
 
