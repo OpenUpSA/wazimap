@@ -117,7 +117,8 @@ ul#site-menu li a:hover {
 }
 
 .chart .action-links ul.sub-group {
-  background-color: $brand-secondary-color;
+  background-color: $btn-active-bg-color;
+  color: $btn-active-fg-color;
 }
 
 .chart .action-links ul.sub-group a {
@@ -125,8 +126,8 @@ ul#site-menu li a:hover {
 }
 
 .chart .action-links ul.sub-group a:hover {
-  color: $brand-secondary-color;
-  background-color: white;
+  color: $btn-active-bg-color;
+  background-color: $btn-active-fg-color;
 }
 
 .data-drawer .tool-group {

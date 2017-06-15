@@ -264,13 +264,13 @@ img.screenshot {
 #menu a.button,
 a.action-button,
 .big-action .with-submit input[type="submit"] {
-    color: $brand-primary-fg-color;
+    color: $btn-muted-fg-color;
     display: block;
     margin-top: 0;
     padding: 0 9px;
     height: 2em;
     line-height: 1.9em;
-    background-color: $brand-secondary-color;
+    background-color: $btn-muted-bg-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -284,7 +284,8 @@ a.action-button,
     display: none;
 }
 #menu a.button:hover {
-    background-color: $brand-primary-bg-color;
+    background-color: $btn-active-bg-color;
+    color: $btn-active-fg-color;
 }
 #menu-toggle {
     float: right;
@@ -1584,10 +1585,10 @@ ul.toggle-set li {
     position: relative;
 }
 .toggle-set a {
-    background-color: $brand-secondary-lightest-color;
-    border-bottom: 1px solid $brand-secondary-darker-color;
+    background-color: $btn-muted-bg-color;
+    border-bottom: 1px solid darken($btn-muted-bg-color, 20%);
     text-decoration: none;
-    color: $grey-darker;
+    color: $btn-muted-fg-color;
     margin-right: 1px;
 }
 .toggle-set a,
@@ -1618,20 +1619,17 @@ ul.toggle-set li {
 .toggle-set a.active,
 .toggle-set a:hover,
 .toggle-set a.hovered {
-    background-color: $brand-secondary-color;
-    color: $white;
+    background-color: $btn-active-bg-color;
+    color: $btn-active-fg-color;
 }
 .toggle-set a.unhovered {
-    background-color: $brand-secondary-lightest-color;
-    color: $grey-darker;
+    background-color: $btn-muted-bg-color;
+    color: $btn-muted-fg-color;
 }
 ul.toggle-set .toggle-sub-group a:hover {
     -webkit-border-bottom-right-radius: 0;
     -moz-border-radius-bottomright: 0;
     border-bottom-right-radius: 0;
-}
-.toggle-sub-group a:hover {
-    color: $brand-secondary-color;
 }
 ul.sub-group {
     display: none;
@@ -1676,9 +1674,9 @@ ul.sub-group a {
 ul.sub-group a:hover {
     text-decoration: none;
     padding: .33em .5em;
-    color: $white;
-    background-color: $brand-secondary-color;
-    border-color: $brand-secondary-color;
+    color: $btn-active-fg-color;
+    background-color: $btn-active-bg-color;
+    border-color: $btn-active-bg-color;
 }
 
 .placeholder {
@@ -1708,8 +1706,8 @@ ul.sub-group a:hover {
     cursor: pointer;
     text-align: center;
     padding: .7em 0;
-    background-color: $brand-secondary-color;
-    color: $white;
+    background-color: $btn-active-bg-color;
+    color: $btn-active-fg-color;
     text-decoration: none;
     font-size: 1.2em;
     -webkit-border-radius: 4px;
@@ -1726,8 +1724,8 @@ ul.sub-group a:hover {
 }
 .change-button:hover,
 .action-button:hover {
-    background-color: $brand-primary-bg-color;
-    color: $brand-primary-fg-color;
+    background-color: $btn-active-bg-color;
+    color: $btn-active-fg-color;
 }
 
 #topic-picker [class^="column-"],

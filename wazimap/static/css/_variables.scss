@@ -52,6 +52,11 @@ $border-lighter-color: $general-bg-darker-color !default;  // often used at the 
 $link-color: $brand-secondary-darkest-color !default;
 $link-active-color: $brand-secondary-lighter-color !default;
 
+$btn-active-bg-color: $brand-secondary-color !default;
+$btn-active-fg-color: $white !default;
+$btn-muted-bg-color: $brand-secondary-lightest-color !default;
+$btn-muted-fg-color: $grey-darker !default;
+
 $text-highlight-color: $brand-secondary-lighter-color !default;
 $text-muted-color: $grey !default;
 // ---
