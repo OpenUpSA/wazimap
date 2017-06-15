@@ -1,4 +1,8 @@
-@import 'charts.css';
+@import "css/vendor/normalize.min";
+
+@import "css/charts";
+
+// client-side imports
 @import url(//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css);
 @import url(//fonts.googleapis.com/css?family=Lato:400,700);
 @import url(//fonts.googleapis.com/css?family=Merriweather);
@@ -17,20 +21,20 @@ html,
 body {
     margin: 0;
     padding: 0;
-    background-color: #f7f8f3;
+    background-color: $background-bg-color;
     line-height: 1.4;
-    font-size: 14px;
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: $font-size-base;
+    font-family: $font-family;
 }
 html {
-    background-color: #e0e4d4;
+    background-color: $footer-bg-color;
 }
 html,
 button,
 input,
 select,
 textarea {
-    color: #222;
+    color: $grey-darkest;
 }
 menu,
 ol,
@@ -38,17 +42,17 @@ ul {
     padding: 0 0 0 2em;
 }
 input:focus {
-    border: 1px solid #02aeab;
+    border: 1px solid $text-highlight-color;
     -webkit-box-shadow: 0px 0px 2px rgba(1, 73, 72, 0.5);
     -moz-box-shadow: 0px 0px 2px rgba(1, 73, 72, 0.5);
     box-shadow: 0px 0px 2px rgba(1, 73, 72, 0.5);
 }
 ::-moz-selection {
-    background: #02aeab;
+    background: $text-highlight-color;
     text-shadow: none;
 }
 ::selection {
-    background: #02aeab;
+    background: $text-highlight-color;
     text-shadow: none;
 }
 
@@ -56,7 +60,7 @@ hr {
     display: block;
     height: 1px;
     border: 0;
-    border-top: 1px solid #fff;
+    border-top: 1px solid $white;
     margin: 1em 0;
     padding: 0;
 }
@@ -84,18 +88,18 @@ textarea {
 
 /* BASIC ELEMENTS */
 a {
-    color: #014948;
+    color: $link-color;
 }
 a.permalink {
     text-decoration: none;
     color: inherit;
 }
 a:hover {
-    color: #02aeab;
+    color: $link-active-color;
 }
 a.permalink span,
 a.permalink i {
-    color: #777;
+    color: $grey-darker;
     display: none;
 }
 a.permalink:hover {
@@ -106,14 +110,14 @@ a.permalink:hover i {
     display: inherit;
 }
 p, .serif {
-    font-family: "Merriweather", Georgia, serif;
+    font-family: $font-family-secondary;
     margin: 0 0 1em;
 }
 .caption {
     margin-top: .25em;
     padding-top: .25em;
     font-size: .83em;
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: $font-family;
 }
 .caption-group {
     margin-right: 1em;
@@ -121,7 +125,7 @@ p, .serif {
 
 .display-type,
 .leader {
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: $font-family;
 }
 .leader {
     font-weight: bold;
@@ -186,21 +190,21 @@ footer ul a:hover {
     margin-bottom: .25em;
 }
 img.screenshot {
-    border: 1px solid #cad0b5;
+    border: 1px solid $border-color;
     width: 100%;
 }
 
 /* LAYOUT */
 #page-header,
 .box-header {
-    background-color: #014948;
+    background-color: $brand-secondary-darkest-color;
 }
 #page-header .wrapper {
     padding: .5em 0;
 }
 #page-header-title a,
 .box-header a {
-    color: #f7f8f3;
+    color: $header-fg-color;
     text-decoration: none;
 }
 #page-header-title a.title {
@@ -243,7 +247,7 @@ img.screenshot {
 }
 #menu .separator {
     float:left;
-    color: #fff;
+    color: $white;
     font-size: .83em;
     width: 3em;
     text-align: center;
@@ -260,13 +264,13 @@ img.screenshot {
 #menu a.button,
 a.action-button,
 .big-action .with-submit input[type="submit"] {
-    color: #fff;
+    color: $brand-primary-fg-color;
     display: block;
     margin-top: 0;
     padding: 0 9px;
     height: 2em;
     line-height: 1.9em;
-    background-color: #1a9d95;
+    background-color: $brand-secondary-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -280,16 +284,16 @@ a.action-button,
     display: none;
 }
 #menu a.button:hover {
-    background-color: #f55b2c;
+    background-color: $brand-primary-bg-color;
 }
 #menu-toggle {
     float: right;
     font-size: 18px;
     margin-top: 2px;
-    color: #67b3a3;
+    color: $brand-secondary-darker-color;
     line-height: 1;
     padding: .25em .33em .2em;
-    background-color: #001716;
+    background-color: $grey-darkest;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -301,8 +305,8 @@ a.action-button,
 }
 
 #page-footer {
-    background-color: #e0e4d4;
-    border-top: 1px solid #cad0b5;
+    background-color: $footer-bg-color;
+    border-top: 1px solid $border-color;
     padding: 1.5em 0 4.5em;
 }
 #page-footer ul {
@@ -343,7 +347,7 @@ header.section-contents h1 {
     font-size: 1em;
     margin: 0;
     padding: .6em 0 .55em .8em;
-    background-color: #eff1e9;
+    background-color: $general-bg-color;
     -webkit-border-top-left-radius: 4px;
     -moz-border-radius-topleft: 4px;
     border-top-left-radius: 4px;
@@ -352,7 +356,7 @@ header.section-contents h1 {
     border-bottom-left-radius: 4px;
 }
 article .section-container {
-    background-color: #fff;
+    background-color: $white;
     margin-left: 13em;
     padding: .6em 1.2em 1.2em;
     -webkit-border-radius: 4px;
@@ -365,8 +369,8 @@ article .section-container {
 header.section-contents h1,
 article .section-container,
 .card {
-    border-top: 1px solid #e8eadf;
-    border-bottom: 1px solid #cad0b5;
+    border-top: 1px solid $border-lighter-color;
+    border-bottom: 1px solid $border-color;
 }
 .card {
     display: block;
@@ -374,13 +378,13 @@ article .section-container,
     margin: 0;
     padding: 0;
     text-decoration: none;
-    background-color: #e0e4d4;
+    background-color: $general-bg-darker-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
 }
 .card:hover {
-    color: #111;
+    color: $grey-darkest;
 }
 .card .caption {
     font-size: 1em;
@@ -396,7 +400,7 @@ article .section-container,
     white-space: nowrap;
 }
 .card:hover .more {
-    color: #f55b2c;
+    color: $brand-primary-bg-color;
 }
 .card-container .card {
     margin-bottom: 1.5em;
@@ -450,7 +454,7 @@ article .section-container,
     font-size: .83em;
     font-weight: bold;
     padding: .33em 0;
-    border-top: 1px solid #E8EADF;
+    border-top: 1px solid $border-lighter-color;
 }
 
 section {
@@ -596,9 +600,9 @@ aside#facets {
 }
 
 .zoom-to-layer {
-    background-color: #a1d0c6;
+    background-color: $brand-secondary-lightest-color;
     text-decoration: none;
-    color: #888;
+    color: $grey-darker;
     margin-left: .67em;
     padding: .33em .4em;
     font-size: .9em;
@@ -610,8 +614,8 @@ aside#facets {
 }
 .zoom-to-layer.active,
 .zoom-to-layer:hover {
-    background-color: #1a9d95;
-    color: #fff;
+    background-color: $brand-secondary-color;
+    color: $white;
 }
 
 #address-search-content.no-map .zoom-to-layer, #address-search-content.no-map .no-map-hide {
@@ -623,11 +627,11 @@ aside#facets {
 }
 #cover-profile article {
     margin-top: 3em;
-    background-color: #fff;
+    background-color: $white;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
-    border: 1px solid #02aeab;
+    border: 1px solid $text-highlight-color;
     padding: .67em 1.25em .33em;
 }
 #cover-profile ul {
@@ -694,10 +698,10 @@ aside#facets {
     padding: 2.5em 0;
 }
 .white-stripe {
-    background-color: #fff;
+    background-color: $white;
 }
 .tan-stripe {
-    background-color: #eff1e9;
+    background-color: $general-bg-color;
 }
 h1.article-header {
     font-size: 3em;
@@ -749,7 +753,7 @@ h1.article-header-right {
     display: inline-block;
     height: 2.6em;
     font-size: 1.3em;
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: $font-family;
 }
 
 #profile #query-topic-picker input,
@@ -815,7 +819,7 @@ h1.article-header-right {
     font-style: italic;
 }
 .or {
-    font-family: "Merriweather", Georgia, serif;
+    font-family: $font-family-secondary;
     font-size: 1.1em;
     line-height: 1;
     padding: .7em 0;
@@ -841,10 +845,10 @@ h1.article-header-right {
     text-align: center;
     width: 28px;
     height: 28px;
-    font-size: 14px;
+    font-size: $font-size-base;
     line-height: 28px;
-    color: #fff;
-    background-color: #014948;
+    color: $white;
+    background-color: $brand-secondary-darkest-color;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
@@ -855,9 +859,9 @@ h1.article-header-right {
 }
 .tag {
     text-transform: uppercase;
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: $font-family;
     font-style: normal;
-    color: #fff;
+    color: $white;
     font-size: .8em;
     padding: .15em .33em;
     background-color: #555c3b;
@@ -885,18 +889,18 @@ h1.article-header-right {
 /* STATS */
 .stat {
     width: 100%;
-    color: #111;
+    color: $grey-darkest;
     margin: 0;
     padding: 0;
 }
 .stat:hover {
-    color: #111;
+    color: $grey-darkest;
 }
 .context,
 .context-phrases {
     font-size: .9em;
     font-weight: 500;
-    color: #777;
+    color: $grey-darker;
 }
 .data-drawer.grid {
     font-size: .83em;
@@ -993,7 +997,7 @@ h1.article-header-right {
     font-size: .8em;
 }
 .stat-row {
-    border-top: 1px solid #eff1e9;
+    border-top: 1px solid $general-bg-color;
     padding-top: 2em;
 }
 .stat-row.grouped-row {
@@ -1010,24 +1014,24 @@ h1.article-header-right {
     position: relative;
 }
 .svg-map .outline {
-    fill: #f7f8f3;
-    stroke: #cad0b5;
+    fill: $general-bg-lighter-color;
+    stroke: $border-color;
     stroke-width: 1.5px;
 }
 .svg-map .feature,
 .svg-map .point {
     stroke: #001b1b;
-    fill: #014948;
+    fill: $brand-secondary-darkest-color;
 }
 .svg-map .mesh {
     fill: none;
-    stroke: #fff;
+    stroke: $white;
     stroke-width: .5px;
     stroke-linejoin: round;
 }
 .svg-map .geographies {
     fill: #e5e5e5;
-    stroke: #fff;
+    stroke: $white;
     stroke-linejoin: round;
 }
 .push-right {
@@ -1052,11 +1056,11 @@ h1.article-header-right {
     z-index: 49;
     top: 10px;
     left: 10px;
-    background-color: #fff;
+    background-color: $white;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
-    border: 1px solid #014948;
+    border: 1px solid $brand-secondary-darkest-color;
     width: 450px;
     overflow-y: auto;
 }
@@ -1148,7 +1152,7 @@ h1.article-header-right {
 }
 .leaflet-label.hovercard {
     font-size: 13px;
-    font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: $font-family;
     padding: .83em 1em;
 }
 
@@ -1181,7 +1185,7 @@ ul.quantile-legend span.quantile-label {
 .map-layer path {
     fill: #000;
     fill-opacity: .2;
-    stroke: #fff;
+    stroke: $white;
     stroke-width: 1.5px;
 }
 
@@ -1191,10 +1195,10 @@ table {
     font-size: .8em;
 }
 thead {
-    border-bottom: 1px solid #d9ddca;
+    border-bottom: 1px solid $border-color;
 }
 th {
-    background-color: #eff1e9;
+    background-color: $general-bg-color;
     min-width: 7em;
     vertical-align: bottom;
 }
@@ -1229,7 +1233,7 @@ tr:hover td,
 tr.highlight td,
 .grid .highlight,
 .grid .hover {
-    background-color: #e0e4d4;
+    background-color: $general-bg-darker-color;
 }
 table .percentage, table .raw-number {
     display: block
@@ -1296,11 +1300,11 @@ select,
 .select-wrapper,
 .filter-group,
 .item-chosen {
-    background-color: #fff;
+    background-color: $white;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    border: 1px solid #cad0b5;
+    border: 1px solid $border-color;
     height: 2.2em;
     line-height: 1em;
     padding: .5em;
@@ -1337,7 +1341,7 @@ form select {
     top: 0;
     right: 0;
     padding: .5em .5em .25em;
-    background-color: #fff;
+    background-color: $white;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -1395,8 +1399,8 @@ h3.item-chosen-title {
     border-radius: 4px;
 }
 .filter-list a.option-selected {
-    color: #fff;
-    background-color: #014948;
+    color: $white;
+    background-color: $brand-secondary-darkest-color;
 }
 .filter-list {
     list-style: none;
@@ -1442,7 +1446,7 @@ p.filter-list a {
     text-transform: uppercase;
     font-size: .75em;
     font-weight: bold;
-    color: #aaa;
+    color: $text-muted-color;
 }
 .select2-result:hover .topic-type {
     color: #eee;
@@ -1495,7 +1499,7 @@ textarea#results {
     text-decoration: underline;
 }
 .tool-group a:hover {
-    color: #f55b2c;
+    color: $brand-primary-bg-color;
 }
 .tool-group .filter-list a {
     text-decoration: none;
@@ -1520,7 +1524,7 @@ textarea#results {
 }
 .tool-group .label {
     font-size: 1em;
-    color: #aaa;
+    color: $text-muted-color;
     font-weight: bold;
 }
 
@@ -1530,7 +1534,7 @@ textarea#results {
 .item-chosen,
 .item-choices {
     position: relative;
-    background-color: #fff;
+    background-color: $white;
 }
 .item-choices {
     max-height: 200px;
@@ -1580,10 +1584,10 @@ ul.toggle-set li {
     position: relative;
 }
 .toggle-set a {
-    background-color: #a1d0c6;
-    border-bottom: 1px solid #67b3a3;
+    background-color: $brand-secondary-lightest-color;
+    border-bottom: 1px solid $brand-secondary-darker-color;
     text-decoration: none;
-    color: #888;
+    color: $grey-darker;
     margin-right: 1px;
 }
 .toggle-set a,
@@ -1614,12 +1618,12 @@ ul.toggle-set li {
 .toggle-set a.active,
 .toggle-set a:hover,
 .toggle-set a.hovered {
-    background-color: #1a9d95;
-    color: #fff;
+    background-color: $brand-secondary-color;
+    color: $white;
 }
 .toggle-set a.unhovered {
-    background-color: #a1d0c6;
-    color: #888;
+    background-color: $brand-secondary-lightest-color;
+    color: $grey-darker;
 }
 ul.toggle-set .toggle-sub-group a:hover {
     -webkit-border-bottom-right-radius: 0;
@@ -1627,20 +1631,20 @@ ul.toggle-set .toggle-sub-group a:hover {
     border-bottom-right-radius: 0;
 }
 .toggle-sub-group a:hover {
-    color: #1a9d95;
+    color: $brand-secondary-color;
 }
 ul.sub-group {
     display: none;
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: #fff;
+    background-color: $white;
     width: 100%;
     z-index: 99;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    border: 1px solid #e8eadf;
+    border: 1px solid $border-lighter-color;
 }
 ul.sub-group li,
 ul.sub-group a {
@@ -1667,132 +1671,23 @@ ul.sub-group li:last-child a {
 ul.sub-group a {
     text-decoration: none;
     padding: .33em .5em;
-    border-bottom: 1px solid #e8eadf;
+    border-bottom: 1px solid $border-lighter-color;
 }
 ul.sub-group a:hover {
     text-decoration: none;
     padding: .33em .5em;
-    color: #fff;
-    background-color: #1a9d95;
-    border-color: #1a9d95;
-}
-
-/* CHARTS */
-
-section.coal-chart-container {
-    padding: 2em 0 4em;
-    margin-bottom: 0;
-}
-section.chart-divider {
-    margin: 1em 0 0;
-    padding: 0.6em 0.75em;
-    background-color: #f7f8f3;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    border-top: 1px solid #e8eadf;
-    border-bottom: 1px solid #cad0b5;
-}
-section.chart-divider h2 {
-    margin: 0;
-    line-height: 1;
-}
-.coal-chart-container h2 {}
-.coal-chart {
-    list-style: none;
-    position: relative;
-    height: 10px;
-    border-bottom: 1px solid #e5e5e5;
-    margin: 0 1.5em;
-}
-.coal-chart li {
-    display: inline;
-    position: absolute;
-    bottom: -6px;
-    margin-left: -5px;
-}
-.coal-chart li .point {
-    display: block;
-    cursor: pointer;
-    position: relative;
-    height: 11px;
-    width: 11px;
-    color: #222;
-    background-color: #eff1e9;
-    border: 1px solid #acb58c;
-    -webkit-border-radius: 50%;
-    -moz-border-radius: 50%;
-    border-radius: 50%;
-}
-.coal-chart li .point:hover,
-.coal-chart li .point.hovered {
-    background-color: #42472e;
-    border-color: #42472e;
-    z-index: 3;
-}
-.coal-chart li .point.selected {
-    background-color: #027b7a;
-    border-color: #027b7a;
-    z-index: 2;
-}
-.coal-chart li .point.selected.hovered {
-    z-index: 4;
-}
-.coal-chart li .point .hovercard {
-    position: absolute;
-    width: 15em;
-    bottom: 1.5em;
-    right: -7.5em;
-    font-size: .83em;
-    line-height: 1.3;
-    text-align: center;
-    display: none;
-    padding: .5em;
-    border: 1px solid #e0e0e0;
-    pointer-events: auto;
-}
-.coal-chart li .point:hover .hovercard,
-.coal-chart li .point.hovered .hovercard,
-.coal-chart li .point.selected .hovercard {
-    display: block;
-    background-color: #fff;
-}
-.coal-chart li.tick-mark {
-    height: 26px;
-    bottom: -13px;
-    margin-left: 0;
-    border-left: 1px solid #d5d5d5;
-}
-.coal-chart li.tick-mark.tick-mark-min {
-    left: 0;
-}
-.coal-chart li.tick-mark.tick-mark-max {
-    left: 100%;
-}
-.coal-chart li.tick-mark span {
-    position: relative;
-    font-size: .75em;
-    display: block;
-    color: #606060;
-    padding: 0;
-    margin-top: 26px;
-    margin-left: -50%;
-    white-space: nowrap;
-}
-.coal-chart li.tick-mark-min span {
-    margin-left: -1px;
-}
-.coal-chart li.tick-mark-max span {
-    margin-left: -99%;
+    color: $white;
+    background-color: $brand-secondary-color;
+    border-color: $brand-secondary-color;
 }
 
 .placeholder {
     background-color: #f5f5f5;
-    color: #777;
+    color: $grey-darker;
     text-align: center;
     height: 200px;
     padding-top: 75px;
-    border: 1px solid #777;
+    border: 1px solid $grey-darker;
 }
 
 .comparison-builder {
@@ -1808,13 +1703,13 @@ section.chart-divider h2 {
 .change-button,
 .go-button,
 .action-button {
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: $font-family;
     line-height: 1;
     cursor: pointer;
     text-align: center;
     padding: .7em 0;
-    background-color: #1a9d95;
-    color: #fff;
+    background-color: $brand-secondary-color;
+    color: $white;
     text-decoration: none;
     font-size: 1.2em;
     -webkit-border-radius: 4px;
@@ -1831,8 +1726,8 @@ section.chart-divider h2 {
 }
 .change-button:hover,
 .action-button:hover {
-    background-color: #f55b2c;
-    color: #fff;
+    background-color: $brand-primary-bg-color;
+    color: $brand-primary-fg-color;
 }
 
 #topic-picker [class^="column-"],
@@ -1858,7 +1753,7 @@ section.chart-divider h2 {
     margin-bottom: 1em;
 }
 #query-builder-bar h4 {
-    color: #aaa;
+    color: $text-muted-color;
     margin-bottom: .5em;
 }
 
@@ -1888,8 +1783,8 @@ section.chart-divider h2 {
     text-align: center;
     height: 31px;
     padding: .5em 0 0;
-    background-color: #fff;
-    border: 1px solid #cad0b5;
+    background-color: $white;
+    border: 1px solid $border-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -1913,20 +1808,20 @@ section.chart-divider h2 {
 #query-builder-bar .query-chosen.hovered,
 #query-builder-bar .query-chosen.go,
 .go-button {
-    border-color: #014948;
-    background-color: #014948;
-    color: #fff;
+    border-color: $brand-secondary-darkest-color;
+    background-color: $brand-secondary-darkest-color;
+    color: $white;
     font-weight: 400;
 }
 #query-builder-bar .query-chosen.go,
 .go-button {
-    border-color: #f55b2c;
-    background-color: #f55b2c;
+    border-color: $brand-primary-bg-color;
+    background-color: $brand-primary-bg-color;
 }
 #query-builder-bar .query-chosen.go:hover,
 .go-button:hover {
-    border-color: #f54814;
-    background-color: #f54814;
+    border-color: $brand-primary-bg-color;
+    background-color: $brand-primary-bg-color;
 }
 #query-builder-bar .query-chosen.tabbed {
     -webkit-border-bottom-right-radius: 0;
@@ -1963,7 +1858,7 @@ section.chart-divider h2 {
     cursor: default;
     border-color: #baccc9;
     background-color: #baccc9;
-    color: #fff;
+    color: $white;
 }
 
 #query-builder-bar section[id$="-picker"] {
@@ -1971,11 +1866,11 @@ section.chart-divider h2 {
     top: 30px;
     left: 0;
     width: 100%;
-    background-color: #fff;
+    background-color: $white;
     display: none;
     z-index: 99;
     padding: 2% 0 2% 2%;
-    border: 1px solid #001716;
+    border: 1px solid $grey-darkest;
     -webkit-border-bottom-right-radius: 4px;
     -webkit-border-bottom-left-radius: 4px;
     -moz-border-radius-bottomright: 4px;
@@ -1994,17 +1889,17 @@ section.chart-divider h2 {
 .release-option a {
     text-decoration: none;
     padding: .33em 1em;
-    background-color: #eff1e9;
-    border-top: 1px solid #e8eadf;
-    border-bottom: 1px solid #cad0b5;
+    background-color: $general-bg-color;
+    border-top: 1px solid $border-lighter-color;
+    border-bottom: 1px solid $border-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
 }
 .release-option a:hover,
 .release-option a.active {
-    background-color: #d9ddca;
-    color: #111;
+    background-color: $border-color;
+    color: $grey-darkest;
 }
 .release-option a.disabled {
     cursor: default;
@@ -2049,7 +1944,7 @@ section.chart-divider h2 {
     margin-bottom: 0;
 }
 .glossary-term {
-    border-bottom: 1px dashed #777;
+    border-bottom: 1px dashed $grey-darker;
     cursor: help;
 }
 #glossary header,
@@ -2064,15 +1959,15 @@ section.chart-divider h2 {
     float: right;
     margin: 0 0 2em 2em;
     padding: 1em;
-    background-color: #fff;
+    background-color: $white;
     -webkit-border-bottom-right-radius: 4px;
     -webkit-border-bottom-left-radius: 4px;
     -moz-border-radius-bottomright: 4px;
     -moz-border-radius-bottomleft: 4px;
     border-bottom-right-radius: 4px;
     border-bottom-left-radius: 4px;
-    border-top: 1px solid #e8eadf;
-    border-bottom: 1px solid #cad0b5;
+    border-top: 1px solid $border-lighter-color;
+    border-bottom: 1px solid $border-color;
 }
 #glossary aside h3,
 .topic aside h3 {
@@ -2108,7 +2003,7 @@ dd {
 }
 .topic table {
     font-size: 1em;
-    background-color: #fff;
+    background-color: $white;
     margin: 2em 0;
 }
 .topic table td {
@@ -2170,8 +2065,8 @@ dd {
 }
 
 code, pre {
-    font-family: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal;
-    font-size: 14px;
+    font-family: $font-family-monospace;
+    font-size: $font-size-base;
 }
 code {
     background-color: #f7f7f7;
@@ -2269,7 +2164,7 @@ dl#racial-iteration dt {
     width: 100%;
     margin-top: 2px;
     padding: 0;
-    background-color: #fff;
+    background-color: $white;
     border: 1px solid #ccc;
     *border-right-width: 2px;
     *border-bottom-width: 2px;
@@ -2281,8 +2176,8 @@ dl#racial-iteration dt {
     font-size: 1.2em;
     padding: .83em;
     margin-bottom: 0;
-    background-color: #014948;
-    color: #fff;
+    background-color: $brand-secondary-darkest-color;
+    color: $white;
 }
 .tt-suggestion {
   display: block;
@@ -2292,8 +2187,8 @@ dl#racial-iteration dt {
 }
 
 .tt-suggestion.tt-cursor {
-  color: #fff;
-  background-color: #027b7a;
+  color: $white;
+  background-color: $brand-secondary-darker-color;
   cursor: pointer;
 }
 
@@ -2364,7 +2259,7 @@ aside .search .result-type {
 /* !importants make me a little sad, but they're better than monkey-patching third-party code */
 .twitter-typeahead .tt-query,
 .twitter-typeahead .tt-hint {
-    background-color: #fff !important;
+    background-color: $white !important;
     margin-bottom: 0;
 }
 .autocomplete-widget .tt-dropdown-menu {
@@ -2387,13 +2282,13 @@ aside .search .result-type {
 
 .location-list a {
     text-decoration: none;
-    background-color: #fff;
+    background-color: $white;
     display: block;
     font-weight: bold;
     padding: .67em .2em;
 }
 .location-list a:hover {
-    color: #f55b2c;
+    color: $brand-primary-bg-color;
 }
 .location-list .identifier {
     float: right;
@@ -2404,7 +2299,7 @@ aside .search .result-type {
     margin-left: .67em;
 }
 .location-list a:hover .identifier {
-    color: #111;
+    color: $grey-darkest;
 }
 
 #body-spinner {
@@ -2438,14 +2333,14 @@ aside .search .result-type {
 }
 .message-help {
     padding: .67em 1em;
-    background-color: #fff;
-    border: 1px solid #e0e4d4;
+    background-color: $white;
+    border: 1px solid $general-bg-darker-color;
 }
 blockquote {
     margin: 1em 0 2em;
     padding: 1em;
-    background-color: #fff;
-    border: 1px solid #CAD0B5;
+    background-color: $white;
+    border: 1px solid $border-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -2482,7 +2377,7 @@ blockquote {
 }
 .inactive,
 .inactive a {
-    color: #aaa;
+    color: $text-muted-color;
 }
 .clear {
     clear: both;
@@ -2847,4 +2742,11 @@ blockquote {
     h1.article-header {
         font-size: 2.2em;
     }
+}
+
+// grid overrides
+.g_HR {
+    border: 0px solid $border-color;
+    border-bottom-width: 1px;
+    background-color: $general-bg-color;
 }

@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "dokku": {
+      "predeploy": "python manage.py compilescss && python manage.py collectstatic --noinput && rm -rf /var/tmp/wazimap_cache"
+    }
+  }
+}

@@ -26,10 +26,10 @@ uncomment for separate inclusion into embed iframes */
     padding: 1em 0 0;
     margin: 0;
     overflow: hidden;
-    background-color: #fff;
+    background-color: $white;
     line-height: 1.4;
-    font-size: 14px;
-    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: $font-size-base;
+    font-family: $font-family;
 }
 .census-chart-embed #census-chart {
     padding: 0 1em;
@@ -301,9 +301,9 @@ uncomment for separate inclusion into embed iframes */
     margin-top: 1.5em !important;
     padding: 3px 2px 0px 0px;
     overflow-x: visible;
-    background-color: #f7f8f3;
-    border: 1px solid #eff1e9;
-    border-bottom-color: #cad0b5;
+    background-color: $background-bg-color;
+    border: 1px solid $tan;
+    border-bottom-color: $border-color;
 }
 #profile .data-drawer h3 a {
     float: right;
@@ -311,13 +311,13 @@ uncomment for separate inclusion into embed iframes */
     margin-right: 1px;
 }
 #profile .data-drawer th {
-    border-left: 5px solid #f7f8f3;
+    border-left: 5px solid $background-bg-color;
 }
 #profile .data-drawer a {
-    color: #02aeab;
+    color: $link-active-color;
 }
 #profile .data-drawer a:hover {
-    color: #014948;
+    color: $link-color;
 }
 
 .embed-footer {
@@ -327,7 +327,7 @@ uncomment for separate inclusion into embed iframes */
     padding-top: 1em;
 }
 .embed-footer a {
-    color: #68b3a3;
+    color: $link-color;
     text-decoration: none;
 }
 .embed-footer a.title {
@@ -336,8 +336,8 @@ uncomment for separate inclusion into embed iframes */
     font-weight: bold;
 }
 .embed-footer a:hover {
-    color: #014948;
-    border-color: #68b3a3;
+    color: $link-active-color;
+    border-color: $border-color;
 }
 .embed-footer img {
     height: 12px;
@@ -366,7 +366,7 @@ uncomment for separate inclusion into embed iframes */
 }
 .action-links {
     float: right;
-    color: #68b3a3;
+    color: $link-color;
     margin-top: -5px;
 }
 .action-links.tool-group {
@@ -374,10 +374,10 @@ uncomment for separate inclusion into embed iframes */
 }
 .action-links a {
     cursor: pointer;
-    color: #68b3a3;
+    color: $link-color;
 }
 .action-links a:hover {
-    color: #014948;
+    color: $brand-secondary-darkest-color;
 }
 
 .box-header img {
@@ -477,7 +477,7 @@ uncomment for separate inclusion into embed iframes */
     margin: 0 0 .5em;
 }
 .flippant-back a {
-    color: #014948;
+    color: $link-color;
 }
 
 section.coal-chart-container {
@@ -487,12 +487,12 @@ section.coal-chart-container {
 section.chart-divider {
     margin: 1em 0 0;
     padding: 0.6em 0.75em;
-    background-color: #f7f8f3;
+    background-color: $background-bg-color;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    border-top: 1px solid #e8eadf;
-    border-bottom: 1px solid #cad0b5;
+    border-top: 1px solid $border-lighter-color;
+    border-bottom: 1px solid $border-color;
 }
 section.chart-divider h2 {
     margin: 0;
@@ -518,8 +518,8 @@ section.chart-divider h2 {
     position: relative;
     height: 11px;
     width: 11px;
-    color: #222;
-    background-color: #eff1e9;
+    color: $grey-darkest;
+    background-color: $tan;
     border: 1px solid #acb58c;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
@@ -527,19 +527,19 @@ section.chart-divider h2 {
 }
 .coal-chart li .point:hover,
 .coal-chart li .point.hovered {
-    background-color: #42472e;
-    border-color: #42472e;
+    background-color: $grey-darker;
+    border-color: $grey-darker;
     z-index: 3;
 }
 .coal-chart li .point.selected {
-    background-color: #027b7a;
-    border-color: #027b7a;
+    background-color: $brand-secondary-darker-color;
+    border-color: $brand-secondary-darker-color;
     z-index: 2;
 }
-.coal-chart li .pointz.selected.hovered {
+.coal-chart li .point.selected.hovered {
     z-index: 4;
 }
-.coal-chart li a .hovercard {
+.coal-chart li .point .hovercard {
     position: absolute;
     width: 15em;
     bottom: 1.5em;
@@ -550,12 +550,13 @@ section.chart-divider h2 {
     display: none;
     padding: .5em;
     border: 1px solid #e0e0e0;
+    pointer-events: auto;
 }
 .coal-chart li .point:hover .hovercard,
 .coal-chart li .point.hovered .hovercard,
 .coal-chart li .point.selected .hovercard {
     display: block;
-    background-color: #fff;
+    background-color: $white;
 }
 .coal-chart li.tick-mark {
     height: 26px;

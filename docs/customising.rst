@@ -37,3 +37,21 @@ If you reload your site you'll see the homepage has your new content. Django use
 relying on Wazimap for the blocks you don't override.
 
 .. seealso:: There's more information on changing profile page template in :ref:`profiles`.
+
+Changing CSS theme
+------------------
+
+In addition to providing your own CSS files by overriding the templates, you can also override the
+SCSS variables that control the Wazimap colour scheme (theme). This is the fastest and easiest
+way to match Wazimap's colours to your brand.
+
+.. note:: If you customise the CSS using this method, you MUST call ``python manage.py compilescss`` before running ``collectstatic`` when you deploy your application.
+
+Create a new file in your project called ``static/css/_custom.scss``. In it, override the `default Wazimap colour variables <https://github.com/Code4SA/wazimap/blob/master/wazimap/static/css/_variables.scss>`.
+
+These are the most important ones:
+
+* ``$brand-primary-color``: a bright primary colour
+* ``$brand-secondary-color``: a darker, secondary colour. Variations on this colour are used throughout the site.
+* ``$brand-secondary-{lightest, lighter, darkest, darker}-color``: lighter and darker shades of the secondary colour. We recommend simply lightening or darkening your ``$brand-secondary-color`` by 10% and 20%.
+* ``$general-bg-color`` and ``$general-bg-{lightest, lighter, darkest, darker}-color``: general background colours and lighter and darker shades. We recommend simply lightening or darkening your ``$general-bg-color`` by 10% and 20%.
