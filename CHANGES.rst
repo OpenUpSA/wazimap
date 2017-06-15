@@ -16,6 +16,7 @@ This release of Wazimap introduces some backwards compatible changes.
 * FIX: load streetmap tiles over https if necessary
 * FEATURE: site menu
 * FEATURE: use SCSS stylesheets, support customising using SCSS variables.
+* Attribution updates to reflect OpenUp, the new name for Code for South Africa.
 
 0.8.2 (20 April 2017)
 ---------------------
