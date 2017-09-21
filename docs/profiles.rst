@@ -73,7 +73,7 @@ The Profile Page Template
 
 You need to tell Wazimap how to display your stats on a place's profile page. 
 
-The file you want to override is ``templates/profile/profile_detail.html``, you can `see what it looks like in the repo <https://github.com/Code4SA/wazimap/blob/master/wazimap/templates/profile/profile_detail.html>`_. You generally only need to change the ``profile_detail`` block.
+The file you want to override is ``templates/profile/profile_detail.html``, you can `see what it looks like in the repo <https://github.com/OpenUpSA/wazimap/blob/master/wazimap/templates/profile/profile_detail.html>`_. You generally only need to change the ``profile_detail`` block.
 
 Create a new file in your project called ``templates/profile/profile_detail.html`` that extends the existing template and provides
 your new content for the ``profile_detail`` block::
@@ -91,7 +91,7 @@ the original file for more ideas.
 .. seealso:: There's more information on changing Wazimap templates in :ref:`customising`.
 
 You must still provide the content that goes into each stats block. The easiest right now is to see how other countries do it, such as
-`South Africa's default census profile <https://github.com/Code4SA/wazimap-za/blob/master/wazimap_za/templates/profile/profile_detail_census.html>`_.
+`South Africa's default census profile <https://github.com/OpenUpSA/wazimap-za/blob/master/wazimap_za/templates/profile/profile_detail_census.html>`_.
 
 Profile Page Charts
 -------------------

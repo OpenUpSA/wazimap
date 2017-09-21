@@ -16,7 +16,7 @@ Wazimap builds on Censusreporter and makes it easier to re-use. Wazimap was orig
 `OpenUp <https://openup.org.za>`_ with the support of `Media Monitoring Africa <http://www.mediamonitoringafrica.org/>`_.
 It is maintained by OpenUp.
 
-* Wazimap is on GitHub at `github.com/Code4SA/wazimap <https://github.com/Code4SA/wazimap>`_.
+* Wazimap is on GitHub at `github.com/OpenUpSA/wazimap <https://github.com/OpenUpSA/wazimap>`_.
 * Wazimap is on Twitter as `@Wazimap <https://twitter.com/@Wazimap>`_.
 
 Sites using Wazimap

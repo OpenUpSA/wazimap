@@ -17,7 +17,7 @@ Deploying on Heroku or Dokku
 .. seealso::
 
     You can find example of the files necessary to deploy on Dokku or Heroku
-    in the `Wazimap deploy <https://github.com/Code4SA/wazimap/tree/master/deploy>`_ directory.
+    in the `Wazimap deploy <https://github.com/OpenUpSA/wazimap/tree/master/deploy>`_ directory.
 
 To deploy on Heroku on Dokku, create your application in the normal way. Then set these config variables:
 
@@ -60,7 +60,7 @@ Add Wazimap and Django as dependencies for your project in your ``requirements.t
     wazimap[gdal]
     Django==1.9.2
 
-Copy `Wazimap's ``app.json``<https://github.com/Code4SA/wazimap/blob/master/wazimap/static/css/_variables.scss>` into your project: ::
+Copy `Wazimap's ``app.json``<https://github.com/OpenUpSA/wazimap/blob/master/wazimap/static/css/_variables.scss>` into your project: ::
 
     {
       "scripts": {
