@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load sass_tags %}
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
@@ -11,10 +12,9 @@
         <meta name="description" content="{% block head_meta_description %}{% endblock %}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {% block head_css %}
-        <link rel="stylesheet" href="{{ STATIC_URL }}css/vendor/normalize.min.css">
-        <link rel="stylesheet" href="{% static 'css/app.css' %}">
-        <link rel="stylesheet" href="{% static 'css/wazimap.css' %}">
-        {% block head_css_extra %}{% endblock %}{% endblock head_css %}
+        <link rel="stylesheet" href="{% sass_src 'css/wazimap.scss' %}">
+        {% endblock head_css %}
+        {% block head_css_extra %}{% endblock %}
         {% block head_javascript %}
         <script src="//cdn.jsdelivr.net/g/modernizr@2.7,respond@1.4"></script>
         {% block head_javascript_extra %}{% endblock %}{% endblock %}
@@ -58,6 +58,12 @@
                     {% endblock %}
                     {{ WAZIMAP.name }}
                 </a>
+                <ul id="site-menu">
+                    {% block header_menu %}
+                    <li><a href="/about">About</a></li>
+                    {% endblock header_menu %}
+                </ul>
+
                 {% if not hide_nav_tools %}
                     {% block nav_tools %}
                     <div id="menu" class="tool-set clearfix">
@@ -109,7 +115,7 @@
 
             <section class="wrapper clearfix">
                 <p class="attribution">
-                {{ WAZIMAP.name }} is built on <a href="http://wazimap.readthedocs.org/">Wazimap</a>, an open source platform by <a href="http://code4sa.org/">Code for South Africa</a> and <a href="http://www.mediamonitoringafrica.org/">Media Monitoring Africa</a> for making census data more understandable. Wazimap is based on <a href="https://censusreporter.org/">Census Reporter</a> which was funded by a Knight News Challenge grant.</p>
+                {{ WAZIMAP.name }} is built on <a href="http://wazimap.readthedocs.org/">Wazimap</a>, an open source platform by <a href="https://openup.org.za/">OpenUp</a> and <a href="http://www.mediamonitoringafrica.org/">Media Monitoring Africa</a> for making census data more understandable. Wazimap is based on <a href="https://censusreporter.org/">Census Reporter</a> which was funded by a Knight News Challenge grant.</p>
             </section>
         </footer>
         {% endblock body %}

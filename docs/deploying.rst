@@ -25,6 +25,7 @@ To deploy on Heroku on Dokku, create your application in the normal way. Then se
 * ``DJANGO_SECRET_KEY=<a random secret key>``
 * ``DJANGO_DEBUG=False``
 * ``DJANGO_SETTINGS_MODULE=<your settings module>``
+* ``DISABLE_COLLECTSTATIC=1=``
 
 You'll need a Procfile, too: ::
 
@@ -58,6 +59,16 @@ Add Wazimap and Django as dependencies for your project in your ``requirements.t
 
     wazimap[gdal]
     Django==1.9.2
+
+Copy `Wazimap's ``app.json``<https://github.com/Code4SA/wazimap/blob/master/wazimap/static/css/_variables.scss>` into your project: ::
+
+    {
+      "scripts": {
+        "dokku": {
+          "predeploy": "python manage.py compilescss && python manage.py collectstatic --noinput && rm -rf /var/tmp/wazimap_cache"
+        }
+      }
+    }
 
 Finally, just use ``git push heroku`` or ``git push dokku master`` to deploy as you usually would.
 

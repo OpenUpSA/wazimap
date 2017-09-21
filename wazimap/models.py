@@ -18,6 +18,7 @@ class GeoMixin(object):
             'child_level': self.child_level,
             'parent_geoid': self.parent_geoid,
             'square_kms': self.square_kms,
+            'version': self.version,
         }
 
     def as_dict_deep(self):
@@ -31,7 +32,8 @@ class GeoMixin(object):
         """
         return self.__class__.objects\
             .filter(parent_level=self.geo_level,
-                    parent_code=self.geo_code)\
+                    parent_code=self.geo_code,
+                    version=self.version)\
             .all()
 
     def split_into(self, level):
@@ -92,14 +94,14 @@ class GeographyBase(models.Model, GeoMixin):
     #: The code for this geography which must be unique for this level.
     #: Together with `geo_level`, this makes up the unique geo id.
     geo_code = models.CharField(max_length=10, null=False)
+    #: Demarcation version of this geography. (advanced).
+    version = models.CharField(max_length=100, db_index=True, null=False, default='')
 
     #: Name of this geography.
     name = models.CharField(max_length=100, null=False, db_index=True)
     #: Long name of this geography, giving it context (such as a city or province)
     #: If this is null, it is computed based on the place's ancestors.
     long_name = models.CharField(max_length=100, null=True, db_index=True)
-    #: Year when this geography was defined. (advanced).
-    year = models.IntegerField(db_index=True, null=True)
 
     #: Area in square kilometers. Optional.
     square_kms = models.FloatField(null=True)
@@ -114,7 +116,7 @@ class GeographyBase(models.Model, GeoMixin):
 
     class Meta:
         abstract = True
-        unique_together = ('geo_level', 'geo_code')
+        unique_together = ('geo_level', 'geo_code', 'version')
 
     @property
     def parent(self):
@@ -123,7 +125,7 @@ class GeographyBase(models.Model, GeoMixin):
         """
         if not hasattr(self, '_parent'):
             if self.parent_level and self.parent_code:
-                self._parent = self.__class__.objects.filter(geo_level=self.parent_level, geo_code=self.parent_code).first()
+                self._parent = self.__class__.objects.filter(geo_level=self.parent_level, geo_code=self.parent_code, version=self.version).first()
             else:
                 self._parent = None
 

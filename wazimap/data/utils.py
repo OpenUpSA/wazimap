@@ -26,7 +26,17 @@ if settings.TESTING:
 else:
     _engine = create_engine(settings.DATABASE_URL)
 
-_metadata = MetaData(bind=_engine)
+
+# See http://docs.sqlalchemy.org/en/latest/core/constraints.html#constraint-naming-conventions
+naming_convention = {
+    "ix": 'ix_%(column_0_label)s',
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s"
+}
+
+_metadata = MetaData(bind=_engine, naming_convention=naming_convention)
 _Session = sessionmaker(bind=_engine)
 
 
@@ -252,23 +262,25 @@ def group_remainder(data, num_items=4, make_percentage=True,
                                         for k, v in values['numerators'].iteritems())
 
 
-def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, order_by=None,
+def get_objects_by_geo(db_model, geo, session, fields=None, order_by=None,
                        only=None, exclude=None, data_table=None):
-    """ Get rows of statistics from the stats mode +db_model+ at a particular
-    geo_code and geo_level, summing over the 'total' field and grouping by
-    +fields+. Filters to include +only+ and ignore +exclude+, if given.
+    """ Get rows of statistics from the stats mode +db_model+ for a particular
+    geography, summing over the 'total' field and grouping by +fields+. Filters
+    to include +only+ and ignore +exclude+, if given.
     """
     data_table = data_table or db_model.data_tables[0]
 
     if fields is None:
-        fields = [c.key for c in class_mapper(db_model).attrs if c.key not in ['geo_code', 'geo_level', 'total']]
+        fields = [c.key for c in class_mapper(db_model).attrs if c.key not in ['geo_code', 'geo_level', 'geo_version', 'total']]
 
     fields = [getattr(db_model, f) for f in fields]
 
     objects = session\
         .query(func.sum(db_model.total).label('total'), *fields)\
         .group_by(*fields)\
-        .filter(db_model.geo_code == geo_code)
+        .filter(db_model.geo_code == geo.geo_code)\
+        .filter(db_model.geo_level == geo.geo_level)\
+        .filter(db_model.geo_version == geo.version)
 
     if only:
         for k, v in only.iteritems():
@@ -277,8 +289,6 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
     if exclude:
         for k, v in exclude.iteritems():
             objects = objects.filter(getattr(db_model, k).notin_(v))
-
-    objects = objects.filter(db_model.geo_level == geo_level)
 
     if order_by is not None:
         attr = order_by
@@ -299,12 +309,12 @@ def get_objects_by_geo(db_model, geo_code, geo_level, session, fields=None, orde
 
     objects = objects.all()
     if len(objects) == 0:
-        raise LocationNotFound("%s for geography '%s-%s' not found"
-                               % (db_model.__table__.name, geo_level, geo_code))
+        raise LocationNotFound("%s for geography %s version '%s' not found"
+                               % (db_model.__table__.name, geo.geoid, geo.version))
     return objects
 
 
-def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
+def get_stat_data(fields, geo, session, order_by=None,
                   percent=True, total=None, table_fields=None,
                   table_name=None, only=None, exclude=None, exclude_zero=False,
                   recode=None, key_order=None, table_dataset=None,
@@ -314,8 +324,8 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     a place's profile page, based on a statistic.
 
     It sums over the data for ``fields`` in the database for the place identified by
-    ``geo_level`` and ``geo_code`` and calculates numerators and values. If multiple
-    fields are given, it creates nested result dictionaries.
+    ``geo`` and calculates numerators and values. If multiple fields are given,
+    it creates nested result dictionaries.
 
     Control the rows that are included or ignored using ``only``, ``exclude`` and ``exclude_zero``.
 
@@ -326,8 +336,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
                    of parameters such as ``only``, ``exclude`` and ``recode`` will change.
                    These must be fields in `api.models.census.census_fields`, e.g. 'highest educational level'
     :type fields: str or list
-    :param str geo_level: the geographical level
-    :param str geo_code: the geographical code
+    :param geo: the geograhy object
     :param dbsession session: sqlalchemy session
     :param str order_by: field to order by, or None for default, eg. '-total'
     :param bool percent: should we calculate percentages, or just sum raw values?
@@ -408,8 +417,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
         if not data_table:
             ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
 
-    model = data_table.get_model(geo_level)
-    objects = get_objects_by_geo(model, geo_code, geo_level, session, fields=fields, order_by=order_by,
+    objects = get_objects_by_geo(data_table.model, geo, session, fields=fields, order_by=order_by,
                                  only=only, exclude=exclude, data_table=data_table)
 
     if total is not None and many_fields:
@@ -441,6 +449,13 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
     group_totals = {}
     grand_total = -1
 
+    def get_recoded_key(recode, field, key):
+        recoder = recode[field]
+        if isinstance(recoder, dict):
+            return recoder.get(key, key)
+        else:
+            return recoder(field, key)
+
     def get_data_object(obj):
         """ Recurse down the list of fields and return the
         final resting place for data for this stat. """
@@ -450,11 +465,7 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
             key = getattr(obj, field)
 
             if recode and field in recode:
-                recoder = recode[field]
-                if isinstance(recoder, dict):
-                    key = recoder.get(key, key)
-                else:
-                    key = recoder(field, key)
+                key = get_recoded_key(recode, field, key)
             else:
                 key = capitalize(key)
 
@@ -506,9 +517,16 @@ def get_stat_data(fields, geo_level, geo_code, session, order_by=None,
 
         if percent_grouping:
             if obj.total is not None:
-                key = tuple(getattr(obj, field) for field in percent_grouping)
-                data['_group_key'] = key
-                group_totals[key] = group_totals.get(key, 0) + obj.total
+                group_key = tuple()
+                for field in percent_grouping:
+                    key = getattr(obj, field)
+                    if recode and field in recode:
+                        # Group by recoded keys
+                        key = get_recoded_key(recode, field, key)
+                    group_key = group_key + (key,)
+
+                data['_group_key'] = group_key
+                group_totals[group_key] = group_totals.get(group_key, 0) + obj.total
 
     if grand_total == -1:
         grand_total = running_total if total is None else total

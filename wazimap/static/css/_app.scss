@@ -1,3 +1,43 @@
+#page-header-title a.title {
+  float: left;
+}
+
+ul#site-menu {
+  float: left;
+  display: block;
+  list-style: none;
+  padding: 7px 0px 0px 10px;
+  margin: 0px;
+}
+
+ul#site-menu li {
+  float: left;
+  padding-left: 20px;
+}
+
+ul#site-menu li a:hover {
+  text-decoration: underline;
+}
+
+@media only screen and (max-width: 640px) {
+  ul#site-menu {
+    display: none;
+    float: none;
+    clear: both;
+    padding: 0px;
+  }
+
+  ul#site-menu li {
+    padding: 5px 0px 0px 0px;
+    float: none;
+  }
+
+  ul#site-menu li a {
+    display: block;
+    padding: 5px 0px;
+  }
+}
+
 #homepage #slippy-map {
   display: none;
 }
@@ -154,7 +194,7 @@ header.section-contents h1 a {
 }
 
 .head2head-wrapper {
-  background-color: #e0e4d4;
+  background-color: $footer-bg-color;
 }
 
 .profile-head2head-view #uvTab {

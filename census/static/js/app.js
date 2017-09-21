@@ -3,6 +3,7 @@ jQuery.support.cors = true;
 // navigation menu
 $('#menu-toggle').on('click', function() {
     $('#menu').slideToggle(150);
+    $('#site-menu').slideToggle(150);
 })
 
 // make table rows highlight-able. Not ideal to attach listener to `body`

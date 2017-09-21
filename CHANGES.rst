@@ -1,7 +1,24 @@
 Wazimap Version History
 =======================
 
-0.8.2 (? April 2017)
+1.0.0 (21 September 2017)
+-------------------------
+
+This release of Wazimap introduces some backwards compatible changes.
+
+* Support versioned geographies.
+* BREAKING: The Geography model has changed. You must run ``python manage.py migrate`` when updating.
+* BREAKING: The method signature of the ``profile_builder`` function has changed. It is now called as ``get_profile(geo, profile_name, request)``. You will need to update your profile methods to work with a ``geo`` object rather than a ``level`` and a ``code``. Use ``geo.geo_level`` and ``geo.geo_code`` instead.
+* BREAKING: Some methods on the ``GeoData`` object now take a ``Geography`` object rather than a ``geo_level`` and a ``geo_code``.
+* BREAKING: The ``geography_data`` setting must include a geography version at the top of the dict. Use ``''`` by default. eg: ``{'': {'country': 'geo/country.geojson'}}``
+* Some methods on the ``GeoData`` object now take an optional ``version`` parameter.
+* A new method ``GeoData.get_comparative_geos`` makes it easier to build the profile page for comparative geographies.
+* FIX: load streetmap tiles over https if necessary
+* FEATURE: site menu
+* FEATURE: use SCSS stylesheets, support customising using SCSS variables.
+* Attribution updates to reflect OpenUp, the new name for Code for South Africa.
+
+0.8.2 (20 April 2017)
 ---------------------
 
 * Make the 'show data / embed' links for charts more visible

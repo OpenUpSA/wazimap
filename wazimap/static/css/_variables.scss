@@ -1,0 +1,68 @@
+// --- 
+// colours
+// primary brand color
+$orange: #f55b2c !default;
+
+// secondary color and shades
+$teal-lightest: #a1d0c6 !default;
+$teal-lighter: #02aeab !default; 
+$teal: #1a9d95 !default;
+$teal-darker: #027b7a !default;
+$teal-darkest: #014948 !default;
+
+$tan-lighter: #f7f8f3 !default;
+$tan: #eff1e9 !default;
+$tan-darker: #e0e4d4 !default;
+$tan-darkest: #cad0b5 !default;
+
+$grey: #aaa !default;
+$grey-darker: #777 !default;
+$grey-darkest: #222 !default;
+
+$white: #fff !default;
+
+
+// these two colours should complement each other:
+//   - primary should be bright
+//   - secondary should be darker and contrast with primary
+$brand-primary-color: $orange !default;
+$brand-primary-fg-color: $white !default;
+$brand-primary-bg-color: $brand-primary-color !default;
+
+$brand-secondary-lightest-color: $teal-lightest !default;
+$brand-secondary-lighter-color: $teal-lighter !default;
+$brand-secondary-color: $teal !default;
+$brand-secondary-darker-color: $teal-darker !default;
+$brand-secondary-darkest-color: $teal-darkest !default;
+
+$general-bg-lighter-color: $tan-lighter !default;
+$general-bg-color: $tan !default;
+$general-bg-darker-color: $tan-darker !default;
+$general-bg-darkest-color: $tan-darkest !default;
+
+$background-bg-color: $general-bg-lighter-color !default;
+
+$header-bg-color: $brand-secondary-darkest-color !default;
+$header-fg-color: $white !default;
+$footer-bg-color: $general-bg-darker-color !default;
+
+$border-color: $general-bg-darkest-color !default;
+$border-lighter-color: $general-bg-darker-color !default;  // often used at the top of elements with $border-color at the bottom to create a shadow effect
+
+$link-color: $brand-secondary-darkest-color !default;
+$link-active-color: $brand-secondary-lighter-color !default;
+
+$btn-active-bg-color: $brand-primary-bg-color !default;
+$btn-active-fg-color: $brand-primary-fg-color !default;
+$btn-muted-bg-color: lighten($btn-active-bg-color, 20%) !default;
+$btn-muted-fg-color: $btn-active-fg-color !default;
+
+$text-highlight-color: $brand-secondary-lighter-color !default;
+$text-muted-color: $grey !default;
+// ---
+
+// --- typography
+$font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$font-family-secondary: "Merriweather", Georgia, serif !default;
+$font-family-monospace: Monaco, "Bitstream Vera Sans Mono", "Lucida Console", Terminal !default;
+$font-size-base: 14px !default;

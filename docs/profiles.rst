@@ -22,13 +22,13 @@ Here's a simple example of a profile builder: ::
 
     from wazimap.data.utils import get_session, get_stat_data
 
-    def get_profile(geo_code, geo_level, profile_name=None):
+    def get_profile(geo, profile_name, request):
         # get a SQLAlchemy database session
         session = get_session()
         data = {}
 
         try:
-            data['demographics'] = get_demographics_profile(geo_code, geo_level, session)
+            data['demographics'] = get_demographics_profile(geo, session)
             # ... load other sections here
 
             return data
@@ -36,9 +36,9 @@ Here's a simple example of a profile builder: ::
             # tidy up the session
             session.close()
 
-    def get_demographics_profile(geo_code, geo_level, session)
+    def get_demographics_profile(geo, session)
         # get the number of people for each sex
-        sex_dist_data, total_pop = get_stat_data('sex', geo_level, geo_code, session)
+        sex_dist_data, total_pop = get_stat_data('sex', geo, session)
         return {
             'sex_distribution': sex_dist_data,
         }

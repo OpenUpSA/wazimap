@@ -73,12 +73,17 @@ set in ``settings.py`` in the ``WAZIMAP`` dict.
   and specify the `.topojson` version here. Wazimap will look for geojson equivalents
   of topojson files.
 
+  The top level of this dict MUST be the geo version. If you're not using versioned
+  geographies, use the empty string.
+
   If a level isn't specified here, Wazimap will try to find a file under the key ``''``.
 
   Default: ::
 
       {
-        '': 'geo/all.geojson',
+        '': {
+          '': 'geo/all.geojson',
+        }
       }
 
 ``map_centre``, ``map_zoom``
@@ -95,6 +100,16 @@ set in ``settings.py`` in the ``WAZIMAP`` dict.
 ``na_label``
   The label to display for stats which have no data available.
   The default is N/A.
+
+``default_geo_version``
+  Default geo version to use when loading geographies. If ``None``,
+  the most recent version in the Geography's table (``geo_data.latest_version``) is used.
+
+``legacy_embed_geo_version``
+  The geo version to use for legacy embeds that don't specify a geo version.
+  If ``None``, uses the latest version (``geo_data.latest_version``).
+  If you're introducing versioned geographies and your users have already embedded charts,
+  you probably want to set this to your earliest version so that embeds continue showing the original data.
 
 Localisation
 ------------
