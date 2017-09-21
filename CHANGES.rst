@@ -1,7 +1,7 @@
 Wazimap Version History
 =======================
 
-1.0.0 (21 September 2017)
+1.0.1 (21 September 2017)
 -------------------------
 
 This release of Wazimap introduces some backwards compatible changes.
