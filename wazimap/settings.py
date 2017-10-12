@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.humanize',
-    'django.contrib.sites',
     'django.contrib.staticfiles',
     'sass_processor',
     'wazimap.apps.WazimapConfig',
@@ -37,7 +36,6 @@ INSTALLED_APPS = [
 ALLOWED_HOSTS = ['*']
 TIME_ZONE = 'Africa/Johannesburg'
 LANGUAGE_CODE = 'en-za'
-SITE_ID = 1
 USE_I18N = False
 USE_L10N = True
 USE_THOUSAND_SEPARATOR = True
