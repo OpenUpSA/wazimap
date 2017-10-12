@@ -3,6 +3,7 @@ import itertools
 
 from django.db import models
 from django.utils.text import slugify
+from django.contrib.postgres.fields import ArrayField
 
 
 # Geographies
@@ -145,3 +146,75 @@ class GeographyBase(models.Model, GeoMixin):
 
 class Geography(GeographyBase):
     pass
+
+
+class Dataset(models.Model):
+    """ Over-arching collection of data tables, spanning many releases.
+    Such as a census that happens every decade. Two data tables from the
+    same dataset and using the same universe, are comparable over time.
+    """
+    name = models.CharField(max_length=100, null=False, blank=False, unique=True, help_text="Friendly name of this dataset.")
+
+    def __str__(self):
+        return self.name
+
+
+class Release(models.Model):
+    name = models.CharField(max_length=100, null=False, blank=False, help_text="Name of this release, excluding the year.")
+    year = models.CharField(max_length=50, null=False, blank=False, help_text="Primary year of this release. Will be used for sorting.")
+    dataset = models.ForeignKey(Dataset, related_name='releases', null=False, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (('year', 'dataset'))
+
+    def __str__(self):
+        return '%s - %s' % (self.name, self.year)
+
+
+class DBTable(models.Model):
+    name = models.CharField(max_length=100, null=False, unique=True, blank=False, help_text="Name of the physical database table containing data for this DB table.")
+
+    def __str__(self):
+        return self.name
+
+
+class DataTable(models.Model):
+    NUMBER = 'number'
+    PERC = 'percentage'
+    CHOICES = ((NUMBER, NUMBER), (PERC, PERC))
+
+    universe = models.CharField(max_length=1024, null=False, blank=False, help_text="Universe this table samples from, such as 'Population', 'Households', or 'Youth aged 15-24'.")
+    dataset = models.ForeignKey(Dataset, null=False, on_delete=models.CASCADE)
+    stat_type = models.CharField(max_length=10, null=False, default=NUMBER, choices=CHOICES)
+
+    class Meta:
+        abstract = True
+
+
+class SimpleTable(DataTable):
+    total_column = models.CharField(max_length=50, null=True, help_text="Name of the column that contains the total value of all the columns in the row. Wazimap usse this to express column values as a percentage. If this is not set, the table doesn't have the concept of a total and only absolute values (not percentages) will be displayed.")
+    db_table_releases = models.ManyToManyField(DBTable, through='SimpleTableRelease', through_fields=('data_table', 'db_table'))
+
+
+class FieldTable(DataTable):
+    fields = ArrayField(models.CharField(max_length=50, null=False, unique=True))
+    db_table_releases = models.ManyToManyField(DBTable, through='FieldTableRelease', through_fields=('data_table', 'db_table'))
+    # TODO: denominator_key
+
+    def __str__(self):
+        return ', '.join(self.fields)
+
+
+class SimpleTableRelease(models.Model):
+    data_table = models.ForeignKey(SimpleTable, on_delete=models.CASCADE)
+    db_table = models.ForeignKey(DBTable, on_delete=models.CASCADE)
+    release = models.ForeignKey(Release, on_delete=models.CASCADE)
+
+
+class FieldTableRelease(models.Model):
+    data_table = models.ForeignKey(FieldTable, on_delete=models.CASCADE)
+    db_table = models.ForeignKey(DBTable, on_delete=models.CASCADE)
+    release = models.ForeignKey(Release, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s for %s in %s' % (self.db_table, self.data_table, self.release)

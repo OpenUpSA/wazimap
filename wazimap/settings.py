@@ -21,7 +21,11 @@ DATABASES = {
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
     'django.contrib.humanize',
     'django.contrib.sites',
     'django.contrib.staticfiles',
@@ -76,14 +80,19 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.core.context_processors.request',
     'django.core.context_processors.static',
+    'django.contrib.auth.context_processors.auth',
     'census.context_processors.api_url',
     'wazimap.context_processors.wazimap_settings',
 )
 
 
 MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'wazimap.middleware.RedirectMiddleware',
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
