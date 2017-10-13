@@ -1,5 +1,6 @@
 from __future__ import division
 from collections import OrderedDict
+import threading
 
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
@@ -358,8 +359,7 @@ def get_stat_data(fields, geo, session, order_by=None,
         ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
 
     # get the release and underlying database table
-    # XXX don't hardcode year
-    db_table = data_table.get_db_table(year='2011')
+    db_table = data_table.get_db_table(year=current_context().get('year'))
     objects = db_table.get_rows_for_geo(geo, session, fields=fields, order_by=order_by, only=only, exclude=exclude)
 
     if total is not None and many_fields:
@@ -519,3 +519,30 @@ def create_debug_dump(data, geo_level, name):
         os.mkdir(debug_dir)
     with open(os.path.join(debug_dir, '%s_%s.json' % (name, geo_level)), 'w') as f:
         f.write(json.dumps(data, indent=4))
+
+
+class DatasetContext(object):
+    _threadlocal = threading.local()
+
+    def __init__(self, **kwargs):
+        self.year = kwargs.pop('year', None)
+
+    def get(self, name):
+        val = getattr(self, name, None)
+        if val is None:
+            raise ValueError("A dataset context of %s is required. Have you specified it by calling dataset_context(%s=...)?" % (name, name))
+        return val
+
+    def __enter__(self):
+        DatasetContext._threadlocal.dataset_context = self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        DatasetContext._threadlocal.dataset_context = None
+
+
+def dataset_context(**kwargs):
+    return DatasetContext(**kwargs)
+
+
+def current_context():
+    return DatasetContext._threadlocal.dataset_context

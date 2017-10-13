@@ -536,6 +536,11 @@ class FieldTable(DataTable):
         """ Get a DBTable instance for a particular year or release,
         or the latest if neither are specified.
         """
+        if year is None and release is None:
+            from wazimap.data.utils import current_context
+            # use the current context
+            year = current_context().get('year')
+
         if year:
             release = self.get_release(year)
 
