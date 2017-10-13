@@ -216,7 +216,7 @@ class DataTable(models.Model):
     universe = models.CharField(max_length=1024, null=False, blank=False, help_text="Universe this table samples from, such as 'Population', 'Households', or 'Youth aged 15-24'.")
     dataset = models.ForeignKey(Dataset, null=False, on_delete=models.CASCADE)
     stat_type = models.CharField(max_length=10, null=False, default=NUMBER, choices=CHOICES)
-    description = models.CharField(max_length=2014, null=True, blank=True, help_text="Helpful description of this table (optional). Generated automatically for FieldTables if left blank.")
+    description = models.CharField(max_length=1024, null=True, blank=True, help_text="Helpful description of this table (optional). Generated automatically for FieldTables if left blank.")
     # TODO: unique name?
 
     class Meta:
@@ -457,9 +457,6 @@ class FieldTable(DataTable):
     def clean(self):
         super(FieldTable, self).clean()
         self._field_set = None
-
-        if self.denominator_key and self.denominator_key not in self.fields:
-            raise ValidationError({'denominator_key': "The denominator key '%s' is not in the field list." % self.denominator_key})
 
     @property
     def field_set(self):
