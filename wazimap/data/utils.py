@@ -262,7 +262,7 @@ def get_stat_data(fields, geo, session, order_by=None,
                   percent=True, total=None, table_fields=None,
                   table_name=None, only=None, exclude=None, exclude_zero=False,
                   recode=None, key_order=None, table_universe=None,
-                  percent_grouping=None, slices=None):
+                  percent_grouping=None, slices=None, year=None):
     """
     This is our primary helper routine for building a dictionary suitable for
     a place's profile page, based on a statistic.
@@ -310,6 +310,8 @@ def get_stat_data(fields, geo, session, order_by=None,
     :param str table_universe: universe used to help find the table if ``table_name`` isn't given.
     :param list slices: return only a slice of the final data, by choosing a single value for each
                        field in the field list, as specified in the slice list.
+    :param str year: release year to use. None will try to use the current dataset context, and 'latest'
+                     will use the latest release.
 
     :return: (data-dictionary, total)
     """
@@ -359,7 +361,7 @@ def get_stat_data(fields, geo, session, order_by=None,
         ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
 
     # get the release and underlying database table
-    db_table = data_table.get_db_table(year=current_context().get('year'))
+    db_table = data_table.get_db_table(year=year or current_context().get('year'))
     objects = db_table.get_rows_for_geo(geo, session, fields=fields, order_by=order_by, only=only, exclude=exclude)
 
     if total is not None and many_fields:
@@ -506,7 +508,7 @@ def get_stat_data(fields, geo, session, order_by=None,
     return root_data, grand_total
 
 
-def get_table_from_fields(fields, universe=None):
+def get_table_for_fields(fields, universe=None):
     from wazimap.models import FieldTable
     return FieldTable.for_fields(fields, universe=universe)
 

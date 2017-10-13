@@ -528,7 +528,14 @@ class FieldTable(DataTable):
     def get_release(self, year):
         """ Get the Release description for the specified year.
         """
-        result = FieldTableRelease.objects.filter(data_table=self, release__year=year).first()
+        query = FieldTableRelease.objects.filter(data_table=self)
+
+        if year == 'latest':
+            query = query.order_by('-release__year')
+        else:
+            query = query.filter(release__year=year)
+
+        result = query.first()
         if result:
             return result.release
 
@@ -544,13 +551,11 @@ class FieldTable(DataTable):
         if year:
             release = self.get_release(year)
 
+        if not release:
+            raise ValueError("Unclear which release year to use. Specify a release or a year, or use dataset_context(year=...)")
+
         # get the db_table
-        query = self.db_table_releases
-        if release:
-            query = query.filter(fieldtablerelease__release=release)
-        else:
-            # most recent
-            query = query.order_by('-fieldtablerelease__release__year')
+        query = self.db_table_releases.filter(fieldtablerelease__release=release)
 
         db_table = query.first()
         db_table.active_release = release
