@@ -102,7 +102,7 @@ def ratio(num, denom, places=2):
         return round(num / denom, places)
 
 
-def add_metadata(data, table):
+def add_metadata(data, table, release):
     if 'metadata' not in data:
         data['metadata'] = {}
 
@@ -114,8 +114,8 @@ def add_metadata(data, table):
     data['metadata']['table_id'] = table.id
     if table.universe:
         data['metadata']['universe'] = table.universe
-    if table.year:
-        data['metadata']['year'] = table.year
+    if release.year:
+        data['metadata']['year'] = release.year
 
 
 # dictionaries that merge_dicts will merge
@@ -317,7 +317,7 @@ def get_objects_by_geo(db_model, geo, session, fields=None, order_by=None,
 def get_stat_data(fields, geo, session, order_by=None,
                   percent=True, total=None, table_fields=None,
                   table_name=None, only=None, exclude=None, exclude_zero=False,
-                  recode=None, key_order=None, table_dataset=None,
+                  recode=None, key_order=None, table_universe=None,
                   percent_grouping=None, slices=None):
     """
     This is our primary helper routine for building a dictionary suitable for
@@ -363,7 +363,7 @@ def get_stat_data(fields, geo, session, order_by=None,
                       this must be a dict from field names to orderings.
                       The default ordering is determined by ``order``.
     :type key_order: dict or list
-    :param str table_dataset: dataset used to help find the table if ``table_name`` isn't given.
+    :param str table_universe: universe used to help find the table if ``table_name`` isn't given.
     :param list slices: return only a slice of the final data, by choosing a single value for each
                        field in the field list, as specified in the slice list.
 
@@ -411,13 +411,22 @@ def get_stat_data(fields, geo, session, order_by=None,
 
     # get the table and the model
     if table_name:
+        # TODO
+        1/0
         data_table = FieldTable.get(table_name)
     else:
-        data_table = FieldTable.for_fields(table_fields, table_dataset)
+        # XXX
+        # data_table = FieldTable.for_fields(table_fields, table_universe)
+        from wazimap.models import FieldTable as NewFieldTable
+        data_table = NewFieldTable.for_fields(table_fields, table_universe)
         if not data_table:
             ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
 
-    objects = get_objects_by_geo(data_table.model, geo, session, fields=fields, order_by=order_by,
+    # XXX
+    release = data_table.get_release(year='2011')
+    db_table = data_table.get_db_table(release=release)
+
+    objects = get_objects_by_geo(db_table.model, geo, session, fields=fields, order_by=order_by,
                                  only=only, exclude=exclude, data_table=data_table)
 
     if total is not None and many_fields:
@@ -559,7 +568,7 @@ def get_stat_data(fields, geo, session, order_by=None,
         for v in slices:
             root_data = root_data[v]
 
-    add_metadata(root_data, data_table)
+    add_metadata(root_data, data_table, release)
 
     return root_data, grand_total
 
