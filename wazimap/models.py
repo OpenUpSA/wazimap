@@ -167,6 +167,9 @@ class Dataset(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
+
 
 class Release(models.Model):
     name = models.CharField(max_length=100, null=False, blank=False, help_text="Name of this release, excluding the year.")
@@ -175,6 +178,7 @@ class Release(models.Model):
 
     class Meta:
         unique_together = (('year', 'dataset'))
+        ordering = ['name', 'year']
 
     def __str__(self):
         return '%s - %s' % (self.name, self.year)
@@ -184,6 +188,9 @@ class DBTable(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True, blank=False, help_text="Name of the physical database table containing data for this DB table.")
     # Cache of SQLALchemy models for each db table
     MODELS = {}
+
+    class Meta:
+        ordering = ['name']
 
     def __init__(self, *args, **kwargs):
         super(DBTable, self).__init__(*args, **kwargs)

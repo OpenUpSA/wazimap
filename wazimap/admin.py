@@ -16,6 +16,7 @@ class FieldTableReleaseInline(admin.TabularInline):
 @admin.register(FieldTable)
 class FieldTableAdmin(admin.ModelAdmin):
     list_display = ('fields', 'universe', 'dataset')
+    list_filter = ('dataset', 'universe')
     inlines = (FieldTableReleaseInline, )
 
 
@@ -28,3 +29,9 @@ class ReleaseInline(admin.StackedInline):
 @admin.register(Dataset)
 class DatasetAdmin(admin.ModelAdmin):
     inlines = (ReleaseInline, )
+
+
+@admin.register(Release)
+class ReleaseAdmin(admin.ModelAdmin):
+    list_display = ('name', 'year')
+    list_filter = ('year',)

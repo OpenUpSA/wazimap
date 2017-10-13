@@ -46,7 +46,7 @@ class Command(BaseCommand):
             release, created = Release.objects.get_or_create(
                 dataset=dataset,
                 year=table.year,
-                name='%s - %s' % (dataset.name, table.year)
+                name=dataset.name,
             )
             if created:
                 self.stdout.write(self.style.SUCCESS("Created release %s for dataset %s" % (release.year, dataset.name)))
