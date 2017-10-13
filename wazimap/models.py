@@ -280,12 +280,28 @@ class DataTable(models.Model):
     description = models.CharField(max_length=1024, null=True, blank=True, help_text="Helpful description of this table (optional). Generated automatically for FieldTables if left blank.")
     # TODO: unique name?
 
+    release_class = None
+
     class Meta:
         abstract = True
 
     def clean(self):
         if not self.description:
             self.description = self._build_description()
+
+    def get_release(self, year):
+        """ Get the Release description for the specified year.
+        """
+        query = self.release_class.objects.filter(data_table=self)
+
+        if year == 'latest':
+            query = query.order_by('-release__year')
+        else:
+            query = query.filter(release__year=year)
+
+        result = query.first()
+        if result:
+            return result.release
 
     def get_db_table(self, release=None, year=None):
         """ Get a DBTable instance for a particular year or release,
@@ -303,15 +319,12 @@ class DataTable(models.Model):
             raise ValueError("Unclear which release year to use. Specify a release or a year, or use dataset_context(year=...)")
 
         # get the db_table
-        fieldname = self.__class__.__name__.lower() + 'release__release'
+        fieldname = self.release_class.__name__.lower() + '__release'
         query = self.db_table_releases.filter(**{fieldname: release})
 
         db_table = query.first()
         db_table.active_release = release
         self.setup_model(db_table)
-
-        # XXX do somewhere else
-        self.setup_columns()
 
         return db_table
 
@@ -359,6 +372,7 @@ class SimpleTable(DataTable):
 
     def __init__(self, *args, **kwargs):
         super(SimpleTable, self).__init__(*args, **kwargs)
+        self.release_class = SimpleTableRelease
 
         # TODO: where to do verification?
         # if self.total_column and self.total_column not in self.columns:
@@ -388,6 +402,7 @@ class SimpleTable(DataTable):
         """
         db_table = self.get_db_table(year=year or current_context().get('year'))
         model = db_table.model
+        columns = self.columns(db_table)
 
         session = get_session()
         try:
@@ -395,11 +410,11 @@ class SimpleTable(DataTable):
                 fields = [fields]
             if fields:
                 for f in fields:
-                    if f not in self.columns:
+                    if f not in columns:
                         raise ValueError("Invalid field/column '%s' for table '%s'. Valid columns are: %s" % (
-                            f, self.id, ', '.join(self.columns.keys())))
+                            f, self.id, ', '.join(columns.keys())))
             else:
-                fields = self.columns.keys()
+                fields = columns.keys()
                 if self.total_column:
                     fields.remove(self.total_column)
 
@@ -410,9 +425,9 @@ class SimpleTable(DataTable):
                     recode = {f: recode(f) for f in fields}
 
             # is the total column valid?
-            if isinstance(total, basestring) and total not in self.columns:
+            if isinstance(total, basestring) and total not in columns:
                 raise ValueError("Total column '%s' isn't one of the columns for table '%s'. Valid columns are: %s" % (
-                    total, self.id, ', '.join(self.columns.keys())))
+                    total, self.id, ', '.join(columns.keys())))
 
             # table columns to fetch
             cols = [model.__table__.columns[c] for c in fields]
@@ -453,7 +468,7 @@ class SimpleTable(DataTable):
 
                 # set the recoded field name, noting that the key may already
                 # exist if another column recoded to it
-                field_info = results.setdefault(key, {'name': recode.get(field, self.columns[field]['name'])})
+                field_info = results.setdefault(key, {'name': recode.get(field, columns[field]['name'])})
 
                 if percent:
                     # sum up existing values, if any
@@ -501,20 +516,23 @@ class SimpleTable(DataTable):
 
         return data
 
-    def setup_columns(self):
+    def columns(self, db_table):
+        """ Work out our columns by finding those that aren't geo columns.
         """
-        Work out our columns by finding those that aren't geo columns.
-        """
-        self.columns = OrderedDict()
+        columns = OrderedDict()
         indent = 0
         if self.total_column:
             indent = 1
 
-        for col in (c.name for c in self.model.__table__.columns if c.name not in ['geo_code', 'geo_level', 'geo_version']):
-            self.columns[col] = {
+        for col in (c.name for c in db_table.model.__table__.columns if c.name not in ['geo_code', 'geo_level', 'geo_version']):
+            columns[col] = {
                 'name': capitalize(col.replace('_', ' ')),
                 'indent': 0 if col == self.total_column else indent
             }
+
+        # TODO: cache it?
+
+        return columns
 
     def setup_model(self, db_table):
         model = db_table.model
@@ -522,7 +540,7 @@ class SimpleTable(DataTable):
             columns = self._build_model_columns()
 
             class Model(Base):
-                __table__ = Table(db_table, Base.metadata, *columns, autoload=True, extend_existing=True)
+                __table__ = Table(db_table.name, Base.metadata, *columns, autoload=True, extend_existing=True)
 
             model = Model
             db_table.model = model
@@ -559,7 +577,9 @@ class FieldTable(DataTable):
 
     def __init__(self, *args, **kwargs):
         super(FieldTable, self).__init__(*args, **kwargs)
+        self.release_class = FieldTableRelease
         self._field_set = None
+        self.total_column = self.column_id([self.denominator_key or 'total'])
 
     def clean(self):
         super(FieldTable, self).clean()
@@ -570,20 +590,6 @@ class FieldTable(DataTable):
         if self._field_set is None:
             self._field_set = set(self.fields)
         return self._field_set
-
-    def get_release(self, year):
-        """ Get the Release description for the specified year.
-        """
-        query = FieldTableRelease.objects.filter(data_table=self)
-
-        if year == 'latest':
-            query = query.order_by('-release__year')
-        else:
-            query = query.filter(release__year=year)
-
-        result = query.first()
-        if result:
-            return result.release
 
     def setup_model(self, db_table):
         """ Build the model that corresponds to the table underlying this data table.

@@ -107,6 +107,7 @@ def add_metadata(data, table, release):
     if 'metadata' not in data:
         data['metadata'] = {}
 
+    # XXX need to have a unique table name for all tables :/
     data['metadata']['table_id'] = table.id
     if table.universe:
         data['metadata']['universe'] = table.universe
