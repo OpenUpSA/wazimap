@@ -4,7 +4,6 @@ import itertools
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.postgres.fields import ArrayField
-from django.core.exceptions import ValidationError
 
 # TODO: move along with data tables
 from itertools import groupby
@@ -12,7 +11,12 @@ from wazimap.data.base import Base
 from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata
 from wazimap.data.tables import ZeroRow, get_model_for_db_table, INT_RE
 from sqlalchemy import Column, String, Table, or_, and_, func
+from sqlalchemy.orm import class_mapper
 import sqlalchemy.types
+
+
+class DataNotFound(Exception):
+    pass
 
 
 # Geographies
@@ -207,6 +211,56 @@ class DBTable(models.Model):
     def model(self, model):
         DBTable.MODELS[self.name] = model
         self._model = model
+
+    def get_rows_for_geo(self, geo, session, fields=None, order_by=None, only=None, exclude=None):
+        """ Get rows of statistics from the stats mode +db_model+ for a particular
+        geography, summing over the 'total' field and grouping by +fields+. Filters
+        to include +only+ and ignore +exclude+, if given.
+        """
+        db_model = self.model
+
+        if fields is None:
+            fields = [c.key for c in class_mapper(db_model).attrs if c.key not in ['geo_code', 'geo_level', 'geo_version', 'total']]
+
+        fields = [getattr(db_model, f) for f in fields]
+
+        objects = session\
+            .query(func.sum(db_model.total).label('total'), *fields)\
+            .group_by(*fields)\
+            .filter(db_model.geo_code == geo.geo_code)\
+            .filter(db_model.geo_level == geo.geo_level)\
+            .filter(db_model.geo_version == geo.version)
+
+        if only:
+            for k, v in only.iteritems():
+                objects = objects.filter(getattr(db_model, k).in_(v))
+
+        if exclude:
+            for k, v in exclude.iteritems():
+                objects = objects.filter(getattr(db_model, k).notin_(v))
+
+        if order_by is not None:
+            attr = order_by
+            is_desc = False
+            if order_by[0] == '-':
+                is_desc = True
+                attr = attr[1:]
+
+            if attr == 'total':
+                if is_desc:
+                    attr = attr + ' DESC'
+            else:
+                attr = getattr(db_model, attr)
+                if is_desc:
+                    attr = attr.desc()
+
+            objects = objects.order_by(attr)
+
+        objects = objects.all()
+        if len(objects) == 0:
+            raise DataNotFound("Entry in %s for geography %s version '%s' not found"
+                               % (self.name, geo.geoid, geo.version))
+        return objects
 
     def __str__(self):
         return 'DBTable<%s>' % self.name
@@ -485,6 +539,7 @@ class FieldTable(DataTable):
         if year:
             release = self.get_release(year)
 
+        # get the db_table
         query = self.db_table_releases
         if release:
             query = query.filter(fieldtablerelease__release=release)
@@ -493,8 +548,10 @@ class FieldTable(DataTable):
             query = query.order_by('-fieldtablerelease__release__year')
 
         db_table = query.first()
-
+        db_table.active_release = release
         self.setup_model(db_table)
+
+        # XXX do somewhere else
         self.setup_columns()
 
         return db_table
@@ -706,26 +763,20 @@ class FieldTable(DataTable):
         return ', '.join(self.fields)
 
     @classmethod
-    def for_fields(cls, fields, table_universe=None):
+    def for_fields(cls, fields, universe=None):
         """ Find a model that can provide us these fields, at this level.
 
         :param fields: list of fields to find a table for
-        :param str table_universe: universe for the FieldTable, if the fields are ambiguous (optional)
+        :param str universe: universe for the FieldTable, if the fields are ambiguous (optional)
 
         :return: a FieldTable instance, or None
         """
-        # lookup based on fields
-        # XXX
-        #for field in fields:
-        #    if field not in FIELD_TABLE_FIELDS:
-        #        raise ValueError('Invalid field: %s' % field)
-
         # try find it based on fields
         field_set = set(fields)
 
         candidates = FieldTable.objects.filter(fields__contains=list(field_set))
-        if table_universe:
-            candidates = [t for t in candidates if t.universe == table_universe]
+        if universe:
+            candidates = [t for t in candidates if t.universe == universe]
 
         possibilities = [
             (t, len(t.field_set - field_set))
@@ -733,10 +784,6 @@ class FieldTable(DataTable):
         table, _ = min(possibilities, key=lambda p: p[1])
 
         return table
-
-    @classmethod
-    def get(cls, table_name):
-        return get_datatable(table_name)
 
 
 class SimpleTableRelease(models.Model):

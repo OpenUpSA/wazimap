@@ -1,8 +1,8 @@
 from __future__ import division
 from collections import OrderedDict
 
-from sqlalchemy import create_engine, MetaData, func
-from sqlalchemy.orm import sessionmaker, class_mapper
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import sessionmaker
 
 from django.conf import settings
 from django.db.backends.base.creation import TEST_DATABASE_PREFIX
@@ -105,11 +105,6 @@ def ratio(num, denom, places=2):
 def add_metadata(data, table, release):
     if 'metadata' not in data:
         data['metadata'] = {}
-
-    # this might be a SQLAlchemy model that is linked back to
-    # a data table
-    if hasattr(table, 'data_tables'):
-        table = table.data_tables[0]
 
     data['metadata']['table_id'] = table.id
     if table.universe:
@@ -262,58 +257,6 @@ def group_remainder(data, num_items=4, make_percentage=True,
                                         for k, v in values['numerators'].iteritems())
 
 
-def get_objects_by_geo(db_model, geo, session, fields=None, order_by=None,
-                       only=None, exclude=None, data_table=None):
-    """ Get rows of statistics from the stats mode +db_model+ for a particular
-    geography, summing over the 'total' field and grouping by +fields+. Filters
-    to include +only+ and ignore +exclude+, if given.
-    """
-    data_table = data_table or db_model.data_tables[0]
-
-    if fields is None:
-        fields = [c.key for c in class_mapper(db_model).attrs if c.key not in ['geo_code', 'geo_level', 'geo_version', 'total']]
-
-    fields = [getattr(db_model, f) for f in fields]
-
-    objects = session\
-        .query(func.sum(db_model.total).label('total'), *fields)\
-        .group_by(*fields)\
-        .filter(db_model.geo_code == geo.geo_code)\
-        .filter(db_model.geo_level == geo.geo_level)\
-        .filter(db_model.geo_version == geo.version)
-
-    if only:
-        for k, v in only.iteritems():
-            objects = objects.filter(getattr(db_model, k).in_(v))
-
-    if exclude:
-        for k, v in exclude.iteritems():
-            objects = objects.filter(getattr(db_model, k).notin_(v))
-
-    if order_by is not None:
-        attr = order_by
-        is_desc = False
-        if order_by[0] == '-':
-            is_desc = True
-            attr = attr[1:]
-
-        if attr == 'total':
-            if is_desc:
-                attr = attr + ' DESC'
-        else:
-            attr = getattr(db_model, attr)
-            if is_desc:
-                attr = attr.desc()
-
-        objects = objects.order_by(attr)
-
-    objects = objects.all()
-    if len(objects) == 0:
-        raise LocationNotFound("%s for geography %s version '%s' not found"
-                               % (db_model.__table__.name, geo.geoid, geo.version))
-    return objects
-
-
 def get_stat_data(fields, geo, session, order_by=None,
                   percent=True, total=None, table_fields=None,
                   table_name=None, only=None, exclude=None, exclude_zero=False,
@@ -369,7 +312,7 @@ def get_stat_data(fields, geo, session, order_by=None,
 
     :return: (data-dictionary, total)
     """
-    from .tables import FieldTable
+    from wazimap.models import FieldTable
 
     if not isinstance(fields, list):
         fields = [fields]
@@ -410,24 +353,14 @@ def get_stat_data(fields, geo, session, order_by=None,
     table_fields = table_fields or fields
 
     # get the table and the model
-    if table_name:
-        # TODO
-        1/0
-        data_table = FieldTable.get(table_name)
-    else:
-        # XXX
-        # data_table = FieldTable.for_fields(table_fields, table_universe)
-        from wazimap.models import FieldTable as NewFieldTable
-        data_table = NewFieldTable.for_fields(table_fields, table_universe)
-        if not data_table:
-            ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
+    data_table = FieldTable.for_fields(table_fields, table_universe)
+    if not data_table:
+        ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
 
-    # XXX
-    release = data_table.get_release(year='2011')
-    db_table = data_table.get_db_table(release=release)
-
-    objects = get_objects_by_geo(db_table.model, geo, session, fields=fields, order_by=order_by,
-                                 only=only, exclude=exclude, data_table=data_table)
+    # get the release and underlying database table
+    # XXX don't hardcode year
+    db_table = data_table.get_db_table(year='2011')
+    objects = db_table.get_rows_for_geo(geo, session, fields=fields, order_by=order_by, only=only, exclude=exclude)
 
     if total is not None and many_fields:
         raise ValueError("Cannot specify a total if many fields are given")
@@ -568,9 +501,14 @@ def get_stat_data(fields, geo, session, order_by=None,
         for v in slices:
             root_data = root_data[v]
 
-    add_metadata(root_data, data_table, release)
+    add_metadata(root_data, data_table, db_table.active_release)
 
     return root_data, grand_total
+
+
+def get_table_from_fields(fields, universe=None):
+    from wazimap.models import FieldTable
+    return FieldTable.for_fields(fields, universe=universe)
 
 
 def create_debug_dump(data, geo_level, name):
