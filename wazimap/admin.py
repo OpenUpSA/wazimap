@@ -1,9 +1,8 @@
 from django.contrib import admin
 
-from .models import Dataset, Release, SimpleTable, FieldTable, DBTable, FieldTableRelease
+from .models import Dataset, Release, SimpleTable, FieldTable, DBTable, FieldTableRelease, SimpleTableRelease
 
 
-admin.site.register(SimpleTable)
 admin.site.register(DBTable)
 
 
@@ -18,6 +17,19 @@ class FieldTableAdmin(admin.ModelAdmin):
     list_display = ('fields', 'universe', 'dataset')
     list_filter = ('dataset', 'universe')
     inlines = (FieldTableReleaseInline, )
+
+
+class SimpleTableReleaseInline(admin.TabularInline):
+    model = SimpleTableRelease
+    fields = ('release', 'db_table')
+    extra = 0
+
+
+@admin.register(SimpleTable)
+class SimpleTableAdmin(admin.ModelAdmin):
+    list_display = ('name', 'universe', 'dataset')
+    list_filter = ('dataset', 'universe')
+    inlines = (SimpleTableReleaseInline, )
 
 
 class ReleaseInline(admin.StackedInline):

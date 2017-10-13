@@ -8,7 +8,7 @@ from django.contrib.postgres.fields import ArrayField
 # TODO: move along with data tables
 from itertools import groupby
 from wazimap.data.base import Base
-from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata
+from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata, current_context
 from wazimap.data.tables import ZeroRow, get_model_for_db_table, INT_RE
 from sqlalchemy import Column, String, Table, or_, and_, func
 from sqlalchemy.orm import class_mapper
@@ -287,6 +287,37 @@ class DataTable(models.Model):
         if not self.description:
             self.description = self._build_description()
 
+    def get_db_table(self, release=None, year=None):
+        """ Get a DBTable instance for a particular year or release,
+        or the latest if neither are specified.
+        """
+        if year is None and release is None:
+            from wazimap.data.utils import current_context
+            # use the current context
+            year = current_context().get('year')
+
+        if year:
+            release = self.get_release(year)
+
+        if not release:
+            raise ValueError("Unclear which release year to use. Specify a release or a year, or use dataset_context(year=...)")
+
+        # get the db_table
+        fieldname = self.__class__.__name__.lower() + 'release__release'
+        query = self.db_table_releases.filter(**{fieldname: release})
+
+        db_table = query.first()
+        db_table.active_release = release
+        self.setup_model(db_table)
+
+        # XXX do somewhere else
+        self.setup_columns()
+
+        return db_table
+
+    def setup_model(self, db_table):
+        pass
+
     def _build_description(self):
         pass
 
@@ -322,6 +353,7 @@ class DataTable(models.Model):
 
 
 class SimpleTable(DataTable):
+    name = models.CharField(max_length=1024, null=False, blank=False, help_text="Name for this table")
     total_column = models.CharField(max_length=50, null=True, help_text="Name of the column that contains the total value of all the columns in the row. Wazimap usse this to express column values as a percentage. If this is not set, the table doesn't have the concept of a total and only absolute values (not percentages) will be displayed.")
     db_table_releases = models.ManyToManyField(DBTable, through='SimpleTableRelease', through_fields=('data_table', 'db_table'))
 
@@ -332,7 +364,7 @@ class SimpleTable(DataTable):
         # if self.total_column and self.total_column not in self.columns:
         #     raise ValueError("Total column is not in the column list. Given '%s', column list: %s" % (self.total_column, self.columns.keys()))
 
-    def get_stat_data(self, geo, fields=None, key_order=None, percent=True, total=None, recode=None):
+    def get_stat_data(self, geo, fields=None, key_order=None, percent=True, total=None, recode=None, year=None):
         """ Get a data dictionary for a place from this table.
 
         This fetches the values for each column in this table and returns a data
@@ -349,9 +381,13 @@ class SimpleTable(DataTable):
                           field, or None to use the sum of all retrieved fields (default)
         :param dict recode: map from field names to strings to recode column names. Many fields
                             can be recoded to the same thing, their values will be summed.
+        :param str year: release year to use. None will try to use the current dataset context, and 'latest'
+                         will use the latest release.
 
         :return: (data-dictionary, total)
         """
+        db_table = self.get_db_table(year=year or current_context().get('year'))
+        model = db_table.model
 
         session = get_session()
         try:
@@ -379,7 +415,7 @@ class SimpleTable(DataTable):
                     total, self.id, ', '.join(self.columns.keys())))
 
             # table columns to fetch
-            cols = [self.model.__table__.columns[c] for c in fields]
+            cols = [model.__table__.columns[c] for c in fields]
 
             if total is not None and isinstance(total, basestring) and total not in cols:
                 cols.append(total)
@@ -387,9 +423,9 @@ class SimpleTable(DataTable):
             # do the query. If this returns no data, row is None
             row = session\
                 .query(*cols)\
-                .filter(self.model.geo_level == geo.geo_level,
-                        self.model.geo_code == geo.geo_code,
-                        self.model.geo_version == geo.version)\
+                .filter(model.geo_level == geo.geo_level,
+                        model.geo_code == geo.geo_code,
+                        model.geo_version == geo.version)\
                 .first()
 
             if row is None:
@@ -429,7 +465,7 @@ class SimpleTable(DataTable):
                     val = val + field_info.get('values', {}).get('this', 0)
                     field_info['values'] = {'this': val}
 
-            add_metadata(results, self)
+            add_metadata(results, self, db_table.active_release)
             return results, total
         finally:
             session.close()
@@ -480,18 +516,28 @@ class SimpleTable(DataTable):
                 'indent': 0 if col == self.total_column else indent
             }
 
-    def _build_model(self, db_table):
-        # does it already exist?
-        model = get_model_for_db_table(db_table)
-        if model:
-            return model
+    def setup_model(self, db_table):
+        model = db_table.model
+        if not model:
+            columns = self._build_model_columns()
 
-        columns = self._build_model_columns()
+            class Model(Base):
+                __table__ = Table(db_table, Base.metadata, *columns, autoload=True, extend_existing=True)
 
-        class Model(Base):
-            __table__ = Table(db_table, Base.metadata, *columns, autoload=True, extend_existing=True)
+            model = Model
+            db_table.model = model
 
-        return Model
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get(cls, name, universe=None, dataset=None):
+        candidates = cls.objects.filter(name=name)
+        if universe:
+            candidates = candidates.filter(universe=universe)
+        if dataset:
+            candidates = candidates.filter(dataset__name=dataset)
+        return candidates.first()
 
 
 class FieldTable(DataTable):
@@ -539,33 +585,6 @@ class FieldTable(DataTable):
         if result:
             return result.release
 
-    def get_db_table(self, release=None, year=None):
-        """ Get a DBTable instance for a particular year or release,
-        or the latest if neither are specified.
-        """
-        if year is None and release is None:
-            from wazimap.data.utils import current_context
-            # use the current context
-            year = current_context().get('year')
-
-        if year:
-            release = self.get_release(year)
-
-        if not release:
-            raise ValueError("Unclear which release year to use. Specify a release or a year, or use dataset_context(year=...)")
-
-        # get the db_table
-        query = self.db_table_releases.filter(fieldtablerelease__release=release)
-
-        db_table = query.first()
-        db_table.active_release = release
-        self.setup_model(db_table)
-
-        # XXX do somewhere else
-        self.setup_columns()
-
-        return db_table
-
     def setup_model(self, db_table):
         """ Build the model that corresponds to the table underlying this data table.
         """
@@ -589,8 +608,7 @@ class FieldTable(DataTable):
             if not hasattr(model, 'data_tables'):
                 model.data_tables = []
             model.data_tables.append(self)
-
-        db_table.model = model
+            db_table.model = model
 
     def _build_model_columns(self):
         columns = super(FieldTable, self)._build_model_columns()
@@ -773,20 +791,20 @@ class FieldTable(DataTable):
         return ', '.join(self.fields)
 
     @classmethod
-    def for_fields(cls, fields, universe=None):
-        """ Find a model that can provide us these fields, at this level.
+    def for_fields(cls, fields, universe=None, dataset=None):
+        """ Lookup a FieldTable that is suitable for a set of fields.
 
-        :param fields: list of fields to find a table for
-        :param str universe: universe for the FieldTable, if the fields are ambiguous (optional)
-
-        :return: a FieldTable instance, or None
+        If there are multiple tables that support these fields, the one with
+        the least number of additional different fields is use.
         """
         # try find it based on fields
         field_set = set(fields)
 
-        candidates = FieldTable.objects.filter(fields__contains=list(field_set))
+        candidates = cls.objects.filter(fields__contains=list(field_set))
         if universe:
-            candidates = [t for t in candidates if t.universe == universe]
+            candidates = candidates.filter(universe=universe)
+        if dataset:
+            candidates = candidates.filter(dataset__name=dataset)
 
         possibilities = [
             (t, len(t.field_set - field_set))

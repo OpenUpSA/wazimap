@@ -261,8 +261,8 @@ def group_remainder(data, num_items=4, make_percentage=True,
 def get_stat_data(fields, geo, session, order_by=None,
                   percent=True, total=None, table_fields=None,
                   table_name=None, only=None, exclude=None, exclude_zero=False,
-                  recode=None, key_order=None, table_universe=None,
-                  percent_grouping=None, slices=None, year=None):
+                  recode=None, key_order=None, table_dataset=None,
+                  percent_grouping=None, slices=None, year=None, table_universe=None):
     """
     This is our primary helper routine for building a dictionary suitable for
     a place's profile page, based on a statistic.
@@ -312,6 +312,7 @@ def get_stat_data(fields, geo, session, order_by=None,
                        field in the field list, as specified in the slice list.
     :param str year: release year to use. None will try to use the current dataset context, and 'latest'
                      will use the latest release.
+    :param str table_dataset: dataset name for finding a table, if the fields are ambiguous.
 
     :return: (data-dictionary, total)
     """
@@ -356,7 +357,7 @@ def get_stat_data(fields, geo, session, order_by=None,
     table_fields = table_fields or fields
 
     # get the table and the model
-    data_table = FieldTable.for_fields(table_fields, table_universe)
+    data_table = FieldTable.for_fields(table_fields, universe=table_universe, dataset=table_dataset)
     if not data_table:
         ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
 
@@ -508,9 +509,14 @@ def get_stat_data(fields, geo, session, order_by=None,
     return root_data, grand_total
 
 
-def get_table_for_fields(fields, universe=None):
+def get_table_for_fields(fields, universe=None, dataset=None):
     from wazimap.models import FieldTable
-    return FieldTable.for_fields(fields, universe=universe)
+    return FieldTable.for_fields(fields, universe=universe, dataset=dataset)
+
+
+def get_simpletable(name, universe=None, dataset=None):
+    from wazimap.models import SimpleTable
+    return SimpleTable.get(name, universe=universe, dataset=dataset)
 
 
 def create_debug_dump(data, geo_level, name):
@@ -532,7 +538,7 @@ class DatasetContext(object):
     def get(self, name):
         val = getattr(self, name, None)
         if val is None:
-            raise ValueError("A dataset context of %s is required. Have you specified it by calling dataset_context(%s=...)?" % (name, name))
+            raise ValueError("A dataset context for %s is required. Have you specified it by calling dataset_context(%s=...)?" % (name, name))
         return val
 
     def __enter__(self):
@@ -547,4 +553,4 @@ def dataset_context(**kwargs):
 
 
 def current_context():
-    return DatasetContext._threadlocal.dataset_context
+    return DatasetContext._threadlocal.dataset_context or DatasetContext()
