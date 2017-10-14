@@ -68,11 +68,7 @@ class Command(BaseCommand):
 
     def upgrade_simple_table(self, table):
         # does it need upgrading?
-        existing = SimpleTable.objects.filter(
-            name=table.id.lower(),
-            universe=table.universe,
-            dataset__name=table.dataset_name,
-        ).first()
+        existing = SimpleTable.objects.filter(name__iexact=table.id).first()
 
         if existing:
             self.stdout.write(self.style.WARNING("Ignoring already upgraded table '%s' that matches '%s'" % (
