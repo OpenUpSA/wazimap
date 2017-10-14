@@ -39,10 +39,10 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.SlugField(help_text=b'Name for this table. No spaces.', max_length=1024, unique=True)),
-                ('universe', models.CharField(help_text=b"Universe this table samples from, such as 'Population', 'Households', or 'Youth aged 15-24'.", max_length=1024)),
+                ('universe', models.CharField(help_text=b"Universe this table describes, such as 'Population', 'Households', or 'Youth aged 15-24'.", max_length=1024)),
                 ('stat_type', models.CharField(choices=[(b'number', b'number'), (b'percentage', b'percentage')], default=b'number', max_length=10)),
                 ('description', models.CharField(blank=True, help_text=b'Helpful description of this table (optional). Generated automatically for FieldTables if left blank.', max_length=1024, null=True)),
-                ('fields', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=50, unique=True), size=None), help_text=b'Comma-separated ordered list of fields this table describes.'),
+                ('fields', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=50, unique=True), size=None, help_text=b'Comma-separated ordered list of fields this table describes.')),
                 ('denominator_key', models.CharField(blank=True, help_text=b'The key value of the rightmost field that should be used as the "total" column, instead of summing over the values for each row. This is necessary when the table doesn\'t describe a true partitioning of the dataset (ie. the row values sum to more than the total population).  This will be used as the total column once the id of the column has been calculated.', max_length=50, null=True)),
                 ('has_total', models.BooleanField(default=True, help_text=b'Does it make sense to calculate a total column and express percentages for values in this table?')),
                 ('value_type', models.CharField(choices=[(b'Integer', b'Integer'), (b'Float', b'Float')], default=b'Integer', max_length=20)),
@@ -77,7 +77,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.SlugField(help_text=b'Name for this table. No spaces.', max_length=1024, unique=True)),
-                ('universe', models.CharField(help_text=b"Universe this table samples from, such as 'Population', 'Households', or 'Youth aged 15-24'.", max_length=1024)),
+                ('universe', models.CharField(help_text=b"Universe this table describes, such as 'Population', 'Households', or 'Youth aged 15-24'.", max_length=1024)),
                 ('stat_type', models.CharField(choices=[(b'number', b'number'), (b'percentage', b'percentage')], default=b'number', max_length=10)),
                 ('description', models.CharField(blank=True, help_text=b'Helpful description of this table (optional). Generated automatically for FieldTables if left blank.', max_length=1024, null=True)),
                 ('total_column', models.CharField(help_text=b"Name of the column that contains the total value of all the columns in the row. Wazimap usse this to express column values as a percentage. If this is not set, the table doesn't have the concept of a total and only absolute values (not percentages) will be displayed.", max_length=50, null=True)),

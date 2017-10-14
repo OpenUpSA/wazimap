@@ -115,7 +115,7 @@ class DataTable(models.Model):
     )
 
     name = models.SlugField(max_length=1024, null=False, blank=False, unique=True, help_text="Name for this table. No spaces.")
-    universe = models.CharField(max_length=1024, null=False, blank=False, help_text="Universe this table samples from, such as 'Population', 'Households', or 'Youth aged 15-24'.")
+    universe = models.CharField(max_length=1024, null=False, blank=False, help_text="Universe this table describes, such as 'Population', 'Households', or 'Youth aged 15-24'.")
     dataset = models.ForeignKey(Dataset, null=False, on_delete=models.CASCADE)
     stat_type = models.CharField(max_length=10, null=False, default=NUMBER, choices=CHOICES)
     description = models.CharField(max_length=1024, null=True, blank=True, help_text="Helpful description of this table (optional). Generated automatically for FieldTables if left blank.")
@@ -124,6 +124,7 @@ class DataTable(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('name',)
 
     def clean(self):
         if not self.description:
