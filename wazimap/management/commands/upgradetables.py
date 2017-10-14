@@ -36,6 +36,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS("Created dataset %s" % dataset.name))
 
             new_table = FieldTable(
+                name=table.id,
                 fields=table.fields,
                 universe=table.universe,
                 denominator_key=table.denominator_key,

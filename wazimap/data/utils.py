@@ -107,8 +107,7 @@ def add_metadata(data, table, release):
     if 'metadata' not in data:
         data['metadata'] = {}
 
-    # XXX need to have a unique table name for all tables :/
-    data['metadata']['table_id'] = table.id
+    data['metadata']['table_id'] = table.name.upper()
     if table.universe:
         data['metadata']['universe'] = table.universe
     if release.year:
@@ -517,7 +516,7 @@ def get_table_for_fields(fields, universe=None, dataset=None):
 
 def get_simpletable(name, universe=None, dataset=None):
     from wazimap.models import SimpleTable
-    return SimpleTable.get(name, universe=universe, dataset=dataset)
+    return SimpleTable.find(name, universe=universe, dataset=dataset)
 
 
 def create_debug_dump(data, geo_level, name):

@@ -9,7 +9,7 @@ from django.contrib.postgres.fields import ArrayField
 from itertools import groupby
 from wazimap.data.base import Base
 from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata, current_context
-from wazimap.data.tables import ZeroRow, get_model_for_db_table, INT_RE
+from wazimap.data.tables import ZeroRow, INT_RE
 from sqlalchemy import Column, String, Table, or_, and_, func
 from sqlalchemy.orm import class_mapper
 import sqlalchemy.types
@@ -189,6 +189,7 @@ class Release(models.Model):
 
 
 class DBTable(models.Model):
+    # TODO: validator on name
     name = models.CharField(max_length=100, null=False, unique=True, blank=False, help_text="Name of the physical database table containing data for this DB table.")
     # Cache of SQLALchemy models for each db table
     MODELS = {}
@@ -274,6 +275,7 @@ class DataTable(models.Model):
         (PERC, PERC)
     )
 
+    name = models.SlugField(max_length=1024, null=False, blank=False, unique=True, help_text="Name for this table. No spaces.")
     universe = models.CharField(max_length=1024, null=False, blank=False, help_text="Universe this table samples from, such as 'Population', 'Households', or 'Youth aged 15-24'.")
     dataset = models.ForeignKey(Dataset, null=False, on_delete=models.CASCADE)
     stat_type = models.CharField(max_length=10, null=False, default=NUMBER, choices=CHOICES)
@@ -288,6 +290,8 @@ class DataTable(models.Model):
     def clean(self):
         if not self.description:
             self.description = self._build_description()
+        if self.name:
+            self.name = self.name.upper()
 
     def get_release(self, year):
         """ Get the Release description for the specified year.
@@ -364,19 +368,23 @@ class DataTable(models.Model):
             'stat_type': self.stat_type,
         }
 
+    @classmethod
+    def find(cls, name, universe=None, dataset=None):
+        candidates = cls.objects.filter(name__iexact=name)
+        if universe:
+            candidates = candidates.filter(universe__iexact=universe)
+        if dataset:
+            candidates = candidates.filter(dataset__name__iexact=dataset)
+        return candidates.first()
+
 
 class SimpleTable(DataTable):
-    name = models.CharField(max_length=1024, null=False, blank=False, help_text="Name for this table")
     total_column = models.CharField(max_length=50, null=True, help_text="Name of the column that contains the total value of all the columns in the row. Wazimap usse this to express column values as a percentage. If this is not set, the table doesn't have the concept of a total and only absolute values (not percentages) will be displayed.")
     db_table_releases = models.ManyToManyField(DBTable, through='SimpleTableRelease', through_fields=('data_table', 'db_table'))
 
     def __init__(self, *args, **kwargs):
         super(SimpleTable, self).__init__(*args, **kwargs)
         self.release_class = SimpleTableRelease
-
-        # TODO: where to do verification?
-        # if self.total_column and self.total_column not in self.columns:
-        #     raise ValueError("Total column is not in the column list. Given '%s', column list: %s" % (self.total_column, self.columns.keys()))
 
     def get_stat_data(self, geo, fields=None, key_order=None, percent=True, total=None, recode=None, year=None):
         """ Get a data dictionary for a place from this table.
@@ -548,15 +556,6 @@ class SimpleTable(DataTable):
     def __str__(self):
         return self.name
 
-    @classmethod
-    def get(cls, name, universe=None, dataset=None):
-        candidates = cls.objects.filter(name=name)
-        if universe:
-            candidates = candidates.filter(universe=universe)
-        if dataset:
-            candidates = candidates.filter(dataset__name=dataset)
-        return candidates.first()
-
 
 class FieldTable(DataTable):
     INTEGER = 'Integer'
@@ -582,6 +581,9 @@ class FieldTable(DataTable):
         self.total_column = self.column_id([self.denominator_key or 'total'])
 
     def clean(self):
+        if not self.name:
+            self.name = slugify(''.join(self.fields))
+
         super(FieldTable, self).clean()
         self._field_set = None
 
@@ -609,12 +611,7 @@ class FieldTable(DataTable):
             finally:
                 session.close()
 
-            model = Model
-            # XXX
-            if not hasattr(model, 'data_tables'):
-                model.data_tables = []
-            model.data_tables.append(self)
-            db_table.model = model
+            db_table.model = Model
 
     def _build_model_columns(self):
         columns = super(FieldTable, self)._build_model_columns()
@@ -824,6 +821,9 @@ class SimpleTableRelease(models.Model):
     data_table = models.ForeignKey(SimpleTable, on_delete=models.CASCADE)
     db_table = models.ForeignKey(DBTable, on_delete=models.CASCADE)
     release = models.ForeignKey(Release, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s for %s in %s' % (self.db_table, self.data_table, self.release)
 
 
 class FieldTableRelease(models.Model):

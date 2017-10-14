@@ -14,7 +14,7 @@ class FieldTableReleaseInline(admin.TabularInline):
 
 @admin.register(FieldTable)
 class FieldTableAdmin(admin.ModelAdmin):
-    list_display = ('fields', 'universe', 'dataset')
+    list_display = ('name', 'fields', 'universe', 'dataset')
     list_filter = ('dataset', 'universe')
     inlines = (FieldTableReleaseInline, )
 
