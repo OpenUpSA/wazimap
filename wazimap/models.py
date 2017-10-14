@@ -219,57 +219,6 @@ class DBTable(models.Model):
         DBTable.MODELS[self.name] = model
         self._model = model
 
-    def get_rows_for_geo(self, geo, session, fields=None, order_by=None, only=None, exclude=None):
-        """ Get rows of statistics from the stats mode +db_model+ for a particular
-        geography, summing over the 'total' field and grouping by +fields+. Filters
-        to include +only+ and ignore +exclude+, if given.
-        """
-        db_model = self.model
-
-        if fields is None:
-            fields = [c.key for c in class_mapper(db_model).attrs if c.key not in ['geo_code', 'geo_level', 'geo_version', 'total']]
-
-        fields = [getattr(db_model, f) for f in fields]
-
-        # TODO: this is specific to field tables
-        objects = session\
-            .query(func.sum(db_model.total).label('total'), *fields)\
-            .group_by(*fields)\
-            .filter(db_model.geo_code == geo.geo_code)\
-            .filter(db_model.geo_level == geo.geo_level)\
-            .filter(db_model.geo_version == geo.version)
-
-        if only:
-            for k, v in only.iteritems():
-                objects = objects.filter(getattr(db_model, k).in_(v))
-
-        if exclude:
-            for k, v in exclude.iteritems():
-                objects = objects.filter(getattr(db_model, k).notin_(v))
-
-        if order_by is not None:
-            attr = order_by
-            is_desc = False
-            if order_by[0] == '-':
-                is_desc = True
-                attr = attr[1:]
-
-            if attr == 'total':
-                if is_desc:
-                    attr = attr + ' DESC'
-            else:
-                attr = getattr(db_model, attr)
-                if is_desc:
-                    attr = attr.desc()
-
-            objects = objects.order_by(attr)
-
-        objects = objects.all()
-        if len(objects) == 0:
-            raise DataNotFound("Entry in %s for geography %s version '%s' not found"
-                               % (self.name, geo.geoid, geo.version))
-        return objects
-
     def __str__(self):
         return 'DBTable<%s>' % self.name
 
@@ -721,7 +670,58 @@ class FieldTable(DataTable):
         else:
             return '-'.join(field_values)
 
-    def raw_data_for_geos(self, geos, release=None, year=None):
+    def get_rows_for_geo(self, geo, session, fields=None, order_by=None, only=None, exclude=None, db_table=None):
+        """ Get rows of statistics from the stats model +db_model+ for a particular
+        geography, summing over the 'total' field and grouping by +fields+. Filters
+        to include +only+ and ignore +exclude+, if given.
+        """
+        db_table = db_table or self.get_db_table()
+        db_model = db_table.model
+
+        if fields is None:
+            fields = [c.key for c in class_mapper(db_model).attrs if c.key not in ['geo_code', 'geo_level', 'geo_version', 'total']]
+
+        fields = [getattr(db_model, f) for f in fields]
+
+        objects = session\
+            .query(func.sum(db_model.total).label('total'), *fields)\
+            .group_by(*fields)\
+            .filter(db_model.geo_code == geo.geo_code)\
+            .filter(db_model.geo_level == geo.geo_level)\
+            .filter(db_model.geo_version == geo.version)
+
+        if only:
+            for k, v in only.iteritems():
+                objects = objects.filter(getattr(db_model, k).in_(v))
+
+        if exclude:
+            for k, v in exclude.iteritems():
+                objects = objects.filter(getattr(db_model, k).notin_(v))
+
+        if order_by is not None:
+            attr = order_by
+            is_desc = False
+            if order_by[0] == '-':
+                is_desc = True
+                attr = attr[1:]
+
+            if attr == 'total':
+                if is_desc:
+                    attr = attr + ' DESC'
+            else:
+                attr = getattr(db_model, attr)
+                if is_desc:
+                    attr = attr.desc()
+
+            objects = objects.order_by(attr)
+
+        objects = objects.all()
+        if len(objects) == 0:
+            raise DataNotFound("Entry in %s for geography %s version '%s' not found"
+                               % (db_table.name, geo.geoid, geo.version))
+        return objects
+
+    def raw_data_for_geos(self, geos, db_table=None):
         """ Pull raw data for a list of geo models.
 
         Returns a dict mapping the geo ids to table data.
@@ -732,7 +732,7 @@ class FieldTable(DataTable):
                 'error': {}}
                 for geo in geos}
 
-        db_table = self.get_db_table(release=release, year=year)
+        db_table = db_table or self.get_db_table()
 
         session = get_session()
         try:

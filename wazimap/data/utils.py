@@ -363,7 +363,7 @@ def get_stat_data(fields, geo, session, order_by=None,
 
     # get the release and underlying database table
     db_table = data_table.get_db_table(year=year or current_context().get('year'))
-    objects = db_table.get_rows_for_geo(geo, session, fields=fields, order_by=order_by, only=only, exclude=exclude)
+    objects = data_table.get_rows_for_geo(geo, session, fields=fields, order_by=order_by, only=only, exclude=exclude, db_table=db_table)
 
     if total is not None and many_fields:
         raise ValueError("Cannot specify a total if many fields are given")
