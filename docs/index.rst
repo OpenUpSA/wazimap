@@ -54,6 +54,7 @@ Contents
    profiles
    customising
    deploying
+   upgrading
    version_history
 
 
