@@ -1,4 +1,30 @@
+'''
+Models for handling census and other data tables.
+
+`SimpleTable` and `FieldTable` instances describe an underlying Postgres table
+and have extra metadata associated with them, such as the universe they cover.
+All tables have an `id` which identifies them internally to the user when
+exploring datasets.
+
+A `SimpleTable` is like a spreadsheet, with one row per geography. It has
+no concept of fields and the table id is set manually. Simple tables are
+not split by geography, for no particular reason. Hence, simple table ids
+are the same as the underlying Postgres table name.
+
+A `FieldTable` is for census data and may have multiple rows per geography.
+The id for a table is derived from the table's fields. The underlying
+database has one table (and hence model) per geography, and the name of those
+tables is derived from the id and the geography level. Each model is created
+dynamically and linked back to its data table.
+
+A `FieldTable` can be looked up based on a required set of fields. This
+means that the census controller doesn't care about table names, only
+about what fields it requires. If more than one FieldTable could serve
+for a set of fields, the one with the fewest extraneous fields is chosen.
+'''
+
 from collections import OrderedDict
+import re
 
 from django.db import models
 from django.utils.text import slugify
@@ -7,7 +33,6 @@ from django.contrib.postgres.fields import ArrayField
 from itertools import groupby
 from wazimap.data.base import Base
 from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata, current_context
-from wazimap.data.tables import ZeroRow, INT_RE
 from sqlalchemy import Column, String, Table, or_, and_, func
 from sqlalchemy.orm import class_mapper
 import sqlalchemy.types
@@ -195,6 +220,21 @@ class DataTable(models.Model):
 
 
 class SimpleTable(DataTable):
+    """ A Simple data table follows a normal spreadsheet format. Each row
+    has one or more numeric values, one for each column. Each geography
+    has only one row.
+
+    A table can optionally have a total column, either named 'total' or
+    controlled with the +total_column+ parameter. Without a total column,
+    table values won't be shown as a percentage.
+
+    In the web view, the total column is removed from the view and is not
+    shown in the display.
+
+    There is no way to have field combinations, such as 'Female, Age 18+'. For that,
+    use a `FieldTable` below.
+    """
+
     total_column = models.CharField(max_length=50, null=True, help_text="Name of the column that contains the total value of all the columns in the row. Wazimap usse this to express column values as a percentage. If this is not set, the table doesn't have the concept of a total and only absolute values (not percentages) will be displayed.")
     db_table_releases = models.ManyToManyField(DBTable, through='SimpleTableRelease', through_fields=('data_table', 'db_table'))
 
@@ -379,6 +419,8 @@ class SimpleTable(DataTable):
 
 
 class FieldTable(DataTable):
+    INT_RE = re.compile("^[0-9]+$")
+
     INTEGER = 'Integer'
     FLOAT = 'Float'
     CHOICES = ((INTEGER, INTEGER), (FLOAT, FLOAT))
@@ -520,7 +562,7 @@ class FieldTable(DataTable):
         return columns
 
     def column_id(self, field_values):
-        if len(field_values) == 1 and INT_RE.match(field_values[0]):
+        if len(field_values) == 1 and self.INT_RE.match(field_values[0]):
             # javascript re-orders keys that are pure integers, so force it to be a string
             return field_values[0] + "_"
         else:
@@ -705,3 +747,9 @@ class FieldTableRelease(models.Model):
 
     def __str__(self):
         return '%s for %s in %s' % (self.db_table, self.data_table, self.release)
+
+
+class ZeroRow(object):
+    # object that acts as a SQLAlchemy row of zeros
+    def __getattribute__(self, attr):
+        return 0

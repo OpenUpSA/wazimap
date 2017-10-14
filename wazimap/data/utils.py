@@ -492,6 +492,14 @@ def get_simpletable(name, universe=None, dataset=None):
     return SimpleTable.find(name, universe=universe, dataset=dataset)
 
 
+def get_datatable(name):
+    from wazimap.models import SimpleTable, FieldTable
+    for cls in [SimpleTable, FieldTable]:
+        table = cls.find(name)
+        if table:
+            return table
+
+
 def create_debug_dump(data, geo_level, name):
     import os
     import json
