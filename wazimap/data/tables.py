@@ -1,4 +1,5 @@
 import re
+import warnings
 
 import sqlalchemy.types
 
@@ -70,6 +71,7 @@ class SimpleTable(object):
                               'number' or 'percentage'
         :param str db_table: name of an existing database table to use for this data table.
         """
+        warnings.warn("SimpleTables are no longer used. Use `python manage.py upgradetables` to migrate.", DeprecationWarning)
         self.id = id.upper()
         self.db_table = db_table or self.id.lower()
 
@@ -145,6 +147,7 @@ class FieldTable(SimpleTable):
                              i.e. `population group` by `gender`, and `gender` by `population group`,
                              to use the same database table.
         """
+        warnings.warn("FieldTables are no longer used. Use `python manage.py upgradetables` to migrate.", DeprecationWarning)
         description = description or (universe + ' by ' + ', '.join(fields))
         id = id or get_table_id(fields)
 
