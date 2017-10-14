@@ -41,12 +41,12 @@ _metadata = MetaData(bind=_engine, naming_convention=naming_convention)
 _Session = sessionmaker(bind=_engine)
 
 
+# dictionaries that merge_dicts will merge
+MERGE_KEYS = set(['values', 'numerators', 'error'])
+
+
 def get_session():
     return _Session()
-
-
-class LocationNotFound(Exception):
-    pass
 
 
 def capitalize(s):
@@ -85,10 +85,6 @@ def add_metadata(data, table, release):
         data['metadata']['universe'] = table.universe
     if release.year:
         data['metadata']['year'] = release.year
-
-
-# dictionaries that merge_dicts will merge
-MERGE_KEYS = set(['values', 'numerators', 'error'])
 
 
 def collapse_categories(data, categories, key_order=None):
@@ -231,22 +227,14 @@ def group_remainder(data, num_items=4, make_percentage=True,
                                         for k, v in values['numerators'].iteritems())
 
 
-def get_stat_data(fields, geo, session, order_by=None,
-                  percent=True, total=None, table_fields=None,
-                  table_name=None, only=None, exclude=None, exclude_zero=False,
-                  recode=None, key_order=None, table_dataset=None,
-                  percent_grouping=None, slices=None, year=None, table_universe=None):
+def get_stat_data(fields, geo, session, table_dataset=None, table_universe=None,
+                  table_fields=None, table_name=None, **kwargs):
     """
     This is our primary helper routine for building a dictionary suitable for
     a place's profile page, based on a statistic.
 
-    It sums over the data for ``fields`` in the database for the place identified by
-    ``geo`` and calculates numerators and values. If multiple fields are given,
-    it creates nested result dictionaries.
-
-    Control the rows that are included or ignored using ``only``, ``exclude`` and ``exclude_zero``.
-
-    The field values can be recoded using ``recode`` and and re-ordered using ``key_order``.
+    See `wazimap.models.data.FieldTable.get_stat_data` for a full description
+    of all parameters.
 
     :param fields: the census field to build stats for. Specify a list of fields to build
                    nested statistics. If multiple fields are specified, then the values
@@ -255,36 +243,8 @@ def get_stat_data(fields, geo, session, order_by=None,
     :type fields: str or list
     :param geo: the geograhy object
     :param dbsession session: sqlalchemy session
-    :param str order_by: field to order by, or None for default, eg. '-total'
-    :param bool percent: should we calculate percentages, or just sum raw values?
-    :param list percent_grouping: when calculating percentages, which fields should rows be grouped by?
-                                  Default: none of them -- calculate each entry as a percentage of the
-                                  whole dataset. Ignored unless ``percent`` is ``True``.
     :param list table_fields: list of fields to use to find the table, defaults to `fields`
-    :param int total: the total value to use for percentages, or None to total columns automatically
     :param str table_name: override the table name, otherwise it's calculated from the fields and geo_level
-    :param list only: only include these field values. If ``fields`` has many items, this must be a dict
-                      mapping field names to a list of strings.
-    :type only: dict or list
-    :param exclude: ignore these field values. If ``fields`` has many items, this must be a dict
-                    mapping field names to a list of strings. Field names are checked
-                    before any recoding.
-    :type exclude: dict or list
-    :param bool exclude_zero: ignore fields that have a zero or null total
-    :param recode: function or dict to recode values of ``key_field``. If ``fields`` is a singleton,
-                   then the keys of this dict must be the values to recode from, otherwise
-                   they must be the field names and then the values. If this is a lambda,
-                   it is called with the field name and its value as arguments.
-    :type recode: dict or lambda
-    :param key_order: ordering for keys in result dictionary. If ``fields`` has many items,
-                      this must be a dict from field names to orderings.
-                      The default ordering is determined by ``order``.
-    :type key_order: dict or list
-    :param str table_universe: universe used to help find the table if ``table_name`` isn't given.
-    :param list slices: return only a slice of the final data, by choosing a single value for each
-                       field in the field list, as specified in the slice list.
-    :param str year: release year to use. None will try to use the current dataset context, and 'latest'
-                     will use the latest release.
     :param str table_dataset: dataset name for finding a table, if the fields are ambiguous.
 
     :return: (data-dictionary, total)
@@ -294,39 +254,6 @@ def get_stat_data(fields, geo, session, order_by=None,
     if not isinstance(fields, list):
         fields = [fields]
 
-    n_fields = len(fields)
-    many_fields = n_fields > 1
-
-    if order_by is None:
-        order_by = fields[0]
-
-    if only is not None:
-        if not isinstance(only, dict):
-            if many_fields:
-                raise ValueError("If many fields are given, then only must be a dict. I got %s instead" % only)
-            else:
-                only = {fields[0]: set(only)}
-
-    if exclude is not None:
-        if not isinstance(exclude, dict):
-            if many_fields:
-                raise ValueError("If many fields are given, then exclude must be a dict. I got %s instead" % exclude)
-            else:
-                exclude = {fields[0]: set(exclude)}
-
-    if key_order:
-        if not isinstance(key_order, dict):
-            if many_fields:
-                raise ValueError("If many fields are given, then key_order must be a dict. I got %s instead" % key_order)
-            else:
-                key_order = {fields[0]: key_order}
-    else:
-        key_order = {}
-
-    if recode:
-        if not isinstance(recode, dict) or not many_fields:
-            recode = dict((f, recode) for f in fields)
-
     table_fields = table_fields or fields
 
     # get the table and the model
@@ -334,152 +261,7 @@ def get_stat_data(fields, geo, session, order_by=None,
     if not data_table:
         ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
 
-    # get the release and underlying database table
-    db_table = data_table.get_db_table(year=year or current_context().get('year'))
-    objects = data_table.get_rows_for_geo(geo, session, fields=fields, order_by=order_by, only=only, exclude=exclude, db_table=db_table)
-
-    if total is not None and many_fields:
-        raise ValueError("Cannot specify a total if many fields are given")
-
-    if total and percent_grouping:
-        raise ValueError("Cannot specify a total if percent_grouping is given")
-
-    if total is None and percent and data_table.total_column is None:
-        # The table doesn't support calculating percentages, but the caller
-        # has asked for a percentage without providing a total value to use.
-        # Either specify a total, or specify percent=False
-        raise ValueError("Asking for a percent on table %s that doesn't support totals and no total parameter specified." % data_table.id)
-
-    # sanity check the percent grouping
-    if percent:
-        if percent_grouping:
-            for field in percent_grouping:
-                if field not in fields:
-                    raise ValueError("Field '%s' specified in percent_grouping must be in the fields list." % field)
-            # re-order percent grouping to be same order as in the field list
-            percent_grouping = [f for f in fields if f in percent_grouping]
-    else:
-        percent_grouping = None
-
-    denominator_key = getattr(data_table, 'denominator_key')
-    root_data = OrderedDict()
-    running_total = 0
-    group_totals = {}
-    grand_total = -1
-
-    def get_recoded_key(recode, field, key):
-        recoder = recode[field]
-        if isinstance(recoder, dict):
-            return recoder.get(key, key)
-        else:
-            return recoder(field, key)
-
-    def get_data_object(obj):
-        """ Recurse down the list of fields and return the
-        final resting place for data for this stat. """
-        data = root_data
-
-        for i, field in enumerate(fields):
-            key = getattr(obj, field)
-
-            if recode and field in recode:
-                key = get_recoded_key(recode, field, key)
-            else:
-                key = capitalize(key)
-
-            # enforce key ordering the first time we see this field
-            if (not data or data.keys() == ['metadata']) and field in key_order:
-                for fld in key_order[field]:
-                    data[fld] = OrderedDict()
-
-            # ensure it's there
-            if key not in data:
-                data[key] = OrderedDict()
-
-            data = data[key]
-
-            # default values for intermediate fields
-            if data is not None and i < n_fields - 1:
-                data['metadata'] = {'name': key}
-
-        # data is now the dict where the end value is going to go
-        if not data:
-            data['name'] = key
-            data['numerators'] = {'this': 0.0}
-
-        return data
-
-    # run the stats for the objects
-    for obj in objects:
-        if not obj.total and exclude_zero:
-            continue
-
-        if denominator_key and getattr(obj, data_table.fields[-1]) == denominator_key:
-            grand_total = obj.total
-            # don't include the denominator key in the output
-            continue
-
-        # get the data dict where these values must go
-        data = get_data_object(obj)
-        if not data:
-            continue
-
-        if obj.total is not None:
-            data['numerators']['this'] += obj.total
-            running_total += obj.total
-        else:
-            # TODO: sanity check this is the right thing to do for multiple fields with
-            # nested nulls -- does aggregating over nulls treat them as zero, or should we
-            # treat them as null?
-            data['numerators']['this'] = None
-
-        if percent_grouping:
-            if obj.total is not None:
-                group_key = tuple()
-                for field in percent_grouping:
-                    key = getattr(obj, field)
-                    if recode and field in recode:
-                        # Group by recoded keys
-                        key = get_recoded_key(recode, field, key)
-                    group_key = group_key + (key,)
-
-                data['_group_key'] = group_key
-                group_totals[group_key] = group_totals.get(group_key, 0) + obj.total
-
-    if grand_total == -1:
-        grand_total = running_total if total is None else total
-
-    # add in percentages
-    def calc_percent(data):
-        for key, data in data.iteritems():
-            if not key == 'metadata':
-                if 'numerators' in data:
-                    if percent:
-                        if '_group_key' in data:
-                            total = group_totals[data.pop('_group_key')]
-                        else:
-                            total = grand_total
-
-                        if total is not None and data['numerators']['this'] is not None:
-                            perc = 0 if total == 0 else (data['numerators']['this'] / total * 100)
-                            data['values'] = {'this': round(perc, 2)}
-                        else:
-                            data['values'] = {'this': None}
-                    else:
-                        data['values'] = dict(data['numerators'])
-                        data['numerators']['this'] = None
-                else:
-                    calc_percent(data)
-
-    calc_percent(root_data)
-
-    if slices:
-        for v in slices:
-            root_data = root_data[v]
-
-    add_metadata(root_data, data_table, db_table.active_release)
-
-    return root_data, grand_total
+    return data_table.get_stat_data(fields, geo, session, **kwargs)
 
 
 def get_table_for_fields(fields, universe=None, dataset=None):

@@ -11,10 +11,10 @@ from django.shortcuts import redirect
 
 from census.views import GeographyDetailView as BaseGeographyDetailView, LocateView as BaseLocateView, render_json_to_response
 
-from wazimap.geo import geo_data
+from wazimap.geo import geo_data, LocationNotFound
 from wazimap.profiles import enhance_api_data
 from wazimap.data.tables import get_datatable, DATA_TABLES
-from wazimap.data.utils import LocationNotFound, dataset_context
+from wazimap.data.utils import dataset_context
 from wazimap.data.download import DownloadManager
 
 

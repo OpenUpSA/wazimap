@@ -8,7 +8,6 @@ from django.utils.module_loading import import_string
 from django.db.models import Q
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from wazimap.data.utils import LocationNotFound
 from wazimap.models import Geography
 
 log = logging.getLogger(__name__)
@@ -21,6 +20,10 @@ try:
     HAS_GDAL = True
 except ImportError:
     HAS_GDAL = False
+
+
+class LocationNotFound(Exception):
+    pass
 
 
 class GeoData(object):
