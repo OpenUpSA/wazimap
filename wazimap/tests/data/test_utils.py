@@ -48,7 +48,7 @@ lev,code,Female,
         self.assertIsNone(data['Female']['values']['this'])
 
     def test_get_stat_data_nulls_with_denominator_key(self):
-        table = FieldTable(['household goods'], universe='Households', denominator_key='total households')
+        table = self.field_table(['household goods'], None, universe='Households', denominator_key='total households')
         self.load_data(table, """
 lev,code,fridge,10
 lev,code,computer,5

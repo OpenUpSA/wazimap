@@ -530,6 +530,9 @@ def create_debug_dump(data, geo_level, name):
 
 
 class DatasetContext(object):
+    """ Use for storing thread-local context to make it less verbose
+    when building profile poges.
+    """
     _threadlocal = threading.local()
 
     def __init__(self, **kwargs):
@@ -555,8 +558,16 @@ class DatasetContext(object):
         return ctx
 
 
-def dataset_context(**kwargs):
-    return DatasetContext(**kwargs)
+def dataset_context(year=None):
+    """ Sets the dataset context. Mostly used when setting the best release year to use when building
+    a profile::
+
+        with dataset_context(year='2011'):
+            get_stat_data(...)
+
+    :param str year: release year to use. Use 'latest' for the latest year.
+    """
+    return DatasetContext(year=year)
 
 
 def current_context():
