@@ -78,7 +78,7 @@ urlpatterns = patterns('',
 
     # Custom data api
     url(
-        regex   = '^api/1.0/data/show/latest$',
+        regex   = '^api/1.0/data/show/(?P<release>\w+)$',
         view    = cache_page(STANDARD_CACHE_TIME)(DataAPIView.as_view()),
         kwargs  = {'action': 'show'},
         name    = 'api_show_data',
@@ -86,7 +86,7 @@ urlpatterns = patterns('',
 
     # download API
     url(
-        regex   = '^api/1.0/data/download/latest$',
+        regex   = '^api/1.0/data/download/(?P<release>\w+)$',
         view    = DataAPIView.as_view(),
         kwargs  = {'action': 'download'},
         name    = 'api_download_data',

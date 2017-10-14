@@ -51,8 +51,12 @@ DB_MODELS = {}
 INT_RE = re.compile("^[0-9]+$")
 
 
-def get_datatable(id):
-    return DATA_TABLES[id.upper()]
+def get_datatable(name):
+    from wazimap.models import SimpleTable, FieldTable
+    for cls in [SimpleTable, FieldTable]:
+        table = cls.find(name)
+        if table:
+            return table
 
 
 class ZeroRow(object):

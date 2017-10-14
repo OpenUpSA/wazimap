@@ -43,6 +43,7 @@ class Command(BaseCommand):
                 has_total=table.has_total,
                 value_type=table.value_type.__name__,
                 stat_type=table.stat_type,
+                description=table.description,
                 dataset=dataset,
             )
             new_table.clean()
@@ -88,6 +89,7 @@ class Command(BaseCommand):
                 name=table.id.lower(),
                 universe=table.universe,
                 stat_type=table.stat_type,
+                description=table.description,
                 dataset=dataset,
             )
             new_table.clean()

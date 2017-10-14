@@ -14,7 +14,7 @@ from census.views import GeographyDetailView as BaseGeographyDetailView, LocateV
 from wazimap.geo import geo_data
 from wazimap.profiles import enhance_api_data
 from wazimap.data.tables import get_datatable, DATA_TABLES
-from wazimap.data.utils import LocationNotFound
+from wazimap.data.utils import LocationNotFound, dataset_context
 from wazimap.data.download import DownloadManager
 
 
@@ -184,23 +184,42 @@ class DataAPIView(View):
         except KeyError as e:
             return render_json_error('Unknown table: %s' % e.message, 404)
 
-        if kwargs.get('action') == 'show':
-            return self.show(request)
-        if kwargs.get('action') == 'download':
-            return self.download(request)
+        # tables should all be from the same dataset
+        datasets = set(t.dataset for t in self.tables)
+        if len(datasets) > 1:
+            return render_json_error("All tables must belong to the same dataset.", 400)
+        self.dataset = list(datasets)[0]
+
+        self.release = None
+        for table in self.tables:
+            release = table.get_release(year=kwargs['release'])
+            if not release:
+                return render_json_error("No release %s for table %s." % (kwargs['release'], table.name.upper()), 400)
+
+            # different?
+            if self.release and self.release != release:
+                return render_json_error("All tables must have the same release.", 400)
+
+            self.release = release
+
+        with dataset_context(year=self.release.year):
+            if kwargs.get('action') == 'show':
+                return self.show(request)
+            if kwargs.get('action') == 'download':
+                return self.download(request)
 
     def show(self, request):
-        dataset = ', '.join(sorted(list(set(t.dataset_name for t in self.tables))))
-        years = ', '.join(sorted(list(set(t.year for t in self.tables))))
-
         data = self.get_data(self.data_geos, self.tables)
 
+        tables = {}
+        for table in self.tables:
+            d = table.as_dict()
+            d['columns'] = table.columns()
+            tables[table.name.upper()] = d
+
         return render_json_to_response({
-            'release': {
-                'name': dataset,
-                'years': years,
-            },
-            'tables': dict((t.id.upper(), t.as_dict()) for t in self.tables),
+            'release': self.release.as_dict(),
+            'tables': tables,
             'data': data,
             'geography': dict((g.geoid, g.as_dict()) for g in chain(self.data_geos, self.info_geos)),
         })
@@ -215,8 +234,9 @@ class DataAPIView(View):
             return response
 
         data = self.get_data(self.data_geos, self.tables)
+        columns = {table.name: table.columns(release=self.release) for table in self.tables}
 
-        content, fname, mime_type = mgr.generate_download_bundle(self.tables, self.data_geos, self.geo_ids, data, fmt)
+        content, fname, mime_type = mgr.generate_download_bundle(self.tables, self.data_geos, self.geo_ids, columns, data, fmt)
 
         response = HttpResponse(content, content_type=mime_type)
         response['Content-Disposition'] = 'attachment; filename="%s"' % fname
@@ -261,7 +281,7 @@ class DataAPIView(View):
 
         for table in tables:
             for geo_id, table_data in table.raw_data_for_geos(geos).iteritems():
-                data.setdefault(geo_id, {})[table.id.upper()] = table_data
+                data.setdefault(geo_id, {})[table.name.upper()] = table_data
 
         return data
 

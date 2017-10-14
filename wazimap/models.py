@@ -187,6 +187,12 @@ class Release(models.Model):
     def __str__(self):
         return '%s - %s' % (self.name, self.year)
 
+    def as_dict(self):
+        return {
+            'name': self.name,
+            'year': self.year,
+        }
+
 
 class DBTable(models.Model):
     # TODO: validator on name
@@ -225,6 +231,7 @@ class DBTable(models.Model):
 
         fields = [getattr(db_model, f) for f in fields]
 
+        # TODO: this is specific to field tables
         objects = session\
             .query(func.sum(db_model.total).label('total'), *fields)\
             .group_by(*fields)\
@@ -280,7 +287,6 @@ class DataTable(models.Model):
     dataset = models.ForeignKey(Dataset, null=False, on_delete=models.CASCADE)
     stat_type = models.CharField(max_length=10, null=False, default=NUMBER, choices=CHOICES)
     description = models.CharField(max_length=1024, null=True, blank=True, help_text="Helpful description of this table (optional). Generated automatically for FieldTables if left blank.")
-    # TODO: unique name?
 
     release_class = None
 
@@ -357,16 +363,21 @@ class DataTable(models.Model):
 
         return columns
 
-    def as_dict(self, columns=True):
-        # TODO: add releases?
+    def as_dict(self):
         return {
-            'title': self.description,
+            'title': self.description or self.name,
             'universe': self.universe,
             'denominator_column_id': self.total_column,
-            'columns': self.columns,
-            'table_id': self.id.upper(),
+            'table_id': self.name.upper(),
             'stat_type': self.stat_type,
+            'releases': [r.as_dict() for r in self.releases()],
         }
+
+    def releases(self):
+        return list(set(r.release for r in self.release_class.objects
+                        .filter(data_table=self)
+                        .prefetch_related('release')
+                        .all()))
 
     @classmethod
     def find(cls, name, universe=None, dataset=None):
@@ -493,29 +504,32 @@ class SimpleTable(DataTable):
         finally:
             session.close()
 
-    def raw_data_for_geos(self, geos):
+    def raw_data_for_geos(self, geos, release=None, year=None):
         # initial values
         data = {('%s-%s' % (geo.geo_level, geo.geo_code)): {
                 'estimate': {},
                 'error': {}}
                 for geo in geos}
 
+        db_table = self.get_db_table(release=release, year=year)
+        columns = self.columns(db_table)
+
         session = get_session()
         try:
             geo_values = None
             rows = session\
-                .query(self.model)\
+                .query(db_table.model)\
                 .filter(or_(and_(
-                    self.model.geo_level == g.geo_level,
-                    self.model.geo_code == g.geo_code,
-                    self.model.geo_version == g.version)
+                    db_table.model.geo_level == g.geo_level,
+                    db_table.model.geo_code == g.geo_code,
+                    db_table.model.geo_version == g.version)
                     for g in geos))\
                 .all()
 
             for row in rows:
                 geo_values = data['%s-%s' % (row.geo_level, row.geo_code)]
 
-                for col in self.columns.iterkeys():
+                for col in columns.iterkeys():
                     geo_values['estimate'][col] = getattr(row, col)
                     geo_values['error'][col] = 0
 
@@ -524,9 +538,11 @@ class SimpleTable(DataTable):
 
         return data
 
-    def columns(self, db_table):
+    def columns(self, db_table=None, year=None, release=None):
         """ Work out our columns by finding those that aren't geo columns.
         """
+        db_table = db_table or self.get_db_table(year=year, release=release)
+
         columns = OrderedDict()
         indent = 0
         if self.total_column:
@@ -578,7 +594,10 @@ class FieldTable(DataTable):
         super(FieldTable, self).__init__(*args, **kwargs)
         self.release_class = FieldTableRelease
         self._field_set = None
-        self.total_column = self.column_id([self.denominator_key or 'total'])
+        if self.has_total:
+            self.total_column = self.column_id([self.denominator_key or 'total'])
+        else:
+            self.total_column = None
 
     def clean(self):
         if not self.name:
@@ -624,9 +643,8 @@ class FieldTable(DataTable):
 
         return columns
 
-    def setup_columns(self):
-        """
-        Prepare our columns for use by +as_dict+ and the data API.
+    def columns(self, db_table=None, year=None, release=None):
+        """ Prepare a description of our columns for use by the data API.
 
         Each 'column' is actually a unique value for each of this table's +fields+.
         """
@@ -654,23 +672,17 @@ class FieldTable(DataTable):
         #   female
 
         # map from column id to column info.
-        self.columns = OrderedDict()
+        columns = OrderedDict()
+        db_table = db_table or self.get_db_table(year=year, release=release)
 
         # TODO: cache this
 
         if self.has_total:
-            self.total_column = self.column_id([self.denominator_key or 'total'])
-            self.columns[self.total_column] = {'name': 'Total', 'indent': 0}
-        else:
-            self.total_column = None
-
-        # XXX
-        # do this on demand, need to know which table and which release it's about
-        return
+            columns[self.total_column] = {'name': 'Total', 'indent': 0}
 
         session = get_session()
         try:
-            fields = [getattr(self.model, f) for f in self.fields]
+            fields = [getattr(db_table.model, f) for f in self.fields]
 
             # get distinct permutations for all fields
             rows = session\
@@ -688,7 +700,7 @@ class FieldTable(DataTable):
                     new_values = field_values + [val]
                     col_id = self.column_id(new_values)
 
-                    self.columns[col_id] = {
+                    columns[col_id] = {
                         'name': capitalize(val) + ('' if last else ':'),
                         'indent': 0 if col_id == self.total_column else indent,
                     }
@@ -700,6 +712,8 @@ class FieldTable(DataTable):
         finally:
             session.close()
 
+        return columns
+
     def column_id(self, field_values):
         if len(field_values) == 1 and INT_RE.match(field_values[0]):
             # javascript re-orders keys that are pure integers, so force it to be a string
@@ -707,32 +721,34 @@ class FieldTable(DataTable):
         else:
             return '-'.join(field_values)
 
-    def raw_data_for_geos(self, geos):
-        """
-        Pull raw data for a list of geo models.
+    def raw_data_for_geos(self, geos, release=None, year=None):
+        """ Pull raw data for a list of geo models.
 
         Returns a dict mapping the geo ids to table data.
         """
+        # initial values
         data = {('%s-%s' % (geo.geo_level, geo.geo_code)): {
                 'estimate': {},
                 'error': {}}
                 for geo in geos}
 
+        db_table = self.get_db_table(release=release, year=year)
+
         session = get_session()
         try:
             geo_values = None
-            fields = [getattr(self.model, f) for f in self.fields]
+            fields = [getattr(db_table.model, f) for f in self.fields]
             rows = session\
-                .query(self.model.geo_level,
-                       self.model.geo_code,
-                       func.sum(self.model.total).label('total'),
+                .query(db_table.model.geo_level,
+                       db_table.model.geo_code,
+                       func.sum(db_table.model.total).label('total'),
                        *fields)\
-                .group_by(self.model.geo_level, self.model.geo_code, *fields)\
-                .order_by(self.model.geo_level, self.model.geo_code, *fields)\
+                .group_by(db_table.model.geo_level, db_table.model.geo_code, *fields)\
+                .order_by(db_table.model.geo_level, db_table.model.geo_code, *fields)\
                 .filter(or_(and_(
-                    self.model.geo_level == geo.geo_level,
-                    self.model.geo_code == geo.geo_code,
-                    self.model.geo_version == geo.version)
+                    db_table.model.geo_level == geo.geo_level,
+                    db_table.model.geo_code == geo.geo_code,
+                    db_table.model.geo_version == geo.version)
                     for geo in geos))\
                 .all()
 

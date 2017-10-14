@@ -547,10 +547,17 @@ class DatasetContext(object):
     def __exit__(self, exc_type, exc_value, traceback):
         DatasetContext._threadlocal.dataset_context = None
 
+    @classmethod
+    def ensure_context(cls):
+        ctx = getattr(cls._threadlocal, 'dataset_context', None)
+        if ctx is None:
+            ctx = cls()
+        return ctx
+
 
 def dataset_context(**kwargs):
     return DatasetContext(**kwargs)
 
 
 def current_context():
-    return DatasetContext._threadlocal.dataset_context or DatasetContext()
+    return DatasetContext.ensure_context()

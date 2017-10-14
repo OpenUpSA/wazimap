@@ -22,7 +22,7 @@ class DownloadManager(object):
         'shp': {"driver": "Esri Shapefile", 'geometry': True, 'mime': 'text/csv'},
     }
 
-    def generate_download_bundle(self, tables, geos, geo_ids, data, fmt):
+    def generate_download_bundle(self, tables, geos, geo_ids, columns, data, fmt):
         if not HAS_GDAL:
             gdal_missing(critical=True)
 
@@ -37,7 +37,7 @@ class DownloadManager(object):
         temp_path = tempfile.mkdtemp()
         try:
             file_ident = "%s_%s" % (
-                tables[0].id.upper(),
+                tables[0].name.upper(),
                 # The gdal KML driver doesn't like certain chars in its layer names.
                 # It will replace them for you, but then subsequent calls hang.
                 self.BAD_LAYER_CHARS.sub('_', geos[0].name))
@@ -62,7 +62,7 @@ class DownloadManager(object):
             out_layer.CreateField(ogr.FieldDefn('name', ogr.OFTString))
 
             for table in tables:
-                for column_id, column_info in table.columns.iteritems():
+                for column_id, column_info in columns[table.name].iteritems():
                     out_layer.CreateField(ogr.FieldDefn(str(column_id), ogr.OFTReal))
 
             for geo in geos:
@@ -81,9 +81,9 @@ class DownloadManager(object):
                 out_feat.SetField2('name', geo.name.encode('utf-8'))
 
                 for table in tables:
-                    table_estimates = data[geoid][table.id.upper()]['estimate']
+                    table_estimates = data[geoid][table.name.upper()]['estimate']
 
-                    for column_id, column_info in table.columns.iteritems():
+                    for column_id, column_info in columns[table.name].iteritems():
                         if column_id in table_estimates:
                             est = table_estimates[column_id]
                             # None values get changed to zero, which isn't accurate
