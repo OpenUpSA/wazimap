@@ -59,6 +59,7 @@ class ReleaseInline(admin.StackedInline):
     model = Release
     fields = ('name', 'year')
     extra = 0
+    min_num = 1
 
 
 @admin.register(Dataset)

@@ -20,21 +20,33 @@ Simple Tables
 
 Both types of tables have some metadata linked to them, such as an id, year and a description of the population that it covers.
 
+Datasets and Releases
+---------------------
+
+In Wazimap, a **dataset** is a collection of related **data tables**, such as a national census. A dataset can be updated with new **releases** every few years. Not all data data tables will always be updated in every release, so Wazimap lets you link data tables to releases individually.
+
+Sometimes a release has a different name to the original dataset. For example, South Africa conducts a full census every decade, but releases a community survey in between each full census. A community survey is a statistical sampling and is not a full census, so it would be incorrect to call them both "census". The results of the community survey are very similar to the census and are directly comparable. We consider census and community surveys to be different **releases** of the same **dataset**.
+
+.. important::
+
+    You must add at least one **dataset** and one **release** before you can add any data tables. See below
+    for details on how to do this.
+
+.. _create-dataset:
+    
+Create a Dataset and Release
+............................
+
+1. Go to the Django admin section at http://localhost:8000/admin and log in.
+2. Under **Wazimap**, click the **Add** button alongside **Datasets**.
+3. Give your dataset a name.
+4. Under **Releases**, fill in the name and the year of your first release. For example, you could use ``Census`` and ``2017``.
+5. Click **Save**.
+
 Configuring Tables
 ------------------
 
-All tables are configured in your project's ``tables.py`` file. Wazimap imports this automatically. Here's a short example: ::
-
-    from wazimap.data.tables import FieldTable
-
-    # Define our tables so the data API can discover them.
-    FieldTable(['rural or urban', 'sex', 'age in completed years'])
-    FieldTable(['employment activity status', 'sex'], universe='People aged 5 years and older')
-    FieldTable(['main source of water'], universe='Households')
-    SimpleTable(id='votes_national_2014', universe='Valid votes', total_column='total_votes',
-                description='2014 National Election votes', dataset='2014 National Elections', year='2014')
-
-This tells Wazimap that it has three Field Tables and one Simple Table. We describe these in more detail below.
+Datasets, releases and data tables are configured through the Django admin interface, at http://localhost:8000/admin.
 
 Once you have told Wazimap about your tables, it'll ensure that they exist in the database. You can then import
 the raw data from CSV.
@@ -77,12 +89,17 @@ province  GT                   French    Female  779
 Adding a Field Table
 ....................
 
-First, you must register your Field Table in your project's ``tables.py``. When Wazimap starts, it will create
-the underlying database table if it doesn't already exist.
+First, ensure that you have :ref:`created at least one dataset and release <create-dataset>`.
 
-.. automethod:: wazimap.data.tables.FieldTable.__init__
+1. Go to the Django admin section at http://localhost:8000/admin and log in.
+2. Under **Wazimap**, click the **Add** button alongside **Field tables**.
+3. Choose the dataset the table belongs to.
+4. Name the **Universe** this table describes, such as ``Population``, ``Households`` or ``Youth aged 14 to 25``.
+5. Provide a comma-separated list of the **Fields** in your table.
+6. Leave the **Description** blank and it will be generated for you.
+7. Click **Save**.
 
-You must then import the data into the table. The easiest way of doing this is to look at the database to understand
+Now import the data into the table. The easiest way of doing this is to look at the database to understand
 the columns in your new table, shape your data accordingly, and import it using psql's CSV import support.
 
 Simple Tables
@@ -121,10 +138,15 @@ shows absolute values.
 Adding a Simple Table
 .....................
 
-First, you must register your Simple Table in your project's ``tables.py``. When Wazimap starts, it will create
-the underlying database table if it doesn't already exist.
+First, ensure that you have :ref:`created at least one dataset and release <create-dataset>`.
 
-.. automethod:: wazimap.data.tables.SimpleTable.__init__
+1. Go to the Django admin section at http://localhost:8000/admin and log in.
+2. Under **Wazimap**, click the **Add** button alongside **Simple tables**.
+3. Give your table a descriptive name.
+4. Choose the dataset the table belongs to.
+5. Name the **Universe** this table describes, such as ``Population``, ``Households`` or ``Youth aged 14 to 25``.
+6. Add a **Description** of your table.
+7. Click **Save**.
 
-You must then import the data into the table. The easiest way of doing this is to look at the database to understand
+Now import the data into the table. The easiest way of doing this is to look at the database to understand
 the columns in your new table, shape your data accordingly, and import it using psql's CSV import support.
