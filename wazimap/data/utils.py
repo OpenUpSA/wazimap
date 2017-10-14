@@ -49,33 +49,6 @@ class LocationNotFound(Exception):
     pass
 
 
-class Location(object):
-    '''
-    Simple object to represent a location in the South African
-    context.
-    '''
-    def __init__(self, address, province_code, ward_code, ward_no,
-                 municipality, coordinates):
-        self.address = address
-        self.province_code = province_code
-        # Northern Province is now called Limpopo
-        if self.province_code == 'NP':
-            self.province_code = 'LIM'
-        self.ward_code = ward_code
-        self.ward_no = ward_no
-        self.municipality = municipality
-        self.latitude = coordinates[0]
-        self.longitude = coordinates[1]
-
-    def __repr__(self):
-        return 'Location(address="%s", ward_code="%s", ' \
-               'municipality="%s", province_code="%s", ' \
-               'latitude=%s, longitude=%s, ward_no=%s)' \
-               % (self.address, self.ward_code, self.municipality,
-                  self.province_code, self.latitude, self.longitude,
-                  self.ward_no)
-
-
 def capitalize(s):
     """
     Capitalize the first char of a string, without
