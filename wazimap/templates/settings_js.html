@@ -8,7 +8,7 @@ var SITE_URL = '{{ WAZIMAP.url }}';
 var EMBED_URL = '{{ WAZIMAP.embed_url|default:WAZIMAP.url }}';
 var WAZIMAP_COUNTRY_CODE = '{{ WAZIMAP.country_code }}';
 var GOOGLE_GEOCODE_API_KEY = '{{ WAZIMAP.google_geocode_api_key }}';
-var GEOMETRY_DEFAULT_GEO_VERSION = '{{ WAZIMAP.default_geo_version }}';
+var GEOMETRY_DEFAULT_GEO_VERSION = {{ geo_data.default_version|jsonify|safe }};
 
 var GEOMETRY_URLS = {
   {% for geo_version, data in WAZIMAP.geometry_data.iteritems %}
