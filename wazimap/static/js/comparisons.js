@@ -34,6 +34,7 @@ function Comparison(options) {
         comparison.geoIDs = options.geoIDs;
         comparison.primaryGeoID = options.primaryGeoID || ((comparison.geoIDs.length == 1) ? comparison.geoIDs[0] : null);
         comparison.chosenSumlevAncestorList = '';
+        comparison.geoVersion = options.geoVersion || GEOMETRY_DEFAULT_GEO_VERSION;
         // jQuery things
         comparison.$topicSelect = $(options.topicSelect);
         comparison.$topicSelectContainer = $(options.topicSelectContainer);
