@@ -20,7 +20,7 @@ function StaticGeometryLoader(geometry_urls) {
      * callback with an object mapping each geo-id to a GeoJSON object.
      */
     this.loadGeometryForComparison = function(comparison, success) {
-        this.loadGeometryForGeoIds(comparison.dataGeoIDs, success);
+        this.loadGeometryForGeoIds(comparison.dataGeoIDs, comparison.geoVersion, success);
     };
 
     /**
@@ -28,7 +28,7 @@ function StaticGeometryLoader(geometry_urls) {
      * and calls the +success+ callback with an object mapping
      * each geo-id to a GeoJSON object.
      */
-    this.loadGeometryForGeoIds = function(geo_ids, success) {
+    this.loadGeometryForGeoIds = function(geo_ids, geo_version, success) {
         var by_level = {};
 
         _.each(geo_ids, function(geo_id) {
@@ -47,7 +47,7 @@ function StaticGeometryLoader(geometry_urls) {
 
             _.each(by_level, function(geo_ids, level) {
                 _.each(geo_ids, function(geo_id) {
-                    features[geo_id] = self.geometry[level][geo_id];
+                    features[geo_id] = self.geometry[geo_version][level][geo_id];
                 });
             });
 
@@ -55,16 +55,16 @@ function StaticGeometryLoader(geometry_urls) {
         });
     };
 
-    this.loadGeometryForLevel = function(level, success) {
-        self.loadLevels([level], function() {
-            success({features: _.values(self.geometry[level])});
+    this.loadGeometryForLevel = function(level, geo_version, success) {
+        self.loadLevels([level], geo_version, function() {
+            success({features: _.values(self.geometry[geo_version][level])});
         });
     };
 
     /**
      * Load the geometry data for +levels+ and then call +success+.
      */
-    this.loadLevels = function(levels, success) {
+    this.loadLevels = function(levels, geo_version, success) {
         var counter = levels.length;
 
         function loaded(level) {
@@ -75,17 +75,18 @@ function StaticGeometryLoader(geometry_urls) {
         }
 
         _.each(levels, function(level) {
-            if (self.geometry[level]) {
+            if (self.geometry[geo_version] && self.geometry[geo_version][level]) {
                 // already have it
                 loaded(level);
             } else {
                 // load it remotely
-                d3.json(self.geometry_urls[level], function(error, json) {
+                d3.json(self.geometry_urls[geo_version][level], function(error, json) {
                     var features;
 
                     if (error) return console.warn(error);
                     if (json) {
-                        self.geometry[level] = {};
+                        if (!self.geometry[geo_version]) self.geometry[geo_version] = {};
+                        self.geometry[geo_version][level] = {};
 
                         if (json.type == 'Topology') {
                             // topojson -> geojson
@@ -100,7 +101,7 @@ function StaticGeometryLoader(geometry_urls) {
 
                         // stash them
                         _.each(features, function(feature) {
-                            self.geometry[level][feature.properties.geoid] = feature;
+                            self.geometry[geo_version][level][feature.properties.geoid] = feature;
                         });
                     }
 
