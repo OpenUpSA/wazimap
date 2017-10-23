@@ -238,7 +238,7 @@ class SimpleTable(DataTable):
     use a `FieldTable` below.
     """
 
-    total_column = models.CharField(max_length=50, null=True, help_text="Name of the column that contains the total value of all the columns in the row. Wazimap usse this to express column values as a percentage. If this is not set, the table doesn't have the concept of a total and only absolute values (not percentages) will be displayed.")
+    total_column = models.CharField(max_length=50, null=True, blank=True, help_text="Name of the column that contains the total value of all the columns in the row. Wazimap usse this to express column values as a percentage. If this is not set, the table doesn't have the concept of a total and only absolute values (not percentages) will be displayed.")
     db_table_releases = models.ManyToManyField(DBTable, through='SimpleTableRelease', through_fields=('data_table', 'db_table'))
 
     def __init__(self, *args, **kwargs):
