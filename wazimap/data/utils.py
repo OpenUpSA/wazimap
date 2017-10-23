@@ -244,8 +244,9 @@ def get_stat_data(fields, geo, session, table_dataset=None, table_universe=None,
     :param geo: the geograhy object
     :param dbsession session: sqlalchemy session
     :param list table_fields: list of fields to use to find the table, defaults to `fields`
-    :param str table_name: override the table name, otherwise it's calculated from the fields and geo_level
+    :param str table_universe: universe for finding a table, if the fields are ambiguous.
     :param str table_dataset: dataset name for finding a table, if the fields are ambiguous.
+    :param str table_name: name of the FieldTable to use, if the fields are ambiguous.
 
     :return: (data-dictionary, total)
     """
@@ -257,7 +258,7 @@ def get_stat_data(fields, geo, session, table_dataset=None, table_universe=None,
     table_fields = table_fields or fields
 
     # get the table and the model
-    data_table = FieldTable.for_fields(table_fields, universe=table_universe, dataset=table_dataset)
+    data_table = FieldTable.for_fields(table_fields, universe=table_universe, dataset=table_dataset, name=table_name)
     if not data_table:
         ValueError("Couldn't find a table that covers these fields: %s" % table_fields)
 

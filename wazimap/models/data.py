@@ -948,7 +948,7 @@ class FieldTable(DataTable):
         return ', '.join(self.fields)
 
     @classmethod
-    def for_fields(cls, fields, universe=None, dataset=None):
+    def for_fields(cls, fields, universe=None, dataset=None, name=None):
         """ Lookup a FieldTable that is suitable for a set of fields.
 
         If there are multiple tables that support these fields, the one with
@@ -958,6 +958,8 @@ class FieldTable(DataTable):
         field_set = set(fields)
 
         candidates = cls.objects.filter(fields__contains=list(field_set))
+        if name:
+            candidates = candidates.filter(name=name)
         if universe:
             candidates = candidates.filter(universe=universe)
         if dataset:
