@@ -1,7 +1,7 @@
 Wazimap Version History
 =======================
 
-2.0.0 (16 October 2017)
+2.0.0 (?)
 -------------------------
 
 This release of Wazimap introduces some backwards incompatible changes. You WILL need to follow the upgrade steps.
@@ -10,6 +10,11 @@ This release of Wazimap introduces some backwards incompatible changes. You WILL
 * BREAKING: SimpleTable and FieldTable are now Django models.
 * BREAKING: Table management is now done through the Django admin interface. You must upgrade your existing tables.
 * BREAKING: ``get_objects_by_geo`` has been replaced by `FieldTable.get_objects_by_geo`.
+
+1.1.0 (23 October 2017)
+-----------------------
+
+* FIX support for versioned geos for static maps
 
 1.0.1 (21 September 2017)
 -------------------------

@@ -31,7 +31,7 @@ var ProfileMaps = function() {
         this.drawAllFeatures();
     };
 
-    this.drawMapForHomepage = function(geo_level, centre, zoom) {
+    this.drawMapForHomepage = function(geo_level, geo_version, centre, zoom) {
         // draw a homepage map, but only for big displays
         if (browserWidth < 768 || $('#slippy-map').length === 0) return;
 
@@ -42,7 +42,7 @@ var ProfileMaps = function() {
             self.map.setView(centre, zoom);
         }
 
-        GeometryLoader.loadGeometryForLevel(geo_level, function(features) {
+        GeometryLoader.loadGeometryForLevel(geo_level, geo_version, function(features) {
             var layer = self.drawFeatures(features);
             if (!centre) {
                 self.map.fitBounds(layer.getBounds());
@@ -82,11 +82,12 @@ var ProfileMaps = function() {
     this.drawAllFeatures = function() {
         var geo_level = this.geo.this.geo_level;
         var geo_code = this.geo.this.geo_code;
+        var geo_version = this.geo.this.version;
         var osm_area_id = this.geo.this.osm_area_id;
         var child_level = this.geo.this.child_level;
 
         // load all map shapes for this level
-        GeometryLoader.loadGeometryForLevel(geo_level, function(features) {
+        GeometryLoader.loadGeometryForLevel(geo_level, geo_version, function(features) {
             // split into this geo, and everything else
             var groups = _.partition(features.features, function(f) {
                 return f.properties.code == geo_code;
@@ -105,7 +106,7 @@ var ProfileMaps = function() {
 
         // load shapes at the child level, if any
         if (child_level) {
-            GeometryLoader.loadGeometryForLevel(child_level, function(features) {
+            GeometryLoader.loadGeometryForLevel(child_level, geo_version, function(features) {
                 self.drawFeatures(features);
             });
         }
