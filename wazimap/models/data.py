@@ -29,11 +29,14 @@ import re
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.postgres.fields import ArrayField
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from itertools import groupby
 from wazimap.data.base import Base
 from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata, current_context
 from sqlalchemy import Column, String, Table, or_, and_, func
+from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.orm import class_mapper
 import sqlalchemy.types
 
@@ -211,6 +214,10 @@ class DataTable(models.Model):
                         .filter(data_table=self)
                         .prefetch_related('release')
                         .all()))
+
+    def ensure_db_tables_exist(self):
+        for release in self.release_class.objects.all():
+            release.ensure_db_table_exists()
 
     @classmethod
     def find(cls, name, universe=None, dataset=None):
@@ -411,8 +418,16 @@ class SimpleTable(DataTable):
         if not model:
             columns = self._build_model_columns()
 
+            try:
+                # We have to find out the other columns from the table itself.
+                # First, assume it exists. If not, we'll create it with our default columns.
+                table = Table(db_table.name, Base.metadata, *columns, autoload=True, extend_existing=True)
+            except NoSuchTableError:
+                # Create it
+                table = Table(db_table.name, Base.metadata, *columns, autoload=False, extend_existing=True)
+
             class Model(Base):
-                __table__ = Table(db_table.name, Base.metadata, *columns, autoload=True, extend_existing=True)
+                __table__ = table
 
             model = Model
             db_table.model = model
@@ -472,13 +487,6 @@ class FieldTable(DataTable):
             # create the table model
             class Model(Base):
                 __table__ = Table(db_table.name, Base.metadata, *columns, extend_existing=True)
-
-            # ensure it exists in the DB
-            session = get_session()
-            try:
-                Model.__table__.create(session.get_bind(), checkfirst=True)
-            finally:
-                session.close()
 
             db_table.model = Model
 
@@ -973,7 +981,25 @@ class FieldTable(DataTable):
         return table
 
 
-class SimpleTableRelease(models.Model):
+class BaseRelease(object):
+    def ensure_db_table_exists(self):
+        """ Ensure that the actual database table behind the db_table link to this
+        release exists.
+        """
+        if not (self.db_table and self.data_table and self.release):
+            return
+
+        db_table = self.data_table.get_db_table(release=self.release)
+
+        # ensure it exists in the DB
+        session = get_session()
+        try:
+            db_table.model.__table__.create(session.get_bind(), checkfirst=True)
+        finally:
+            session.close()
+
+
+class SimpleTableRelease(models.Model, BaseRelease):
     data_table = models.ForeignKey(SimpleTable, on_delete=models.CASCADE)
     db_table = models.ForeignKey(DBTable, on_delete=models.CASCADE)
     release = models.ForeignKey(Release, on_delete=models.CASCADE)
@@ -982,13 +1008,23 @@ class SimpleTableRelease(models.Model):
         return '%s for %s in %s' % (self.db_table, self.data_table, self.release)
 
 
-class FieldTableRelease(models.Model):
+class FieldTableRelease(models.Model, BaseRelease):
     data_table = models.ForeignKey(FieldTable, on_delete=models.CASCADE)
     db_table = models.ForeignKey(DBTable, on_delete=models.CASCADE)
     release = models.ForeignKey(Release, on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s for %s in %s' % (self.db_table, self.data_table, self.release)
+
+
+@receiver(post_save, sender=SimpleTable)
+def ensure_simple_table_db_tables_exist(sender, **kwargs):
+    kwargs['instance'].ensure_db_tables_exist()
+
+
+@receiver(post_save, sender=FieldTable)
+def ensure_field_table_db_tables_exist(sender, **kwargs):
+    kwargs['instance'].ensure_db_tables_exist()
 
 
 class ZeroRow(object):
