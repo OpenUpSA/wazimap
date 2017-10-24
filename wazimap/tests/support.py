@@ -26,6 +26,8 @@ class WazimapTestCase(TransactionTestCase):
             db_table, _ = DBTable.objects.get_or_create(name=table.name.lower())
             table.release_class.objects.create(data_table=table, db_table=db_table, release=release)
 
+            table.ensure_db_tables_exist()
+
         if data_str:
             self.load_data(table, data_str)
 
