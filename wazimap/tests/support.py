@@ -13,6 +13,8 @@ class WazimapTestCase(TransactionTestCase):
         self.ctxt.__enter__()
 
     def tearDown(self):
+        self.s.close()
+        _engine.dispose()
         self.ctxt.__exit__(None, None, None)
 
     def field_table(self, fields, data_str, **kwargs):
@@ -52,7 +54,3 @@ class WazimapTestCase(TransactionTestCase):
             self.s.add(entry)
 
         self.s.flush()
-
-    def tearDown(self):
-        self.s.close()
-        _engine.dispose()
