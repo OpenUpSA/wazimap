@@ -967,7 +967,7 @@ class FieldTable(DataTable):
 
         candidates = cls.objects.filter(fields__contains=list(field_set))
         if name:
-            candidates = candidates.filter(name=name)
+            candidates = candidates.filter(name=name.upper())
         if universe:
             candidates = candidates.filter(universe=universe)
         if dataset:
