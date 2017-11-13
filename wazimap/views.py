@@ -13,9 +13,10 @@ from census.views import GeographyDetailView as BaseGeographyDetailView, LocateV
 
 from wazimap.geo import geo_data, LocationNotFound
 from wazimap.profiles import enhance_api_data
-from wazimap.data.tables import get_datatable, DATA_TABLES
+from wazimap.data.tables import get_datatable
 from wazimap.data.utils import dataset_context
 from wazimap.data.download import DownloadManager
+from wazimap.models import FieldTable, SimpleTable
 
 
 def render_json_error(message, status_code=400):
@@ -294,7 +295,9 @@ class TableAPIView(View):
     View that lists data tables.
     """
     def get(self, request, *args, **kwargs):
-        return render_json_to_response([t.as_dict(columns=False) for t in DATA_TABLES.itervalues()])
+        return render_json_to_response([
+            t.as_dict() for t in chain(SimpleTable.objects.all(), FieldTable.objects.all())
+        ])
 
 
 class AboutView(TemplateView):
