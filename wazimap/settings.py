@@ -64,10 +64,6 @@ STATICFILES_FINDERS = (
     'sass_processor.finders.CssFinder',
 )
 
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
-#STATICFILES_STORAGE = 'wazimap.pipeline.GzipManifestPipelineStorage'
-
 
 # Templates
 TEMPLATE_LOADERS = (
@@ -256,4 +252,10 @@ WAZIMAP = {
     # geographies, you probably want to set this to your earliest version, so
     # that embeds continue to show the original data.
     'legacy_embed_geo_version': None,
+
+    # The primary release year to use for each geo level. The default is to use
+    # the `latest` release. Set this if you have newer releases at some geo
+    # levels, such as a 2010 national census down to the city level, and a 2015
+    # partial census to the provincial level.
+    'primary_release_year': {},
 }

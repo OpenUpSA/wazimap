@@ -313,6 +313,13 @@ class GeoData(object):
         # first child level in the hierarchy
         return self.geo_levels[self.root_level]['children'][0]
 
+    def primary_release_year(self, geo):
+        """ Return the primary release year to use for the provided geography.
+        This uses the `WAZIMAP['primary_release_year']` setting to lookup the
+        year based on the geo's level, and defaults to `latest`.
+        """
+        return settings.WAZIMAP['primary_release_year'].get(geo.geo_level, 'latest')
+
 
 geo_data = import_string(settings.WAZIMAP['geodata'])()
 

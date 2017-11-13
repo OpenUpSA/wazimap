@@ -73,7 +73,7 @@ class GeographyDetailView(BaseGeographyDetailView):
             raise ValueError("You must define WAZIMAP.profile_builder in settings.py")
         profile_method = import_string(profile_method)
 
-        year = self.request.GET.get('release', 'latest')
+        year = self.request.GET.get('release', geo_data.primary_release_year(self.geo))
         with dataset_context(year=year):
             profile_data = profile_method(self.geo, self.profile_name, self.request)
 
