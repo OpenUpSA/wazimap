@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+1.1.1 (21 November 2017)
+-----------------------
+
+* FIX another bug for versioned geos for static maps
+
 1.1.0 (23 October 2017)
 -----------------------
 
