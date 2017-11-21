@@ -309,7 +309,7 @@ class DatasetContext(object):
         return val
 
     def __enter__(self):
-        self._prev_context = DatasetContext._threadlocal.dataset_context
+        self._prev_context = getattr(DatasetContext._threadlocal, 'dataset_context', None)
         DatasetContext._threadlocal.dataset_context = self
 
     def __exit__(self, exc_type, exc_value, traceback):
