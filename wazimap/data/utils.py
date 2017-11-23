@@ -83,6 +83,8 @@ def add_metadata(data, table, release):
     data['metadata']['table_id'] = table.name.upper()
     if table.universe:
         data['metadata']['universe'] = table.universe
+    if release.name:
+        data['metadata']['release'] = release.name
     if release.year:
         data['metadata']['year'] = release.year
 
