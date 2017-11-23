@@ -26,6 +26,7 @@ function Chart(options) {
         chart.chartDataKey = options.chartDataKey;
         chart.chartChartTitle = options.chartChartTitle || null;
         chart.chartQualifier = options.chartQualifier || null;
+        chart.chartSource= options.chartSource || null;
         chart.chartInitialSort = options.chartInitialSort || null;
         chart.chartStatType = options.chartStatType || 'number';
         chart.chartNullLabel = options.chartNullLabel || "N/A";
@@ -288,6 +289,9 @@ function Chart(options) {
         if (!!chart.chartQualifier) {
             chart.addChartQualifier(chart.chartContainer);
         }
+        if (!!chart.chartSource) {
+            chart.addchartSource(chart.chartContainer);
+        }
         chart.addActionLinks();
 
         return chart;
@@ -516,6 +520,9 @@ function Chart(options) {
         if (!!chart.chartQualifier) {
             chart.addChartQualifier(chart.chartContainer);
         }
+        if (!!chart.chartSource) {
+            chart.addchartSource(chart.chartContainer);
+        }
         chart.addActionLinks();
 
         return chart;
@@ -723,6 +730,9 @@ function Chart(options) {
         if (!!chart.chartQualifier) {
             chart.addChartQualifier(chart.chartContainer);
         }
+        if (!!chart.chartSource) {
+            chart.addchartSource(chart.chartContainer);
+        }
         chart.addActionLinks();
 
         return chart;
@@ -798,6 +808,7 @@ function Chart(options) {
                 chartType: chart.chartType,
                 chartHeight: 200,
                 chartQualifier: (chart.chartQualifier || ''),
+                chartSource: (chart.chartSource || ''),
                 chartTitle: (chart.chartChartTitle || ''),
                 initialSort: (chart.chartInitialSort || ''),
                 statType: (chart.chartStatType || '')
@@ -1142,6 +1153,18 @@ function Chart(options) {
             container.append("span")
                 .classed("chart-qualifier", true)
                 .text("* " + chart.chartQualifier);
+
+            chart.updateSettings({
+                height: parseInt(chart.settings.height) + 20
+            });
+        }
+    }
+
+    chart.addchartSource = function(container) {
+        if (!!chart.chartSource) {
+            container.append("span")
+                .classed("chart-qualifier", true)
+                .text("* " + chart.chartSource);
 
             chart.updateSettings({
                 height: parseInt(chart.settings.height) + 20

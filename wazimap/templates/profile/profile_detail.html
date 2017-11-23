@@ -167,6 +167,7 @@ var makeCharts = function() {
             chartStatType = $(this).data('stat-type'),
             chartDecimalPlaces = $(this).data('decimal-places'),
             chartQualifier = $(this).data('qualifier') || null,
+            chartSource = $(this).data('source') || null,
             geographyData = profileData['geography'],
             comparisonLevels = {{ WAZIMAP.comparative_levels|safe }};
 
@@ -194,6 +195,7 @@ var makeCharts = function() {
             chartHeight: 160,
             chartData: chartData,
             chartQualifier: chartQualifier,
+            chartSource: chartSource,
             chartChartTitle: chartChartTitle,
             chartInitialSort: chartInitialSort,
             chartStatType: chartStatType,
