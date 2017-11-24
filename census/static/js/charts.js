@@ -26,7 +26,7 @@ function Chart(options) {
         chart.chartDataKey = options.chartDataKey;
         chart.chartChartTitle = options.chartChartTitle || null;
         chart.chartQualifier = options.chartQualifier || null;
-        chart.chartSource= options.chartSource || null;
+        chart.chartRelease= options.chartRelease || null;
         chart.chartInitialSort = options.chartInitialSort || null;
         chart.chartStatType = options.chartStatType || 'number';
         chart.chartNullLabel = options.chartNullLabel || "N/A";
@@ -289,8 +289,8 @@ function Chart(options) {
         if (!!chart.chartQualifier) {
             chart.addChartQualifier(chart.chartContainer);
         }
-        if (!!chart.chartSource) {
-            chart.addchartSource(chart.chartContainer);
+        if (!!chart.chartRelease) {
+            chart.addChartRelease(chart.chartContainer);
         }
         chart.addActionLinks();
 
@@ -520,8 +520,8 @@ function Chart(options) {
         if (!!chart.chartQualifier) {
             chart.addChartQualifier(chart.chartContainer);
         }
-        if (!!chart.chartSource) {
-            chart.addchartSource(chart.chartContainer);
+        if (!!chart.chartRelease) {
+            chart.addChartRelease(chart.chartContainer);
         }
         chart.addActionLinks();
 
@@ -730,8 +730,8 @@ function Chart(options) {
         if (!!chart.chartQualifier) {
             chart.addChartQualifier(chart.chartContainer);
         }
-        if (!!chart.chartSource) {
-            chart.addchartSource(chart.chartContainer);
+        if (!!chart.chartRelease) {
+            chart.addChartRelease(chart.chartContainer);
         }
         chart.addActionLinks();
 
@@ -753,7 +753,7 @@ function Chart(options) {
             .append("ul")
             .classed("sub-group", true)
             .attr("style", "display: none");
-            
+
         chart.getData = links
             .append("li")
             .append("a")
@@ -808,7 +808,7 @@ function Chart(options) {
                 chartType: chart.chartType,
                 chartHeight: 200,
                 chartQualifier: (chart.chartQualifier || ''),
-                chartSource: (chart.chartSource || ''),
+                chartRelease: (chart.chartRelease || ''),
                 chartTitle: (chart.chartChartTitle || ''),
                 initialSort: (chart.chartInitialSort || ''),
                 statType: (chart.chartStatType || '')
@@ -1160,11 +1160,11 @@ function Chart(options) {
         }
     }
 
-    chart.addchartSource = function(container) {
-        if (!!chart.chartSource) {
+    chart.addChartRelease = function(container) {
+        if (!!chart.chartRelease) {
             container.append("span")
                 .classed("chart-qualifier", true)
-                .text("* " + chart.chartSource);
+                .text("* " + chart.chartRelease);
 
             chart.updateSettings({
                 height: parseInt(chart.settings.height) + 20
