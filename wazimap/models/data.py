@@ -76,6 +76,7 @@ class Release(models.Model):
         return {
             'name': self.name,
             'year': self.year,
+            'citation': self.citation
         }
 
 
