@@ -62,6 +62,7 @@ class Dataset(models.Model):
 class Release(models.Model):
     name = models.CharField(max_length=100, null=False, blank=False, help_text="Name of this release, excluding the year.")
     year = models.CharField(max_length=50, null=False, blank=False, help_text="Primary year of this release. Will be used for sorting.")
+    citation = models.TextField(max_length=None, null=True, blank=True, help_text="What the user should use when citing this data.")
     dataset = models.ForeignKey(Dataset, related_name='releases', null=False, on_delete=models.CASCADE)
 
     class Meta:
