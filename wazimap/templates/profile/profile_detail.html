@@ -154,6 +154,7 @@ var gracefulType = function(chartType) {
 }
 
 var makeCharts = function() {
+    var citationList = [];
     $.each(chartContainers, function(i, obj) {
         $(obj).empty();
         var chartID = $(this).prop('id'),
@@ -183,6 +184,11 @@ var makeCharts = function() {
         var dataRelease = chartData['metadata']['release'];
         var chartRelease = thisRelease ? thisRelease : dataRelease;
 
+        citationList.push({
+          name: chartData['metadata']['release'],
+          citation: chartData['metadata']['citation']
+        });
+
         var chartstuff = {
             chartContainer: chartID,
             chartDataKey: chartDataKey,
@@ -204,6 +210,20 @@ var makeCharts = function() {
             console.log("Error making chart " + chartID)
             console.log(chartstuff);
         }
+    });
+
+    var citations = _.uniq(citationList, function(c) {
+      return c.name;
+    });
+
+    $.each(citations, function(i, c) {
+      $('#citations ul')
+        .append(
+          $('<li>')
+            .append($('<b>').append(c['name'] + ": "))
+            .append(c['citation'])
+            .append(_.escape('<' + window.location.href + '>'))
+          )
     });
 }
 

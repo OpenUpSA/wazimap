@@ -236,8 +236,13 @@ function Comparison(options) {
                 .classed('caption-group', true)
                 .html('<strong>Table universe:</strong> '+ comparison.table.universe);
 
-        comparison.$displayWrapper.parent().append('<div class="citations"></div>');
-        comparison.$displayWrapper.parent().find('.citations').text(comparison.release.citation);
+        comparison.$displayWrapper.parent()
+          .append(
+            $('<div>').attr('id', 'citations')
+              .append(comparison.release.citation)
+              .append($('</br>'))
+              .append(_.escape('<' + window.location.href + '>'))
+            )
     }
 
     comparison.makeMapLegendContainer = function() {
@@ -982,8 +987,13 @@ function Comparison(options) {
         //comparison.$displayWrapper.find('h1').text('Table ' + comparison.tableID)
         //    .append('<a href="#" id="change-table">Change</a>');
         comparison.$displayWrapper.find('h2.header-for-columns').text(comparison.release.name + " " + comparison.release.year);
-        comparison.$displayWrapper.parent().append('<div class="citations"></div>');
-        comparison.$displayWrapper.parent().find('.citations').text(comparison.release.citation);
+        comparison.$displayWrapper.parent()
+          .append(
+            $('<div>').attr('id', 'citations')
+              .append(comparison.release.citation)
+              .append($('</br>'))
+              .append(_.escape('<' + window.location.href + '>'))
+            )
     }
 
     comparison.addPercentageDataValues = function() {

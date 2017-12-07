@@ -87,6 +87,8 @@ def add_metadata(data, table, release):
         data['metadata']['release'] = "%s %s" % (release.name, release.year)
     if release.year:
         data['metadata']['year'] = release.year
+    if release.citation:
+        data['metadata']['citation'] = release.citation
 
 
 def collapse_categories(data, categories, key_order=None):
