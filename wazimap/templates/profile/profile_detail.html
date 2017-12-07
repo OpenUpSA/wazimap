@@ -183,6 +183,7 @@ var makeCharts = function() {
         // Display the release specified in data-release, else display the metadata release
         var dataRelease = chartData['metadata']['release'];
         var chartRelease = thisRelease ? thisRelease : dataRelease;
+        var chartReleaseYear = chartData['metadata']['year'];
 
         citationList.push({
           name: chartData['metadata']['release'],
@@ -197,6 +198,7 @@ var makeCharts = function() {
             chartData: chartData,
             chartQualifier: chartQualifier,
             chartRelease: chartRelease,
+            chartReleaseYear: chartReleaseYear,
             chartChartTitle: chartChartTitle,
             chartInitialSort: chartInitialSort,
             chartStatType: chartStatType,

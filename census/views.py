@@ -508,7 +508,7 @@ class DataView(TemplateView):
         self.primary_geo_id = self.request.GET.get('primary_geo_id', None)
         self.geo_ids = self.request.GET.get('geo_ids', 'country-SA')
         self.release_slug = self.request.GET.get('release', None)
-        self.release = ACS_RELEASES.get(self.release_slug, None)
+        self.release = self.request.GET.get('release', None)
 
         if not self.table or not self.geo_ids:
             errors = {

@@ -29,7 +29,7 @@ for applying things across that entire family of pages.
             <h2 class="table-title">Table {{ table }}</h2>
             <h2 class="header-for-columns"></h2>
             <aside>{% block aside_notes %}{% endblock %}</aside>
-            
+
             <div id="tool-notes" class="tool-set caption-tool-set"></div>
             <p class="caption">
                 <span id="table-universe" class="caption-group"></span>
@@ -53,7 +53,8 @@ dataView = new Comparison({
     displayHeader: '#header-container',
     displayWrapper: '#data-display',
     pageWrapper: '.data-view',
-    dataContainer: '#data-container'
+    dataContainer: '#data-container',
+    release: '{{ release }}'
 })
 
 // toggle links

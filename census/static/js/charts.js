@@ -26,7 +26,8 @@ function Chart(options) {
         chart.chartDataKey = options.chartDataKey;
         chart.chartChartTitle = options.chartChartTitle || null;
         chart.chartQualifier = options.chartQualifier || null;
-        chart.chartRelease= options.chartRelease || null;
+        chart.chartRelease = options.chartRelease || null;
+        chart.chartReleaseYear = options.chartReleaseYear || null;
         chart.chartInitialSort = options.chartInitialSort || null;
         chart.chartStatType = options.chartStatType || 'number';
         chart.chartNullLabel = options.chartNullLabel || "N/A";
@@ -1333,7 +1334,7 @@ function Chart(options) {
         if (chart.tableID) {
             var geoIDs = chart.geoIDs;
 
-            chart.tableURL =        '/data/table/?table='+chart.tableID+'&primary_geo_id='+chart.primaryGeoID+'&geo_ids='+geoIDs.join(',');
+            chart.tableURL ='/data/table/?table='+chart.tableID+'&primary_geo_id='+chart.primaryGeoID+'&geo_ids='+geoIDs.join(',')+'&release='+chart.chartReleaseYear;
 
             // when showing distribution and maps, try to show relevant geos right from
             // the start.
@@ -1351,8 +1352,8 @@ function Chart(options) {
                 geoIDs.push(chart.thisGeo.child_level + "|" + chart.thisGeo.full_geoid);
             }
 
-            chart.mapURL = '/data/map/?table='+chart.tableID+'&primary_geo_id='+chart.primaryGeoID+'&geo_ids='+geoIDs.join(',');
-            chart.distributionURL = '/data/distribution/?table='+chart.tableID+'&primary_geo_id='+chart.primaryGeoID+'&geo_ids='+geoIDs.join(',');
+            chart.mapURL = '/data/map/?table='+chart.tableID+'&primary_geo_id='+chart.primaryGeoID+'&geo_ids='+geoIDs.join(',')+'&release='+chart.chartReleaseYear;
+            chart.distributionURL = '/data/distribution/?table='+chart.tableID+'&primary_geo_id='+chart.primaryGeoID+'&geo_ids='+geoIDs.join(',')+'&release='+chart.chartReleaseYear;
         }
     }
 
