@@ -1164,7 +1164,9 @@ function Chart(options) {
         if (!!chart.chartRelease) {
             container.append("span")
                 .classed("chart-qualifier", true)
-                .text("* " + chart.chartRelease);
+                .append("a")
+                .attr("href", "#citations")
+                .text("Source: " + chart.chartRelease);
 
             chart.updateSettings({
                 height: parseInt(chart.settings.height) + 20
