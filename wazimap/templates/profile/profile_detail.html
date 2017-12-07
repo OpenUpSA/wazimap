@@ -139,8 +139,7 @@
 var Charts = {},
     chartContainers = $('[id^=chart-]'),
     defaultDataRelease = '{{ geography.census_release }}',
-    profileData = {{ profile_data_json }},
-    primaryRelease = profileData['primary_release'];
+    profileData = {{ profile_data_json }};
 
 var gracefulType = function(chartType) {
     // convert certain chart types to more readable versions at narrow widths
@@ -180,9 +179,9 @@ var makeCharts = function() {
             }
         }
 
-        // Display the release specified in data-release, else display the metadata release if it's not the primary release
+        // Display the release specified in data-release, else display the metadata release
         var dataRelease = chartData['metadata']['release'];
-        var chartRelease = thisRelease ? thisRelease : ((dataRelease != primaryRelease) ? dataRelease : null);
+        var chartRelease = thisRelease ? thisRelease : dataRelease;
 
         var chartstuff = {
             chartContainer: chartID,
