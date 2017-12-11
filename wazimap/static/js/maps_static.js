@@ -42,7 +42,7 @@ function StaticGeometryLoader(geometry_urls) {
         });
 
         // load the levels we need
-        self.loadLevels(_.keys(by_level), function() {
+        self.loadLevels(_.keys(by_level), geo_version, function() {
             var features = {};
 
             _.each(by_level, function(geo_ids, level) {
