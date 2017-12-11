@@ -21,6 +21,7 @@ field_list.short_description = 'Fields'
 class FieldTableAdmin(admin.ModelAdmin):
     list_display = ('name', field_list, 'dataset', 'universe')
     list_filter = ('dataset', 'universe')
+    search_fields = ['name']
     inlines = (FieldTableReleaseInline, )
     fieldsets = (
         (None, {

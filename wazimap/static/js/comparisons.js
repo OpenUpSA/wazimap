@@ -225,7 +225,7 @@ function Comparison(options) {
                 .text('Table '+ comparison.tableID);
         headerMetadataContainer.append('li')
                 .classed('bigger', true)
-                .text(comparison.release.name);
+                .text(comparison.release.name + " " + comparison.release.year);
         headerMetadataContainer.append('li')
                 .html('<a id="change-table" href="#">Change table</a>');
 
@@ -235,6 +235,14 @@ function Comparison(options) {
             .append('span')
                 .classed('caption-group', true)
                 .html('<strong>Table universe:</strong> '+ comparison.table.universe);
+
+        comparison.$displayWrapper.parent()
+          .append(
+            $('<div>').attr('id', 'citations')
+              .append(comparison.release.citation)
+              .append($('</br>'))
+              .append(_.escape('<' + window.location.href + '>'))
+            )
     }
 
     comparison.makeMapLegendContainer = function() {
@@ -978,7 +986,14 @@ function Comparison(options) {
         // tableID and change table link
         //comparison.$displayWrapper.find('h1').text('Table ' + comparison.tableID)
         //    .append('<a href="#" id="change-table">Change</a>');
-        comparison.$displayWrapper.find('h2.header-for-columns').text(comparison.release.name);
+        comparison.$displayWrapper.find('h2.header-for-columns').text(comparison.release.name + " " + comparison.release.year);
+        comparison.$displayWrapper.parent()
+          .append(
+            $('<div>').attr('id', 'citations')
+              .append(comparison.release.citation)
+              .append($('</br>'))
+              .append(_.escape('<' + window.location.href + '>'))
+            )
     }
 
     comparison.addPercentageDataValues = function() {
