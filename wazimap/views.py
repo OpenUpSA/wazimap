@@ -240,7 +240,7 @@ class DataAPIView(View):
         data = self.get_data(self.data_geos, self.tables)
         columns = {table.name: table.columns(release=self.release) for table in self.tables}
 
-        content, fname, mime_type = mgr.generate_download_bundle(self.tables, self.data_geos, self.geo_ids, columns, data, fmt)
+        content, fname, mime_type = mgr.generate_download_bundle(self.tables, self.data_geos, self.geo_ids, self.release, columns, data, fmt)
 
         response = HttpResponse(content, content_type=mime_type)
         response['Content-Disposition'] = 'attachment; filename="%s"' % fname

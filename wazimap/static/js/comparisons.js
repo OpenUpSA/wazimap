@@ -24,7 +24,7 @@ function Comparison(options) {
         tableSearchAPI: '/api/1.0/table',
         geoSearchAPI: '/place-search/json/',
         rootGeoAPI: '/api/1.0/geo/',
-        dataAPI: '/api/1.0/data/show/latest'
+        dataAPI: '/api/1.0/data/show/'
     };
 
     comparison.init = function(options) {
@@ -45,6 +45,7 @@ function Comparison(options) {
         comparison.headerContainer = d3.select(options.displayHeader);
         comparison.dataContainer = d3.select(options.dataContainer);
         comparison.aside = d3.select('aside');
+        comparison.releaseYear = options.release || '';
 
         // add the "change table" widget and listener
         comparison.makeTopicSelectWidget();
@@ -60,7 +61,7 @@ function Comparison(options) {
                 table_ids: comparison.tableID,
                 geo_ids: comparison.geoIDs.join(',')
             }
-            $.getJSON(comparison.dataAPI, params)
+            $.getJSON(comparison.dataAPI + comparison.releaseYear, params)
                 .done(function(results) {
                     comparison.data = comparison.cleanData(results);
                     comparison.addStandardMetadata();
@@ -1472,7 +1473,8 @@ function Comparison(options) {
         var dataFormat = dataFormat || comparison.dataFormat,
             tableID = tableID || comparison.tableID,
             geoIDs = geoIDs || comparison.geoIDs,
-            primaryGeoID = primaryGeoID || comparison.primaryGeoID;
+            primaryGeoID = primaryGeoID || comparison.primaryGeoID,
+            releaseYear = comparison.releaseYear;
 
         var url = '/data/'+dataFormat+'/?table='+tableID;
         if (!!geoIDs) {
@@ -1480,6 +1482,9 @@ function Comparison(options) {
         }
         if (!!primaryGeoID) {
             url += '&primary_geo_id=' + primaryGeoID
+        }
+        if (!!releaseYear) {
+            url += '&release=' + releaseYear
         }
 
         if (dataFormat == 'map') {
