@@ -1067,7 +1067,7 @@ function Comparison(options) {
             if (!!comparison.tableID) {
                 comparison.trackEvent(comparison.capitalize(comparison.dataFormat)+' View', 'Change table', comparison.tableID);
 
-                window.location = comparison.buildComparisonURL();
+                window.location = comparison.buildComparisonURL(null, null, null, null, 'latest');
             }
         });
 
@@ -1462,7 +1462,7 @@ function Comparison(options) {
 
     // UTILITIES
 
-    comparison.buildComparisonURL = function(dataFormat, tableID, geoIDs, primaryGeoID) {
+    comparison.buildComparisonURL = function(dataFormat, tableID, geoIDs, primaryGeoID, releaseYear) {
         // pass in vars to create arbitrary destinations
         if (!!tableID) {
             // if we're changing tables, need to get rid of hash params
@@ -1474,7 +1474,7 @@ function Comparison(options) {
             tableID = tableID || comparison.tableID,
             geoIDs = geoIDs || comparison.geoIDs,
             primaryGeoID = primaryGeoID || comparison.primaryGeoID,
-            releaseYear = comparison.releaseYear;
+            releaseYear = releaseYear || comparison.releaseYear;
 
         var url = '/data/'+dataFormat+'/?table='+tableID;
         if (!!geoIDs) {
