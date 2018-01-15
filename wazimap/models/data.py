@@ -31,6 +31,7 @@ from django.utils.text import slugify
 from django.contrib.postgres.fields import ArrayField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.cache import cache
 
 from itertools import groupby
 from wazimap.data.base import Base
@@ -125,7 +126,7 @@ class DataTable(models.Model):
     stat_type = models.CharField(max_length=10, null=False, default=NUMBER, choices=CHOICES)
     description = models.CharField(max_length=1024, null=True, blank=True, help_text="Helpful description of this table (optional). Generated automatically for FieldTables if left blank.")
 
-    release_class = None
+    table_releases = None
 
     class Meta:
         abstract = True
@@ -140,16 +141,12 @@ class DataTable(models.Model):
     def get_release(self, year):
         """ Get the Release description for the specified year.
         """
-        query = self.release_class.objects.filter(data_table=self)
-
         if year == 'latest':
-            query = query.order_by('-release__year')
+            candidates = sorted([x.release for x in self.table_releases if x.release.year == year], key=lambda r: r.year)
+            return candidates[-1] if candidates else None
         else:
-            query = query.filter(release__year=year)
-
-        result = query.first()
-        if result:
-            return result.release
+            # first or None
+            return next((x.release for x in self.table_releases if x.release.year == year), None)
 
     def get_db_table(self, release=None, year=None):
         """ Get a DBTable instance for a particular year or release,
@@ -160,18 +157,20 @@ class DataTable(models.Model):
             # use the current context
             year = current_context().get('year')
 
-        if year:
-            release = self.get_release(year)
+        if release:
+            year = release.year
 
-        if not release:
+        if not year:
             raise ValueError("Unclear which release year to use. Specify a release or a year, or use dataset_context(year=...)")
 
-        # get the db_table
-        fieldname = self.release_class.__name__.lower() + '__release'
-        query = self.db_table_releases.filter(**{fieldname: release})
+        if year == 'latest':
+            table_release = sorted(self.table_releases, key=lambda r: r.release.year)[-1]
+        else:
+            # first match, or None
+            table_release = [x for x in self.table_releases if x.release.year == year][0]
 
-        db_table = query.first()
-        db_table.active_release = release
+        db_table = table_release.db_table
+        db_table.active_release = table_release.release
         self.setup_model(db_table)
 
         return db_table
@@ -212,23 +211,38 @@ class DataTable(models.Model):
         }
 
     def releases(self):
-        return list(set(r.release for r in self.release_class.objects
-                        .filter(data_table=self)
-                        .prefetch_related('release')
-                        .all()))
+        return list(set(r.release for r in self.table_releases))
 
     def ensure_db_tables_exist(self):
-        for release in self.release_class.objects.all():
-            release.ensure_db_table_exists()
+        for table_release in self.table_releases.all():
+            table_release.ensure_db_table_exists()
 
     @classmethod
     def find(cls, name, universe=None, dataset=None):
-        candidates = cls.objects.filter(name__iexact=name)
+        name = name.lower()
+        candidates = (t for t in cls._cached_objects() if t.name.lower() == name)
+
         if universe:
-            candidates = candidates.filter(universe__iexact=universe)
+            candidates = (t for t in candidates if t.universe == universe)
         if dataset:
-            candidates = candidates.filter(dataset__name__iexact=dataset)
-        return candidates.first()
+            candidates = (t for t in candidates if t.dataset.name == dataset)
+
+        return next(candidates, None)
+
+    @classmethod
+    def _cached_objects(cls):
+        """ Get (and set) a cache of all data table objects.
+        The objects themselves use queryset caching, so once a table
+        is cached all db_table, release and dataset lookups are fast.
+        """
+        cache_name = cls.__name__ + '_list'
+
+        candidates = cache.get(cache_name)
+        if candidates is None:
+            candidates = list(cls.objects.prefetch_related('dataset'))
+            cache.set(cache_name, candidates)
+
+        return candidates
 
 
 class SimpleTable(DataTable):
@@ -252,7 +266,7 @@ class SimpleTable(DataTable):
 
     def __init__(self, *args, **kwargs):
         super(SimpleTable, self).__init__(*args, **kwargs)
-        self.release_class = SimpleTableRelease
+        self.table_releases = self.simpletablerelease_set.prefetch_related('db_table', 'release')
 
     def get_stat_data(self, geo, fields=None, key_order=None, percent=True, total=None, recode=None, year=None):
         """ Get a data dictionary for a place from this table.
@@ -459,7 +473,8 @@ class FieldTable(DataTable):
 
     def __init__(self, *args, **kwargs):
         super(FieldTable, self).__init__(*args, **kwargs)
-        self.release_class = FieldTableRelease
+        self.table_releases = self.fieldtablerelease_set.prefetch_related('db_table', 'release')
+
         self._field_set = None
         if self.has_total:
             self.total_column = self.column_id([self.denominator_key or 'total'])
@@ -966,14 +981,15 @@ class FieldTable(DataTable):
         """
         # try find it based on fields
         field_set = set(fields)
+        candidates = (t for t in cls._cached_objects() if field_set <= t.field_set)
 
-        candidates = cls.objects.filter(fields__contains=list(field_set))
         if name:
-            candidates = candidates.filter(name__iexact=name)
+            name = name.lower()
+            candidates = (t for t in candidates if t.name.lower() == name)
         if universe:
-            candidates = candidates.filter(universe=universe)
+            candidates = (t for t in candidates if t.universe == universe)
         if dataset:
-            candidates = candidates.filter(dataset__name=dataset)
+            candidates = (t for t in candidates if t.dataset.name == dataset)
 
         possibilities = [
             (t, len(t.field_set - field_set))
