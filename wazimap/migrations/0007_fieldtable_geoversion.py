@@ -76,5 +76,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(forwards, reverse)
+        # We no longer need this migration in 2.x
+        # Be sure to upgrade to 1.x before 2.x if you run into issues.
     ]

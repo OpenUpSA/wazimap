@@ -4,6 +4,7 @@ Wazimap Version History
 2.0.0 (?)
 
 This release of Wazimap introduces some backwards incompatible changes. You WILL need to follow the upgrade steps.
+Be sure to upgrade to 1.x before upgrading to 2.x.
 
 * Wazimap now supports multiple releases of a dataset. This means that you can, for example, have two releases of a national census in Wazimap at the same time. You will need to make some changes to how you build profile pages.
 * BREAKING: SimpleTable and FieldTable are now Django models.
