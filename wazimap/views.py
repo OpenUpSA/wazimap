@@ -199,9 +199,14 @@ class DataAPIView(View):
             return render_json_error("All tables must belong to the same dataset.", 400)
         self.dataset = list(datasets)[0]
 
+        self.year = kwargs['release']
+        if settings.WAZIMAP['latest_release_year'] == self.year:
+            self.year = 'latest'
+
+        self.available_releases = get_page_releases(self.dataset.name, self.data_geos[0], self.year)
         self.release = None
         for table in self.tables:
-            release = table.get_release(year=kwargs['release'])
+            release = table.get_release(year=self.year)
             if not release:
                 return render_json_error("No release %s for table %s." % (kwargs['release'], table.name.upper()), 400)
 
@@ -228,6 +233,7 @@ class DataAPIView(View):
 
         return render_json_to_response({
             'release': self.release.as_dict(),
+            'other_releases': self.available_releases['other'],
             'tables': tables,
             'data': data,
             'geography': dict((g.geoid, g.as_dict()) for g in chain(self.data_geos, self.info_geos)),

@@ -81,6 +81,7 @@ function Comparison(options) {
 
         comparison.table = comparison.data.tables[comparison.tableID];
         comparison.release = comparison.data.release;
+        comparison.other_releases = comparison.data.other_releases;
         comparison.values = comparison.data.data;
         comparison.thisSumlev = (!!comparison.primaryGeoID) ? comparison.primaryGeoID.split('-')[0] : null;
         comparison.statType = comparison.getStatType(),
@@ -227,6 +228,16 @@ function Comparison(options) {
         headerMetadataContainer.append('li')
                 .classed('bigger', true)
                 .text(comparison.release.name + " " + comparison.release.year);
+
+        headerMetadataContainer.append('li')
+                .classed('bigger', true)
+                .html('<div class="tool-group toggle-sub-group releases"><a href="#">Change release<i class="fa fa-chevron-circle-down"></i></a><ul class="sub-group"></ul></div>');
+
+        _.each(comparison.other_releases, function(e) {
+            var href = comparison.buildComparisonURL(null, null, null, null, e.year);
+            $('.releases ul.sub-group').html('<li><a href="' + href + '">' + e.name + ' ' + e.year + '</a></li>')
+        });
+
         headerMetadataContainer.append('li')
                 .html('<a id="change-table" href="#">Change table</a>');
 
@@ -988,6 +999,13 @@ function Comparison(options) {
         //comparison.$displayWrapper.find('h1').text('Table ' + comparison.tableID)
         //    .append('<a href="#" id="change-table">Change</a>');
         comparison.$displayWrapper.find('h2.header-for-columns').text(comparison.release.name + " " + comparison.release.year);
+
+        _.each(comparison.other_releases, function(e) {
+            var href = comparison.buildComparisonURL(null, null, null, null, e.year);
+            comparison.$displayWrapper.find('.releases ul.sub-group')
+            .html('<li><a href="' + href + '">' + e.name + ' ' + e.year + '</a></li>')
+        });
+
         comparison.$displayWrapper.parent()
           .append(
             $('<div>').attr('id', 'citations')
