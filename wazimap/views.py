@@ -14,7 +14,7 @@ from census.views import GeographyDetailView as BaseGeographyDetailView, LocateV
 from wazimap.geo import geo_data, LocationNotFound
 from wazimap.profiles import enhance_api_data
 from wazimap.data.tables import get_datatable
-from wazimap.data.utils import dataset_context
+from wazimap.data.utils import dataset_context, get_page_releases
 from wazimap.data.download import DownloadManager
 from wazimap.models import FieldTable, SimpleTable
 
@@ -74,10 +74,15 @@ class GeographyDetailView(BaseGeographyDetailView):
         profile_method = import_string(profile_method)
 
         year = self.request.GET.get('release', geo_data.primary_release_year(self.geo))
+        if settings.WAZIMAP['latest_release_year'] == year:
+            year = 'latest'
+
         with dataset_context(year=year):
             profile_data = profile_method(self.geo, self.profile_name, self.request)
 
         profile_data['geography'] = self.geo.as_dict_deep()
+        profile_data['primary_releases'] = get_page_releases(
+            settings.WAZIMAP['primary_dataset_name'], self.geo, year)
 
         profile_data = enhance_api_data(profile_data)
         page_context.update(profile_data)
