@@ -81,6 +81,7 @@ function Comparison(options) {
 
         comparison.table = comparison.data.tables[comparison.tableID];
         comparison.release = comparison.data.release;
+        comparison.other_releases = comparison.data.other_releases;
         comparison.values = comparison.data.data;
         comparison.thisSumlev = (!!comparison.primaryGeoID) ? comparison.primaryGeoID.split('-')[0] : null;
         comparison.statType = comparison.getStatType(),
@@ -226,7 +227,36 @@ function Comparison(options) {
                 .text('Table '+ comparison.tableID);
         headerMetadataContainer.append('li')
                 .classed('bigger', true)
+                .classed('release-name', true)
                 .text(comparison.release.name + " " + comparison.release.year);
+
+        if (comparison.other_releases.length > 0) {
+          headerMetadataContainer.append('li')
+                .classed('bigger', true)
+                .classed('release-list', true)
+              .append('div')
+                .classed('tool-group toggle-sub-group release-list', true)
+              .append('a')
+                .attr('href', '#')
+                .text('Change release')
+              .append('i')
+                .classed('fa fa-chevron-circle-down', true);
+
+          $('div.release-list').append('<ul class="sub-group"></ul>');
+
+          _.each(comparison.other_releases, function(e) {
+              var href = comparison.buildComparisonURL(null, null, null, null, e.year);
+              $('.release-list ul.sub-group').html('<li><a href="' + href + '">' + e.name + ' ' + e.year + '</a></li>');
+              // $('.release-list ul.sub-group').append('li').append('a').attr('href', href).text(e.name + ' ' + e.year);
+          });
+
+          // We need to set this event handler here too as the html is created after returning from the API
+          $('.toggle-sub-group').hover(function() {
+            $(this).find('.sub-group').toggle();
+          });
+        }
+
+
         headerMetadataContainer.append('li')
                 .html('<a id="change-table" href="#">Change table</a>');
 
@@ -988,6 +1018,16 @@ function Comparison(options) {
         //comparison.$displayWrapper.find('h1').text('Table ' + comparison.tableID)
         //    .append('<a href="#" id="change-table">Change</a>');
         comparison.$displayWrapper.find('h2.header-for-columns').text(comparison.release.name + " " + comparison.release.year);
+
+        if (comparison.other_releases.length > 0) {
+          comparison.$displayWrapper.find('.release-list').prepend('<a href="#">Change release<i class="fa fa-chevron-circle-down"></i></a>');
+          _.each(comparison.other_releases, function(e) {
+              var href = comparison.buildComparisonURL(null, null, null, null, e.year);
+              comparison.$displayWrapper.find('.release-list ul.sub-group')
+              .html('<li><a href="' + href + '">' + e.name + ' ' + e.year + '</a></li>')
+          });
+        }
+
         comparison.$displayWrapper.parent()
           .append(
             $('<div>').attr('id', 'citations')
