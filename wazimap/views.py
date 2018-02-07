@@ -203,7 +203,9 @@ class DataAPIView(View):
         if settings.WAZIMAP['latest_release_year'] == self.year:
             self.year = 'latest'
 
-        self.available_releases = get_page_releases(self.dataset.name, self.data_geos[0], self.year)
+        self.available_releases = get_page_releases(
+            self.dataset.name, self.data_geos[0], self.year, filter_releases=False)
+
         self.release = None
         for table in self.tables:
             release = table.get_release(year=self.year)

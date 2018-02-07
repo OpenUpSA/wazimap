@@ -342,7 +342,7 @@ def current_context():
     return DatasetContext.ensure_context()
 
 
-def get_page_releases(dataset_name, geo, year):
+def get_page_releases(dataset_name, geo, year, filter_releases=True):
     """
     Return the active release being viewed and a list of related releases
     for a geo and dataset
@@ -356,7 +356,7 @@ def get_page_releases(dataset_name, geo, year):
 
     # Some releases don't have data for all geo_levels
     available_years = settings.WAZIMAP['available_release_years'].get(geo.geo_level, None)
-    if available_years:
+    if filter_releases and available_years:
         query = query.filter(year__in=available_years)
 
     dataset_releases = [
