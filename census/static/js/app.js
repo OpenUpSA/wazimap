@@ -43,7 +43,7 @@ $(document).ajaxComplete(function(event, request, settings) {
 var valFmt = function(value, statType, disablePct) {
     if (value >= 0 && value !== null) {
         if (!disablePct && statType == 'percentage') {
-            value += '%';
+            value = roundNumber(value, 1) + '%';
         } else if (statType == 'dollar') {
             value = '$' + commaFmt(value);
         } else {
@@ -146,7 +146,7 @@ var roundNumber = function(value, decimals) {
     var precision = (!!decimals) ? decimals : 0,
         factor = Math.pow(10, precision),
         value = Math.round(value * factor) / factor;
-    
+
     return value;
 }
 
