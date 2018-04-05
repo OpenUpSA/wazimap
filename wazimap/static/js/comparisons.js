@@ -269,6 +269,7 @@ function Comparison(options) {
         comparison.$displayWrapper.parent()
           .append(
             $('<div>').attr('id', 'citations')
+              .append('<h2>Citation:</h2>')
               .append(comparison.release.citation)
               .append($('</br>'))
               .append(_.escape('<' + window.location.href + '>'))
@@ -1027,9 +1028,11 @@ function Comparison(options) {
           });
         }
 
+        comparison.$displayWrapper.parent().find('#citations').remove();
         comparison.$displayWrapper.parent()
           .append(
             $('<div>').attr('id', 'citations')
+              .append('<h2>Citation:</h2>')
               .append(comparison.release.citation)
               .append($('</br>'))
               .append(_.escape('<' + window.location.href + '>'))
