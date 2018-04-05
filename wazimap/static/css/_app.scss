@@ -234,12 +234,27 @@ header.section-contents h1 a {
   margin-bottom: 0.5em;
 }
 
-#map-controls ul.metadata li {
-  display: block;
+.data-view {
+    #citations {
+      font-size: 0.8em;
+      h2 {
+          padding-left: 0;
+      }
+    }
 }
 
-#map-controls ul.metadata li.release-list ul li {
-  display: block;
-  margin-right: 0;
-  font-size: 1em;
+#map-controls {
+  ul.metadata {
+    li {
+      display: block;
+    }
+
+    li.release-list {
+      li {
+        display: block;
+        margin-right: 0;
+        font-size: 1em;
+      }
+    }
+  }
 }
