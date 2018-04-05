@@ -247,7 +247,6 @@ function Comparison(options) {
           _.each(comparison.other_releases, function(e) {
               var href = comparison.buildComparisonURL(null, null, null, null, e.year);
               $('.release-list ul.sub-group').html('<li><a href="' + href + '">' + e.name + ' ' + e.year + '</a></li>');
-              // $('.release-list ul.sub-group').append('li').append('a').attr('href', href).text(e.name + ' ' + e.year);
           });
 
           // We need to set this event handler here too as the html is created after returning from the API
@@ -1020,11 +1019,11 @@ function Comparison(options) {
         comparison.$displayWrapper.find('h2.header-for-columns').text(comparison.release.name + " " + comparison.release.year);
 
         if (comparison.other_releases.length > 0) {
-          comparison.$displayWrapper.find('.release-list').prepend('<a href="#">Change release<i class="fa fa-chevron-circle-down"></i></a>');
+          var releaseList = comparison.$displayWrapper.find('.release-list');
+          releaseList.empty().append('<a href="#">Change release<i class="fa fa-chevron-circle-down"></i></a>').append('<ul class="sub-group"></ul>');
           _.each(comparison.other_releases, function(e) {
               var href = comparison.buildComparisonURL(null, null, null, null, e.year);
-              comparison.$displayWrapper.find('.release-list ul.sub-group')
-              .html('<li><a href="' + href + '">' + e.name + ' ' + e.year + '</a></li>')
+              releaseList.find('ul.sub-group').html('<li><a href="' + href + '">' + e.name + ' ' + e.year + '</a></li>')
           });
         }
 
