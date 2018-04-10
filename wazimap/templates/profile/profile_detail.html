@@ -228,6 +228,13 @@ var makeCharts = function() {
             .append(_.escape('<' + window.location.href + '>'))
           )
     });
+
+    {% if head2head %}
+    // we remove the source hrefs in the iframes
+    $.each($("a[href='#citations']"), function(i, a) {
+      a.removeAttribute("href");
+    });
+    {% endif %}
 }
 
 var maps = new ProfileMaps();
