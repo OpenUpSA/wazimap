@@ -1,5 +1,6 @@
 from itertools import chain
 import json
+import urllib
 
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
@@ -56,7 +57,7 @@ class GeographyDetailView(BaseGeographyDetailView):
         if self.adjust_slugs and (kwargs.get('slug') or self.geo.slug):
             if kwargs['slug'] != self.geo.slug:
                 kwargs['slug'] = self.geo.slug
-                url = '/profiles/%s-%s-%s' % (self.geo_level, self.geo_code, self.geo.slug)
+                url = '/profiles/%s-%s-%s?%s' % (self.geo_level, self.geo_code, self.geo.slug, urllib.urlencode(request.GET))
                 return redirect(url, permanent=True)
 
         # Skip the parent class's logic completely and go back to basics
@@ -330,12 +331,16 @@ class GeographyCompareView(TemplateView):
             'geo_id2': geo_id2,
         }
 
+        release = self.request.GET.get('release')
         try:
             level, code = geo_id1.split('-', 1)
             page_context['geo1'] = geo_data.get_geography(code, level)
+            page_context['geo1_release_year'] = str(settings.WAZIMAP['primary_release_year'].get(level, release)) if release == settings.WAZIMAP['latest_release_year'] else release
 
             level, code = geo_id2.split('-', 1)
             page_context['geo2'] = geo_data.get_geography(code, level)
+            page_context['geo2_release_year'] = str(settings.WAZIMAP['primary_release_year'].get(level, release)) if release == settings.WAZIMAP['latest_release_year'] else release
+
         except (ValueError, LocationNotFound):
             raise Http404
 

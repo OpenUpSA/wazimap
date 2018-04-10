@@ -93,5 +93,5 @@ makeGeoSelectWidget(geoSelect);
 makeGeoSelectWidget($('#compare-place-select'), function(event, datum) {
     var geoId = [profileData.geography.this.geo_level, profileData.geography.this.geo_code].join('-');
     event.stopPropagation();
-    window.location = '/compare/' + geoId + '/vs/' + datum.full_geoid + '/';
+    window.location = '/compare/' + geoId + '/vs/' + datum.full_geoid + '/' + '?release=' + RELEASE;
 });
