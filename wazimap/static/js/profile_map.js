@@ -152,7 +152,11 @@ var ProfileMaps = function() {
                     layer.setStyle(self.layerStyle);
                 });
                 layer.on('click', function() {
-                    window.location = '/profiles/' + feature.properties.level + '-' + feature.properties.code + '/';
+                    var location = '/profiles/' + feature.properties.level + '-' + feature.properties.code + '/';
+                    if (feature.properties.release) {
+                        location += '?release=' + feature.properties.release;
+                    }
+                    window.location = location;
                 });
             },
         }).addTo(this.map);
