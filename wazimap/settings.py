@@ -21,9 +21,12 @@ DATABASES = {
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
     'django.contrib.humanize',
-    'django.contrib.sites',
     'django.contrib.staticfiles',
     'sass_processor',
     'wazimap.apps.WazimapConfig',
@@ -33,7 +36,6 @@ INSTALLED_APPS = [
 ALLOWED_HOSTS = ['*']
 TIME_ZONE = 'Africa/Johannesburg'
 LANGUAGE_CODE = 'en-za'
-SITE_ID = 1
 USE_I18N = False
 USE_L10N = True
 USE_THOUSAND_SEPARATOR = True
@@ -62,10 +64,6 @@ STATICFILES_FINDERS = (
     'sass_processor.finders.CssFinder',
 )
 
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
-#STATICFILES_STORAGE = 'wazimap.pipeline.GzipManifestPipelineStorage'
-
 
 # Templates
 TEMPLATE_LOADERS = (
@@ -76,14 +74,19 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.core.context_processors.request',
     'django.core.context_processors.static',
+    'django.contrib.auth.context_processors.auth',
     'census.context_processors.api_url',
     'wazimap.context_processors.wazimap_settings',
 )
 
 
 MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'wazimap.middleware.RedirectMiddleware',
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -249,4 +252,10 @@ WAZIMAP = {
     # geographies, you probably want to set this to your earliest version, so
     # that embeds continue to show the original data.
     'legacy_embed_geo_version': None,
+
+    # The primary release year to use for each geo level. The default is to use
+    # the `latest` release. Set this if you have newer releases at some geo
+    # levels, such as a 2010 national census down to the city level, and a 2015
+    # partial census to the provincial level.
+    'primary_release_year': {},
 }

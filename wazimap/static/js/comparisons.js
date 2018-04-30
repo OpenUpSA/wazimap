@@ -24,7 +24,7 @@ function Comparison(options) {
         tableSearchAPI: '/api/1.0/table',
         geoSearchAPI: '/place-search/json/',
         rootGeoAPI: '/api/1.0/geo/',
-        dataAPI: '/api/1.0/data/show/latest'
+        dataAPI: '/api/1.0/data/show/'
     };
 
     comparison.init = function(options) {
@@ -45,6 +45,7 @@ function Comparison(options) {
         comparison.headerContainer = d3.select(options.displayHeader);
         comparison.dataContainer = d3.select(options.dataContainer);
         comparison.aside = d3.select('aside');
+        comparison.releaseYear = options.release || '';
 
         // add the "change table" widget and listener
         comparison.makeTopicSelectWidget();
@@ -60,7 +61,7 @@ function Comparison(options) {
                 table_ids: comparison.tableID,
                 geo_ids: comparison.geoIDs.join(',')
             }
-            $.getJSON(comparison.dataAPI, params)
+            $.getJSON(comparison.dataAPI + comparison.releaseYear, params)
                 .done(function(results) {
                     comparison.data = comparison.cleanData(results);
                     comparison.addStandardMetadata();
@@ -80,6 +81,7 @@ function Comparison(options) {
 
         comparison.table = comparison.data.tables[comparison.tableID];
         comparison.release = comparison.data.release;
+        comparison.other_releases = comparison.data.other_releases;
         comparison.values = comparison.data.data;
         comparison.thisSumlev = (!!comparison.primaryGeoID) ? comparison.primaryGeoID.split('-')[0] : null;
         comparison.statType = comparison.getStatType(),
@@ -225,7 +227,35 @@ function Comparison(options) {
                 .text('Table '+ comparison.tableID);
         headerMetadataContainer.append('li')
                 .classed('bigger', true)
-                .text(comparison.release.name);
+                .classed('release-name', true)
+                .text(comparison.release.name + " " + comparison.release.year);
+
+        if (comparison.other_releases.length > 0) {
+          headerMetadataContainer.append('li')
+                .classed('bigger', true)
+                .classed('release-list', true)
+              .append('div')
+                .classed('tool-group toggle-sub-group release-list', true)
+              .append('a')
+                .attr('href', '#')
+                .text('Change release')
+              .append('i')
+                .classed('fa fa-chevron-circle-down', true);
+
+          $('div.release-list').append('<ul class="sub-group"></ul>');
+
+          _.each(comparison.other_releases, function(e) {
+              var href = comparison.buildComparisonURL(null, null, null, null, e.year);
+              $('.release-list ul.sub-group').html('<li><a href="' + href + '">' + e.name + ' ' + e.year + '</a></li>');
+          });
+
+          // We need to set this event handler here too as the html is created after returning from the API
+          $('.toggle-sub-group').hover(function() {
+            $(this).find('.sub-group').toggle();
+          });
+        }
+
+
         headerMetadataContainer.append('li')
                 .html('<a id="change-table" href="#">Change table</a>');
 
@@ -235,6 +265,15 @@ function Comparison(options) {
             .append('span')
                 .classed('caption-group', true)
                 .html('<strong>Table universe:</strong> '+ comparison.table.universe);
+
+        comparison.$displayWrapper.parent()
+          .append(
+            $('<div>').attr('id', 'citations')
+              .append('<h2>Citation:</h2>')
+              .append(comparison.release.citation)
+              .append($('</br>'))
+              .append(_.escape('<' + window.location.href + '>'))
+            )
     }
 
     comparison.makeMapLegendContainer = function() {
@@ -978,7 +1017,26 @@ function Comparison(options) {
         // tableID and change table link
         //comparison.$displayWrapper.find('h1').text('Table ' + comparison.tableID)
         //    .append('<a href="#" id="change-table">Change</a>');
-        comparison.$displayWrapper.find('h2.header-for-columns').text(comparison.release.name);
+        comparison.$displayWrapper.find('h2.header-for-columns').text(comparison.release.name + " " + comparison.release.year);
+
+        if (comparison.other_releases.length > 0) {
+          var releaseList = comparison.$displayWrapper.find('.release-list');
+          releaseList.empty().append('<a href="#">Change release<i class="fa fa-chevron-circle-down"></i></a>').append('<ul class="sub-group"></ul>');
+          _.each(comparison.other_releases, function(e) {
+              var href = comparison.buildComparisonURL(null, null, null, null, e.year);
+              releaseList.find('ul.sub-group').html('<li><a href="' + href + '">' + e.name + ' ' + e.year + '</a></li>')
+          });
+        }
+
+        comparison.$displayWrapper.parent().find('#citations').remove();
+        comparison.$displayWrapper.parent()
+          .append(
+            $('<div>').attr('id', 'citations')
+              .append('<h2>Citation:</h2>')
+              .append(comparison.release.citation)
+              .append($('</br>'))
+              .append(_.escape('<' + window.location.href + '>'))
+            )
     }
 
     comparison.addPercentageDataValues = function() {
@@ -1051,7 +1109,7 @@ function Comparison(options) {
             if (!!comparison.tableID) {
                 comparison.trackEvent(comparison.capitalize(comparison.dataFormat)+' View', 'Change table', comparison.tableID);
 
-                window.location = comparison.buildComparisonURL();
+                window.location = comparison.buildComparisonURL(null, null, null, null, 'latest');
             }
         });
 
@@ -1446,7 +1504,7 @@ function Comparison(options) {
 
     // UTILITIES
 
-    comparison.buildComparisonURL = function(dataFormat, tableID, geoIDs, primaryGeoID) {
+    comparison.buildComparisonURL = function(dataFormat, tableID, geoIDs, primaryGeoID, releaseYear) {
         // pass in vars to create arbitrary destinations
         if (!!tableID) {
             // if we're changing tables, need to get rid of hash params
@@ -1457,7 +1515,8 @@ function Comparison(options) {
         var dataFormat = dataFormat || comparison.dataFormat,
             tableID = tableID || comparison.tableID,
             geoIDs = geoIDs || comparison.geoIDs,
-            primaryGeoID = primaryGeoID || comparison.primaryGeoID;
+            primaryGeoID = primaryGeoID || comparison.primaryGeoID,
+            releaseYear = releaseYear || comparison.releaseYear;
 
         var url = '/data/'+dataFormat+'/?table='+tableID;
         if (!!geoIDs) {
@@ -1465,6 +1524,9 @@ function Comparison(options) {
         }
         if (!!primaryGeoID) {
             url += '&primary_geo_id=' + primaryGeoID
+        }
+        if (!!releaseYear) {
+            url += '&release=' + releaseYear
         }
 
         if (dataFormat == 'map') {

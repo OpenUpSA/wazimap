@@ -508,7 +508,7 @@ class DataView(TemplateView):
         self.primary_geo_id = self.request.GET.get('primary_geo_id', None)
         self.geo_ids = self.request.GET.get('geo_ids', 'country-SA')
         self.release_slug = self.request.GET.get('release', None)
-        self.release = ACS_RELEASES.get(self.release_slug, None)
+        self.release = self.request.GET.get('release', None)
 
         if not self.table or not self.geo_ids:
             errors = {
@@ -525,7 +525,7 @@ class DataView(TemplateView):
         return super(DataView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
-        download_link_prefix = '/api/1.0/data/download/latest?table_ids=%s&geo_ids=%s' % (self.table, self.geo_ids)
+        download_link_prefix = '/api/1.0/data/download/%s?table_ids=%s&geo_ids=%s' % (self.release, self.table, self.geo_ids)
 
         page_context = {
             'table': self.table or '',

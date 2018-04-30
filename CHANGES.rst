@@ -1,10 +1,21 @@
 Wazimap Version History
 =======================
 
+2.0.0 (?)
+
+This release of Wazimap introduces some backwards incompatible changes. You WILL need to follow the upgrade steps.
+Be sure to upgrade to 1.x before upgrading to 2.x.
+
+* Wazimap now supports multiple releases of a dataset. This means that you can, for example, have two releases of a national census in Wazimap at the same time. You will need to make some changes to how you build profile pages.
+* BREAKING: SimpleTable and FieldTable are now Django models.
+* BREAKING: Table management is now done through the Django admin interface. You must upgrade your existing tables.
+* BREAKING: ``get_objects_by_geo`` has been replaced by ``FieldTable.get_rows_for_geo``.
+
 1.1.1 (21 November 2017)
 -----------------------
 
 * FIX another bug for versioned geos for static maps
+
 
 1.1.0 (23 October 2017)
 -----------------------
@@ -14,7 +25,7 @@ Wazimap Version History
 1.0.1 (21 September 2017)
 -------------------------
 
-This release of Wazimap introduces some backwards compatible changes.
+This release of Wazimap introduces some backwards incompatible changes.
 
 * Support versioned geographies.
 * BREAKING: The Geography model has changed. You must run ``python manage.py migrate`` when updating.

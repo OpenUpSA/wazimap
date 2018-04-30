@@ -111,6 +111,12 @@ set in ``settings.py`` in the ``WAZIMAP`` dict.
   If you're introducing versioned geographies and your users have already embedded charts,
   you probably want to set this to your earliest version so that embeds continue showing the original data.
 
+``primary_release_year``
+  The primary release year to use for each geo level. The default is to use
+  the ``latest`` release. Set this if you have newer releases at some geo
+  levels, such as a 2010 national census down to the city level, and a 2015
+  partial census to the provincial level.
+
 Localisation
 ------------
 

@@ -154,6 +154,7 @@ var gracefulType = function(chartType) {
 }
 
 var makeCharts = function() {
+    var citationList = [];
     $.each(chartContainers, function(i, obj) {
         $(obj).empty();
         var chartID = $(this).prop('id'),
@@ -167,6 +168,7 @@ var makeCharts = function() {
             chartStatType = $(this).data('stat-type'),
             chartDecimalPlaces = $(this).data('decimal-places'),
             chartQualifier = $(this).data('qualifier') || null,
+            thisRelease = $(this).data('release') || null,
             geographyData = profileData['geography'],
             comparisonLevels = {{ WAZIMAP.comparative_levels|safe }};
 
@@ -178,14 +180,15 @@ var makeCharts = function() {
             }
         }
 
-        // determine whether data point is from anything other
-        // than the primary ACS release for this page
-        for (var key in chartData) if (chartData.hasOwnProperty(key)) break;
-        var thisRelease = chartData[key]['acs_release'],
-            noteRelease = (thisRelease != defaultDataRelease) ? thisRelease + ' data' : null;
+        // Display the release specified in data-release, else display the metadata release
+        var dataRelease = chartData['metadata']['release'];
+        var chartRelease = thisRelease ? thisRelease : dataRelease;
+        var chartReleaseYear = chartData['metadata']['year'];
 
-        /*chartQualifier = (chartQualifier && noteRelease) ? Array(chartQualifier, noteRelease)
-            .filter(function(n) { return n }).join('; ') : null;*/
+        citationList.push({
+          name: chartData['metadata']['release'],
+          citation: chartData['metadata']['citation']
+        });
 
         var chartstuff = {
             chartContainer: chartID,
@@ -194,6 +197,8 @@ var makeCharts = function() {
             chartHeight: 160,
             chartData: chartData,
             chartQualifier: chartQualifier,
+            chartRelease: chartRelease,
+            chartReleaseYear: chartReleaseYear,
             chartChartTitle: chartChartTitle,
             chartInitialSort: chartInitialSort,
             chartStatType: chartStatType,
@@ -208,6 +213,28 @@ var makeCharts = function() {
             console.log(chartstuff);
         }
     });
+
+    var citations = _.uniq(citationList, function(c) {
+      return c.name;
+    });
+
+    $('#citations ul').empty();
+    $.each(citations, function(i, c) {
+      $('#citations ul')
+        .append(
+          $('<li>')
+            .append($('<b>').append(c['name'] + ": "))
+            .append(c['citation'])
+            .append(_.escape('<' + window.location.href + '>'))
+          )
+    });
+
+    {% if head2head %}
+    // we remove the source hrefs in the iframes
+    $.each($("a[href='#citations']"), function(i, a) {
+      a.removeAttribute("href");
+    });
+    {% endif %}
 }
 
 var maps = new ProfileMaps();
