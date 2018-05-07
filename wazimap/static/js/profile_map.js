@@ -29,6 +29,7 @@ var ProfileMaps = function() {
         this.createMap();
         this.addImagery();
         this.drawAllFeatures();
+        this.drawPoints();
     };
 
     this.drawMapForHomepage = function(geo_level, geo_version, centre, zoom) {
@@ -60,7 +61,8 @@ var ProfileMaps = function() {
             boxZoom: false,
             keyboard: false,
             dragging: allowMapDrag,
-            touchZoom: allowMapDrag
+            touchZoom: allowMapDrag,
+            preferCanvas: true
         });
 
         if (allowMapDrag) {
@@ -157,4 +159,12 @@ var ProfileMaps = function() {
             },
         }).addTo(this.map);
     };
+
+    this.drawPoints = function() {
+        _.each(profileData['point_data'], function(collection, collection_name) {
+            _.each(collection.points, function(p) {
+                L.circleMarker(p.latlong).bindPopup(p.place).addTo(this.map);
+            }, this);
+        }, this);
+    }
 };
