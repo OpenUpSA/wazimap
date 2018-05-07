@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Dataset, Release, SimpleTable, FieldTable, DBTable, FieldTableRelease, SimpleTableRelease
+from .models import Dataset, Release, SimpleTable, FieldTable, PointTable, DBTable, FieldTableRelease, SimpleTableRelease, PointTableRelease
 
 
 admin.site.register(DBTable)
@@ -51,6 +51,29 @@ class SimpleTableAdmin(admin.ModelAdmin):
         }),
         ('Advanced', {
             'fields': ('stat_type', 'total_column'),
+            'classes': ('collapse', ),
+        })
+    )
+
+
+class PointTableReleaseInline(admin.StackedInline):
+    model = PointTableRelease
+    fields = ('release', 'db_table')
+    extra = 0
+
+
+@admin.register(PointTable)
+class PointTableAdmin(admin.ModelAdmin):
+    list_display = ('name', field_list, 'dataset', 'universe')
+    list_filter = ('dataset', 'universe')
+    search_fields = ['name']
+    inlines = (PointTableReleaseInline, )
+    fieldsets = (
+        (None, {
+            'fields': ('dataset', 'universe', 'fields', 'description')
+        }),
+        ('Advanced', {
+            'fields': ('name', 'stat_type', ),
             'classes': ('collapse', ),
         })
     )
