@@ -286,6 +286,11 @@ def get_datatable(name):
             return table
 
 
+def get_pointtable(name, universe=None, dataset=None):
+    from wazimap.models import PointTable
+    return PointTable.find(name, universe=universe, dataset=dataset)
+
+
 def create_debug_dump(data, geo_level, name):
     import os
     import json
