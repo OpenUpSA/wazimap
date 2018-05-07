@@ -35,7 +35,7 @@ from django.dispatch import receiver
 from itertools import groupby
 from wazimap.data.base import Base
 from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata, current_context
-from sqlalchemy import Column, String, Table, or_, and_, func
+from sqlalchemy import Column, String, Float, Table, or_, and_, func
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.orm import class_mapper
 import sqlalchemy.types
@@ -110,13 +110,15 @@ class DBTable(models.Model):
     def __str__(self):
         return 'DBTable<%s>' % self.name
 
-
+    
 class DataTable(models.Model):
     NUMBER = 'number'
     PERC = 'percentage'
+    POINT = 'point'
     CHOICES = (
         (NUMBER, NUMBER),
-        (PERC, PERC)
+        (PERC, PERC),
+        (POINT, POINT)
     )
 
     name = models.SlugField(max_length=1024, null=False, blank=False, unique=True, help_text="Name for this table. No spaces.")
@@ -983,6 +985,134 @@ class FieldTable(DataTable):
         return table
 
 
+class PointTable(DataTable):
+    """ A PointTable stores data points and their co-ordinates. Each point is 
+    """
+    db_table_releases = models.ManyToManyField(DBTable, through='PointTableRelease', through_fields=('data_table', 'db_table'))
+    fields = ArrayField(models.CharField(max_length=50, null=False, unique=True), help_text="Comma-separated ordered list of fields for this table, exlcuding the place name.")
+
+    def __init__(self, *args, **kwargs):
+        super(PointTable, self).__init__(*args, **kwargs)
+        self.release_class = PointTableRelease
+        self._field_set = None
+
+    @property
+    def field_set(self):
+        if self._field_set is None:
+            self._field_set = set(self.fields)
+        return self._field_set
+
+    def setup_model(self, db_table):
+        """ Build the model that corresponds to the table underlying this data table.
+        """
+        model = db_table.model
+        if not model:
+            columns = self._build_model_columns()
+
+            # create the table model
+            class Model(Base):
+                __table__ = Table(db_table.name, Base.metadata, *columns, extend_existing=True)
+
+            db_table.model = Model
+
+    def _build_model_columns(self):
+        columns = super(PointTable, self)._build_model_columns()
+
+        # place name
+        columns.append(Column('place', String(128)))
+        
+        # other fields defined for this table
+        columns.extend(Column(field, String(128)) for field in self.fields)
+        
+        # co-ordinate columns
+        columns.append(Column('latitude', Float(), primary_key=True))
+        columns.append(Column('longitude', Float(), primary_key=True))
+
+        return columns
+
+    def get_point_data(self, geo, session, fields=None, recode=None, year=None,
+                       db_table=None):
+        """
+        :param fields: fields to return as specified in the PointTable fields column.
+        :type fields: str or list
+        """
+        db_table = self.get_db_table(year=year or current_context().get('year'))
+        model = db_table.model
+        columns = self.columns(db_table)
+
+        session = get_session()
+        try:
+            if fields is not None and not isinstance(fields, list):
+                fields = [fields]
+            if fields:
+                for f in fields:
+                    if f not in columns:
+                        raise ValueError("Invalid field/column '%s' for table '%s'. Valid columns are: %s" % (
+                            f, self.id, ', '.join(columns.keys())))
+            else:
+                fields = columns.keys()
+
+            recode = recode or {}
+            if recode:
+                # change lambda to dicts
+                if not isinstance(recode, dict):
+                    recode = {f: recode(f) for f in fields}
+
+            # table columns to fetch
+            cols = [model.__table__.columns[c] for c in fields]
+
+            # ensure cols we need are fetched
+            req_cols = ['place', 'latitude', 'longitude']
+            cols.extend([model.__table__.columns[c] for c in req_cols if c not in fields])
+
+            # do the query.
+            rows = session\
+                .query(*cols)\
+                .filter(model.geo_level == geo.geo_level,
+                        model.geo_code == geo.geo_code,
+                        model.geo_version == geo.version)\
+                .all()
+            #TODO: What happends if rows is empty?
+            
+            results = OrderedDict()
+            for row in rows:
+                point = {}
+                point['place'] = getattr(row, 'place') or None
+                point['latlong'] = [getattr(row, 'latitude'), getattr(row, 'longitude')]
+
+                point.setdefault('fields', []).extend([
+                    {
+                        'name': recode.get(f, f),
+                        'value': getattr(row, f) or None
+                    }
+                    for f in self.fields if f in fields
+                ])
+
+                results.setdefault('points', []).append(point)
+            
+            add_metadata(results, self, db_table.active_release)
+            return results
+        finally:
+            session.close()
+    
+    def columns(self, db_table=None, year=None, release=None):
+        """ Get extra columns of table specified in fields.
+        """
+        db_table = db_table or self.get_db_table(year=year, release=release)
+
+        columns = OrderedDict()
+
+        for col in (c.name for c in db_table.model.__table__.columns if c.name not in ['geo_code', 'geo_level', 'geo_version']):
+            columns[col] = {
+                'name': capitalize(col.replace('_', ' '))
+            }
+
+        return columns
+
+    def __str__(self):
+        return self.name
+    
+
 class BaseRelease(object):
     def ensure_db_table_exists(self):
         """ Ensure that the actual database table behind the db_table link to this
@@ -1019,6 +1149,15 @@ class FieldTableRelease(models.Model, BaseRelease):
         return '%s for %s in %s' % (self.db_table, self.data_table, self.release)
 
 
+class PointTableRelease(models.Model, BaseRelease):
+    data_table = models.ForeignKey(PointTable, on_delete=models.CASCADE)
+    db_table = models.ForeignKey(DBTable, on_delete=models.CASCADE)
+    release = models.ForeignKey(Release, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s for %s in %s' % (self.db_table, self.data_table, self.release)
+
+
 @receiver(post_save, sender=SimpleTable)
 def ensure_simple_table_db_tables_exist(sender, **kwargs):
     kwargs['instance'].ensure_db_tables_exist()
@@ -1026,6 +1165,11 @@ def ensure_simple_table_db_tables_exist(sender, **kwargs):
 
 @receiver(post_save, sender=FieldTable)
 def ensure_field_table_db_tables_exist(sender, **kwargs):
+    kwargs['instance'].ensure_db_tables_exist()
+
+
+@receiver(post_save, sender=PointTable)
+def ensure_point_table_db_tables_exist(sender, **kwargs):
     kwargs['instance'].ensure_db_tables_exist()
 
 
