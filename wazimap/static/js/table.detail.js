@@ -18,6 +18,7 @@ function Table(options) {
         table.$placeSelectContainer = $('#explore-topic-place-picker');
         table.$parentSelect = $('#topic-place-select-parent');
         table.$parentSelectContainer = $('#explore-topic-place-picker-parent');
+        table.releaseYear = options.releaseYear;
         
         // make the side preview expand and collapse
         table.makePreviewExpander();
@@ -287,6 +288,10 @@ function Table(options) {
         }
         if (!!primaryGeoID) {
             url += "&primary_geo_id=" + primaryGeoID
+        }
+
+        if (!! table.releaseYear) {
+            url += "&release=" + table.releaseYear
         }
     
         return url
