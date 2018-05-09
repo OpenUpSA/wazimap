@@ -377,10 +377,10 @@ class TableDetailView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         latest_release_year = self.release.year
-        with dataset_context(year=):
-            table_columns = self.table.columns(latest_release_year)
+        with dataset_context(year=latest_release_year):
+            table_columns = self.table.columns()
         return {
             'table': self.table,
             'latest_release_year': latest_release_year,
-            'table_columns': cols
+            'table_columns': table_columns
         }
