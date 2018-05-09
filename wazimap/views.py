@@ -368,6 +368,8 @@ class TableDetailView(TemplateView):
     def dispatch(self, *args, **kwargs):
         try:
             self.table = get_datatable(kwargs['table'])
+            # There's no dataset context set here, so we use the latest year
+            self.release = self.table.get_release(year='latest')
         except KeyError:
             raise Http404
 
@@ -376,4 +378,5 @@ class TableDetailView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         return {
             'table': self.table,
+            'latest_release_year': self.release.year,
         }

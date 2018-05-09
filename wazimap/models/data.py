@@ -158,7 +158,11 @@ class DataTable(models.Model):
         if year is None and release is None:
             from wazimap.data.utils import current_context
             # use the current context
-            year = current_context().get('year')
+            try:
+                year = current_context().get('year')
+            except ValueError:
+                # We don't have a current context. Use the latest year.
+                year = 'latest'
 
         if year:
             release = self.get_release(year)
