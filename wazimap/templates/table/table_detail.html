@@ -56,7 +56,7 @@
 
             <div class="column-golden-wide expanded-table">
                 <h4>Columns in this table</h4>
-                <ul>{% for column_id, column_data in table.columns.items %}
+                <ul>{% for column_id, column_data in table_columns.items %}
                     <li class="indent-{{ column_data.indent }}">{{ column_data.name }}</li>
                 {% endfor %}</ul>
             </div>
