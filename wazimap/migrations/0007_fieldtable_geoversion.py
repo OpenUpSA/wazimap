@@ -6,6 +6,7 @@ from django.db import migrations
 
 
 from sqlalchemy import inspect
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.schema import AddConstraint
 from wazimap.data.utils import get_session
 from wazimap.data.tables import DATA_TABLES
@@ -29,7 +30,10 @@ def forwards(apps, schema_editor):
                 session.execute("ALTER TABLE %s DROP CONSTRAINT %s" % (table.name, pk))
 
             # add the new column
-            session.execute("ALTER TABLE %s ADD COLUMN geo_version VARCHAR(100) DEFAULT ''" % table.name)
+            try:
+                session.execute("ALTER TABLE %s ADD COLUMN geo_version VARCHAR(100) DEFAULT ''" % table.name)
+            except ProgrammingError:
+                pass
 
             # add the correct new constraint
             session.execute(AddConstraint(table.primary_key))
