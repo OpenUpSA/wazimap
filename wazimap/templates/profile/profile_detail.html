@@ -225,7 +225,7 @@ var makeCharts = function() {
           $('<li>')
             .append($('<b>').append(c['name'] + ": "))
             .append(c['citation'])
-            .append(_.escape('<' + window.location.href + '>'))
+            .append(_.escape(' <' + window.location.origin + window.location.pathname + '>'))
           )
     });
 
