@@ -215,7 +215,7 @@ var makeCharts = function() {
     });
 
     var citations = _.uniq(citationList, function(c) {
-      return c.name;
+      return c.name + " " + c.citation;
     });
 
     $('#citations ul').empty();
@@ -225,7 +225,7 @@ var makeCharts = function() {
           $('<li>')
             .append($('<b>').append(c['name'] + ": "))
             .append(c['citation'])
-            .append(_.escape('<' + window.location.href + '>'))
+            .append(_.escape(' <' + window.location.origin + window.location.pathname + '>'))
           )
     });
 
