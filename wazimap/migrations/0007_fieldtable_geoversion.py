@@ -32,9 +32,7 @@ def forwards(apps, schema_editor):
                 session.execute("ALTER TABLE %s DROP CONSTRAINT %s" % (table.name, pk))
 
             # add the new column
-
             session.execute("ALTER TABLE %s ADD COLUMN geo_version VARCHAR(100) DEFAULT ''" % table.name)
-
 
             # add the correct new constraint
             session.execute(AddConstraint(table.primary_key))
