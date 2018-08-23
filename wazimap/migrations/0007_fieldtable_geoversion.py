@@ -8,7 +8,6 @@ from django.db import migrations
 
 
 from sqlalchemy import inspect
-from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.schema import AddConstraint
 from wazimap.data.utils import get_session
 from wazimap.data.tables import DATA_TABLES
@@ -26,6 +25,10 @@ def forwards(apps, schema_editor):
             db_model = data_table.model
             table = db_model.__table__
 
+            cols = [c['name'] for c in inspector.get_columns(table.name)]
+            if 'geo_version' in cols:
+                continue
+
             # remove the old primary key constraint, if any
             pk = inspector.get_pk_constraint(table.name)['name']
             if pk:
@@ -38,8 +41,6 @@ def forwards(apps, schema_editor):
             session.execute(AddConstraint(table.primary_key))
 
         session.commit()
-    except ProgrammingError:
-        log.info("ADD geo_version COLUMN FAILED", exc_info=True)
     finally:
         session.close()
 
