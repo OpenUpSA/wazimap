@@ -12,7 +12,7 @@ with open(path.join(here, 'VERSION')) as f:
     version = f.read().strip()
 
 install_requires = [
-    'Django>=1.8.0,<1.10',
+    'Django>=1.11.15<1.12.0',
     'SQLAlchemy>=0.9.4',
     'boto>=2.27.0',
     'dj-database-url>=0.4.0',
