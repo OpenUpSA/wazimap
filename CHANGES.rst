@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+1.2 (13 September 2018)
+-----------------------
+
+* Update to Django version 1.11 which has long-term support
+
 1.1.1 (21 November 2017)
 -----------------------
 
