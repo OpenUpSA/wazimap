@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import url, patterns
+from django.conf.urls import url
 from django.contrib import admin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
@@ -20,7 +20,7 @@ STANDARD_CACHE_TIME = settings.WAZIMAP['cache_secs']
 EMBED_CACHE_TIME = settings.WAZIMAP.get('embed_cache_secs', STANDARD_CACHE_TIME)
 
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(
         regex   = '^$',
         view    = cache_page(STANDARD_CACHE_TIME)(HomepageView.as_view()),
@@ -236,4 +236,4 @@ urlpatterns = patterns('',
     #     name    = 'elasticsearch',
     # ),
     # END LOCAL DEV VERSION OF API ##
-)
+]
