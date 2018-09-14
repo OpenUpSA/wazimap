@@ -1,6 +1,11 @@
 Wazimap Version History
 =======================
 
+1.2.1 (14 September 2018)
+-----------------------
+
+* FIX warning for template parameters
+
 1.2 (13 September 2018)
 -----------------------
 
