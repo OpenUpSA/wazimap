@@ -5,7 +5,6 @@ import dj_database_url
 
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true') == 'true'
-TEMPLATE_DEBUG = DEBUG
 TESTING = 'test' in sys.argv[1:3]
 
 ROOT_URLCONF = 'wazimap.urls'
@@ -84,6 +83,7 @@ TEMPLATES = [
                 'census.context_processors.api_url',
                 'wazimap.context_processors.wazimap_settings',
             ],
+            'debug': DEBUG,
         },
     },
 ]
