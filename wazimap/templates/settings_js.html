@@ -24,5 +24,6 @@ var GEOMETRY_URLS = {
 var sumlevMap = {{ geo_data.geo_levels|jsonify|safe }};
 
 var releaseNames = {};
+var RELEASE = '{{ primary_releases.active.year }}';
 {% endblock settings_javascript %}
 </script>

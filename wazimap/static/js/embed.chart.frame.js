@@ -24,6 +24,14 @@ function makeEmbedFrame() {
         embedFrame.params.chartDataYearDir = (!!embedFrame.params.dataYear) ? embedFrame.params.dataYear+'/' : '';
         embedFrame.dataSource = '/profiles/'+embedFrame.params.geoID+'.json';
         if (embedFrame.params.geoVersion) embedFrame.dataSource += '?geo_version=' + embedFrame.params.geoVersion;
+        if (embedFrame.params.dataYear) {
+          if (embedFrame.dataSource.indexOf('?') > -1) {
+            embedFrame.dataSource += '&';
+          } else {
+            embedFrame.dataSource += '?';
+          }
+          embedFrame.dataSource += 'release=' + embedFrame.params.dataYear;
+        }
 
         // avoid css media-query caching issues with multiple embeds on same page
         $('#chart-styles').attr('href','css/charts.css?'+embedFrame.parentContainerID);
@@ -47,7 +55,7 @@ function makeEmbedFrame() {
                         data = data[embedFrame.params.chartDataID[i]];
                     }
                 }
-            
+
                 embedFrame.data.chartData = data;
                 embedFrame.data.geographyData = results.geography;
                 embedFrame.makeChart();
@@ -102,7 +110,7 @@ function makeEmbedFrame() {
     embedFrame.makeChartFooter = function() {
         embedFrame.elements.footer = d3.select('.census-chart-embed').append('div')
             .classed('embed-footer', true);
-                    
+
         embedFrame.elements.footer.append('ul')
             .append('li')
             .html('<a href="#" id="about-trigger">About this chart</a>');
@@ -120,10 +128,10 @@ function makeEmbedFrame() {
             eventListener = window[eventMethod],
             messageEvent = (eventMethod == 'attachEvent') ? 'onmessage' : 'message';
         eventListener(messageEvent, embedFrame.handleMessage, false);
-    
+
         var flip = flippant.flip,
             back;
-        
+
         embedFrame.flipped = false,
         $('.embed-footer').on('click', '#about-trigger', function(e) {
             e.preventDefault();
@@ -170,7 +178,7 @@ function makeEmbedFrame() {
         // IE9 can only send strings via postmessage
         parent.postMessage(JSON.stringify(data), embedFrame.parentOrigin);
     }
-    
+
     embedFrame.trackEvent = function(category, action, label) {
         // make sure we have Google Analytics function available
         if (typeof(ga) == 'function') {

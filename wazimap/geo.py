@@ -8,7 +8,6 @@ from django.utils.module_loading import import_string
 from django.db.models import Q
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from wazimap.data.utils import LocationNotFound
 from wazimap.models import Geography
 
 log = logging.getLogger(__name__)
@@ -21,6 +20,10 @@ try:
     HAS_GDAL = True
 except ImportError:
     HAS_GDAL = False
+
+
+class LocationNotFound(Exception):
+    pass
 
 
 class GeoData(object):
@@ -309,6 +312,13 @@ class GeoData(object):
     def first_child_level(self):
         # first child level in the hierarchy
         return self.geo_levels[self.root_level]['children'][0]
+
+    def primary_release_year(self, geo):
+        """ Return the primary release year to use for the provided geography.
+        This uses the `WAZIMAP['primary_release_year']` setting to lookup the
+        year based on the geo's level, and defaults to `latest`.
+        """
+        return settings.WAZIMAP['primary_release_year'].get(geo.geo_level, 'latest')
 
 
 geo_data = import_string(settings.WAZIMAP['geodata'])()

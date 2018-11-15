@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import url
+from django.conf.urls import url, patterns, include
 from django.contrib import admin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
@@ -13,7 +13,7 @@ from wazimap.views import (HomepageView, GeographyDetailView, GeographyJsonView,
                            GeoAPIView, TableDetailView)
 
 
-admin.autodiscover()
+#admin.autodiscover()
 handler500 = 'census.views.server_error'
 
 STANDARD_CACHE_TIME = settings.WAZIMAP['cache_secs']
@@ -22,7 +22,9 @@ EMBED_CACHE_TIME = settings.WAZIMAP.get('embed_cache_secs', STANDARD_CACHE_TIME)
 GEOGRAPHY_LEVELS = '|'.join(settings.WAZIMAP['levels'].keys())
 PROFILES_GEOGRAPHY_REGEX = r'profiles/(?P<geography_id>[{}]+-\w+)(-(?P<slug>[\w-]+))?'.format(GEOGRAPHY_LEVELS)
 
-urlpatterns = [
+urlpatterns = patterns('',
+    url(r'^admin/', include(admin.site.urls)),
+
     url(
         regex   = '^$',
         view    = cache_page(STANDARD_CACHE_TIME)(HomepageView.as_view()),
@@ -78,7 +80,7 @@ urlpatterns = [
 
     # Custom data api
     url(
-        regex   = '^api/1.0/data/show/latest$',
+        regex   = '^api/1.0/data/show/(?P<release>\w+)$',
         view    = cache_page(STANDARD_CACHE_TIME)(DataAPIView.as_view()),
         kwargs  = {'action': 'show'},
         name    = 'api_show_data',
@@ -86,7 +88,7 @@ urlpatterns = [
 
     # download API
     url(
-        regex   = '^api/1.0/data/download/latest$',
+        regex   = '^api/1.0/data/download/(?P<release>\w+)$',
         view    = DataAPIView.as_view(),
         kwargs  = {'action': 'download'},
         name    = 'api_download_data',
