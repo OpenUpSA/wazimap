@@ -20,12 +20,9 @@ DATABASES = {
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.humanize',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
     'sass_processor',
     'wazimap.apps.WazimapConfig',
@@ -76,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
+                'django.template.context_processors.request',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 'census.context_processors.api_url',
