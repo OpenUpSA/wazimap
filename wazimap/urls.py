@@ -240,4 +240,4 @@ urlpatterns = patterns('',
     #     name    = 'elasticsearch',
     # ),
     # END LOCAL DEV VERSION OF API ##
-]
+)
