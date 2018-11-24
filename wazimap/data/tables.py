@@ -286,7 +286,16 @@ class SimpleTable(object):
         columns = self._build_model_columns()
 
         class Model(Base):
-            __table__ = Table(db_table, Base.metadata, *columns, autoload=True, extend_existing=True)
+            __table__ = Table(db_table, Base.metadata, *columns, extend_existing=True)
+        
+        # ensure it exists in the DB
+        session = get_session()
+        try:
+            Model.__table__.create(session.get_bind(), checkfirst=True)
+        finally:
+            session.close()
+
+        DB_MODELS[db_table] = Model
 
         return Model
 
@@ -595,11 +604,6 @@ class FieldTable(SimpleTable):
         DB_MODELS[db_table] = Model
 
         return Model
-
-        # Now add the field columns
-        columns.extend(Column(field, String(128), primary_key=True) for field in fields)
-        # and the value column
-        columns.append(Column('total', value_type, nullable=True))
 
     def _build_model_columns(self, fields, value_type):
         columns = super(FieldTable, self)._build_model_columns()
