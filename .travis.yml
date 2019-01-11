@@ -5,6 +5,7 @@ services:
   - postgresql
 env:
   - DATABASE_URL=postgres://postgres:@localhost:5432/wazimap
+  - BOTO_CONFIG=/dev/null  # workaround for https://github.com/travis-ci/travis-ci/issues/7940
 install:
   - python setup.py -q install
 script: python manage.py test
