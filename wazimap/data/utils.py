@@ -36,7 +36,13 @@ naming_convention = {
     "pk": "pk_%(table_name)s"
 }
 
-_metadata = MetaData(bind=_engine, naming_convention=naming_convention, reflect=True)
+_metadata = MetaData(bind=_engine, naming_convention=naming_convention)
+
+# if testing,  don't get information about tables already in the database.
+
+if not settings.TESTING:
+    _metadata.reflect()
+
 _Session = sessionmaker(bind=_engine)
 
 
