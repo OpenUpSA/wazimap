@@ -43,7 +43,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/Code4SA/wazimap',
+    url='https://github.com/OpenUpSA/wazimap',
 
     # Author details
     author='OpenUp',
