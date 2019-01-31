@@ -4,8 +4,11 @@ import sys
 import dj_database_url
 
 
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true') == 'true'
-TEMPLATE_DEBUG = DEBUG
 TESTING = 'test' in sys.argv[1:3]
 
 ROOT_URLCONF = 'wazimap.urls'
@@ -66,18 +69,24 @@ STATICFILES_FINDERS = (
 
 
 # Templates
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.media',
-    'django.core.context_processors.request',
-    'django.core.context_processors.static',
-    'django.contrib.auth.context_processors.auth',
-    'census.context_processors.api_url',
-    'wazimap.context_processors.wazimap_settings',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'debug': DEBUG,
+            'context_processors': [
+                'django.template.context_processors.media',
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'django.contrib.auth.context_processors.auth',
+                'census.context_processors.api_url',
+                'wazimap.context_processors.wazimap_settings',
+            ]
+        }
+    }
+]
 
 
 MIDDLEWARE_CLASSES = (
