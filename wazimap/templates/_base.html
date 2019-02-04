@@ -114,7 +114,10 @@
 
             <section class="wrapper clearfix">
                 <p class="attribution">
-                {{ WAZIMAP.name }} is built on <a href="http://wazimap.readthedocs.org/">Wazimap</a>, an open source platform by <a href="https://openup.org.za/">OpenUp</a> and <a href="http://www.mediamonitoringafrica.org/">Media Monitoring Africa</a> for making census data more understandable. Wazimap is based on <a href="https://censusreporter.org/">Census Reporter</a> which was funded by a Knight News Challenge grant.</p>
+		    {% block footer-attribution %}
+		    {{ WAZIMAP.name }} is built on <a href="http://wazimap.readthedocs.org/">Wazimap</a>, an open source platform by <a href="https://openup.org.za/">OpenUp</a> and <a href="http://www.mediamonitoringafrica.org/">Media Monitoring Africa</a> for making census data more understandable. Wazimap is based on <a href="https://censusreporter.org/">Census Reporter</a> which was funded by a Knight News Challenge grant.
+		    {% endblock %}
+               </p>
             </section>
         </footer>
         {% endblock body %}
