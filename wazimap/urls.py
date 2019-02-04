@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import url, patterns, include
+from django.conf.urls import url, include
 from django.contrib import admin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
@@ -20,7 +20,7 @@ STANDARD_CACHE_TIME = settings.WAZIMAP['cache_secs']
 EMBED_CACHE_TIME = settings.WAZIMAP.get('embed_cache_secs', STANDARD_CACHE_TIME)
 
 
-urlpatterns = patterns('',
+urlpatterns = (
     url(r'^admin/', include(admin.site.urls)),
 
     url(
