@@ -20,7 +20,7 @@ STANDARD_CACHE_TIME = settings.WAZIMAP['cache_secs']
 EMBED_CACHE_TIME = settings.WAZIMAP.get('embed_cache_secs', STANDARD_CACHE_TIME)
 
 
-urlpatterns = (
+urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
     url(
@@ -238,4 +238,4 @@ urlpatterns = (
     #     name    = 'elasticsearch',
     # ),
     # END LOCAL DEV VERSION OF API ##
-)
+]
