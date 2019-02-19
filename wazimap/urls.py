@@ -107,6 +107,7 @@ urlpatterns = (
         kwargs  = {},
         name    = 'api_geo_parents',
     ),
+    
     url(
         regex   = '^api/1.0/geo/(?P<geo_id>\w+-\w+)/children$',
         view    = cache_page(STANDARD_CACHE_TIME)(GeoAPIView.as_view()),
