@@ -349,7 +349,7 @@ class GeographyCompareView(TemplateView):
 
 class GeoAPIView(View):
     """
-    View that lists things about geos. Currently just parents.
+    View that lists things about geos. Currently parents and children.
     """
     def get(self, request, geo_id, *args, **kwargs):
         try:
@@ -360,6 +360,16 @@ class GeoAPIView(View):
 
         parents = [g.as_dict() for g in geo.ancestors()]
         return render_json_to_response(parents)
+
+    def children(self, request, geo_id, *args, **kwargs):
+        try:
+            level, code = geo_id.split('-', 1)
+            geo = geo_data.get_geography(code, level)
+        except (ValueError, LocationNotFound):
+            raise Http404
+
+        children = [g.as_dict() for g in geo.children()]
+        return render_json_to_response(children)
 
 
 class TableDetailView(TemplateView):
