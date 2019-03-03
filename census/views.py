@@ -1,7 +1,7 @@
 from __future__ import division
 from collections import OrderedDict, defaultdict
 from urllib.parse import urlencode
-from urllib2 import unquote
+from urllib.parse import unquote
 import cStringIO
 import gzip
 import re
