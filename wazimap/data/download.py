@@ -1,5 +1,3 @@
-from builtins import str
-from builtins import object
 import shutil
 import tempfile
 import os
@@ -65,7 +63,7 @@ class DownloadManager(object):
             out_layer.CreateField(ogr.FieldDefn('name', ogr.OFTString))
 
             for table in tables:
-                for column_id, column_info in list(columns[table.name].items()):
+                for column_id, column_info in columns[table.name].items():
                     out_layer.CreateField(ogr.FieldDefn(str(column_id), ogr.OFTReal))
 
             for geo in geos:
@@ -86,7 +84,7 @@ class DownloadManager(object):
                 for table in tables:
                     table_estimates = data[geoid][table.name.upper()]['estimate']
 
-                    for column_id, column_info in list(columns[table.name].items()):
+                    for column_id, column_info in columns[table.name].items():
                         if column_id in table_estimates:
                             est = table_estimates[column_id]
                             # None values get changed to zero, which isn't accurate

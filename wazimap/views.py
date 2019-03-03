@@ -1,9 +1,6 @@
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
 from itertools import chain
 import json
-import urllib.request, urllib.parse, urllib.error
+import urllib
 
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
@@ -60,7 +57,7 @@ class GeographyDetailView(BaseGeographyDetailView):
         if self.adjust_slugs and (kwargs.get('slug') or self.geo.slug):
             if kwargs['slug'] != self.geo.slug:
                 kwargs['slug'] = self.geo.slug
-                url = '/profiles/%s-%s-%s?%s' % (self.geo_level, self.geo_code, self.geo.slug, urllib.parse.urlencode(request.GET))
+                url = '/profiles/%s-%s-%s?%s' % (self.geo_level, self.geo_code, self.geo.slug, urllib.urlencode(request.GET))
                 return redirect(url, permanent=True)
 
         # Skip the parent class's logic completely and go back to basics
@@ -250,7 +247,7 @@ class DataAPIView(View):
 
         fmt = request.GET.get('format', 'csv')
         if fmt not in mgr.DOWNLOAD_FORMATS:
-            response = HttpResponse('Unspported format %s. Supported formats: %s' % (fmt, ', '.join(list(mgr.DOWNLOAD_FORMATS.keys()))))
+            response = HttpResponse('Unspported format %s. Supported formats: %s' % (fmt, ', '.join(mgr.DOWNLOAD_FORMATS.keys())))
             response.status_code = 400
             return response
 
@@ -301,7 +298,7 @@ class DataAPIView(View):
         data = {}
 
         for table in tables:
-            for geo_id, table_data in list(table.raw_data_for_geos(geos).items()):
+            for geo_id, table_data in table.raw_data_for_geos(geos).items():
                 data.setdefault(geo_id, {})[table.name.upper()] = table_data
 
         return data

@@ -1,6 +1,3 @@
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
 from django.core.management.base import BaseCommand
 from multiprocessing import Pool
 from traceback import format_exc
@@ -8,7 +5,7 @@ from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
 import json
-import io
+import cStringIO
 import gzip
 
 from ...profile import geo_profile, enhance_api_data
@@ -35,7 +32,7 @@ def write_profile_json(s3_key, data):
     s3_key.storage_class = 'REDUCED_REDUNDANCY'
 
     # create gzipped version of json in memory
-    memfile = io.StringIO()
+    memfile = cStringIO.StringIO()
     #memfile.write(data)
     with gzip.GzipFile(filename=s3_key.key, mode='wb', fileobj=memfile) as gzip_data:
         gzip_data.write(data)
@@ -53,7 +50,7 @@ def seed(geoid):
         s3key = key(geoid)
         write_profile_json(s3key, json.dumps(api_data))
         logger.info("Wrote to key {}".format(s3key))
-    except Exception as e:
+    except Exception, e:
         logger.error("Problem caching {}".format(geoid))
         logger.exception(e)
     logger.info("Done working on {}".format(geoid))
@@ -64,7 +61,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if not args:
-            print("Please include the name of a file containing the seed geo_ids.")
+            print "Please include the name of a file containing the seed geo_ids."
             return False
 
         parallelism = 4

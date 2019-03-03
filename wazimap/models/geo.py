@@ -1,4 +1,3 @@
-from builtins import object
 from collections import OrderedDict
 import itertools
 
@@ -115,7 +114,7 @@ class GeographyBase(models.Model, GeoMixin):
     #: geography that has no parent.
     parent_code = models.CharField(max_length=10, null=True)
 
-    class Meta(object):
+    class Meta:
         abstract = True
         unique_together = ('geo_level', 'geo_code', 'version')
 

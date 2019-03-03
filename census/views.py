@@ -1,11 +1,8 @@
 from __future__ import division
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next
 from collections import OrderedDict, defaultdict
-from urllib.parse import urlencode
-from urllib.parse import unquote
-import io
+from urllib import urlencode
+from urllib2 import unquote
+import cStringIO
 import gzip
 import re
 import requests
@@ -67,7 +64,7 @@ def server_error(request):
 
 def raise_404_with_messages(request, error_data={}):
     ''' expects a dict containing error labels and messages for the user '''
-    for k, v in list(error_data.items()):
+    for k, v in error_data.items():
         error_text = '<strong>%s:</strong> %s' % (k.title(), v)
         messages.error(request, error_text)
 
@@ -229,8 +226,8 @@ class TableDetailView(TemplateView):
             'preview': {},
         }
 
-        for group, group_values in list(tables.items()):
-            preview_table = next(list(group_values.items()))[0]
+        for group, group_values in tables.items():
+            preview_table = next(group_values.items())[0]
             tabulation_data['related_tables']['preview'][preview_table] = self.get_table_data(preview_table)
             tabulation_data['related_tables']['preview'][preview_table]['table_type'] = self.TABLE_TYPE_TRANSLATE_DICT[preview_table.upper()[0]]
 
@@ -238,7 +235,7 @@ class TableDetailView(TemplateView):
 
     def get_topic_pages(self, table_topics):
         related_topic_pages = []
-        for key, values in list(TOPICS_MAP.items()):
+        for key, values in TOPICS_MAP.items():
             topics = values.get('topics', [])
             matches = set(topics).intersection(table_topics)
             if matches:
@@ -406,7 +403,7 @@ class GeographyDetailView(TemplateView):
         s3_key.storage_class = 'REDUCED_REDUNDANCY'
 
         # create gzipped version of json in memory
-        memfile = io.StringIO()
+        memfile = cStringIO.StringIO()
         #memfile.write(data)
         with gzip.GzipFile(filename=s3_key.key, mode='wb', fileobj=memfile) as gzip_data:
             gzip_data.write(data)
@@ -424,7 +421,7 @@ class GeographyDetailView(TemplateView):
             s3_key = None
 
         if s3_key and s3_key.exists():
-            memfile = io.StringIO()
+            memfile = cStringIO.StringIO()
             s3_key.get_file(memfile)
             memfile.seek(0)
             compressed = gzip.GzipFile(fileobj=memfile)
@@ -599,7 +596,7 @@ class PlaceSearchJson(View):
             allowed_sumlev_list = self.request.GET['sumlevs'].split(',')
             geographies = geographies.filter(sumlev__in=allowed_sumlev_list)
 
-        geographies = list(geographies.values())
+        geographies = geographies.values()
         geographies = geographies.only('full_name','full_geoid','sumlev')
 
         return render_json_to_response(list(geographies))
@@ -674,12 +671,12 @@ class TableSearchJson(View):
 
         table = self.request.GET.get('table', None)
         if table:
-            tables = list(tables.filter(table_name__icontains=table).values())
+            tables = tables.filter(table_name__icontains=table).values()
             results['tables'] = list(tables)
 
         column = self.request.GET.get('column', None)
         if column:
-            columns = list(columns.filter(column_name__icontains=column).values())
+            columns = columns.filter(column_name__icontains=column).values()
             columns = columns.only('table', 'parent_table_id', 'column_name', 'column_id')
             results['columns'] = list(columns)
 
