@@ -350,7 +350,7 @@ class GeographyDetailView(TemplateView):
                     return HttpResponseRedirect(
                         reverse('geography_detail', args=(fragment,)
                     ))
-                except Exception, e:
+                except Exception as e:
                     # if we have a strange situation where there's no
                     # display name attached to the geography, we should
                     # go ahead and display the profile page
