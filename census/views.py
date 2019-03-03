@@ -2,7 +2,7 @@ from __future__ import division
 from collections import OrderedDict, defaultdict
 from urllib.parse import urlencode
 from urllib.parse import unquote
-import cStringIO
+import io
 import gzip
 import re
 import requests
@@ -403,7 +403,7 @@ class GeographyDetailView(TemplateView):
         s3_key.storage_class = 'REDUCED_REDUNDANCY'
 
         # create gzipped version of json in memory
-        memfile = cStringIO.StringIO()
+        memfile = io.StringIO()
         #memfile.write(data)
         with gzip.GzipFile(filename=s3_key.key, mode='wb', fileobj=memfile) as gzip_data:
             gzip_data.write(data)
@@ -421,7 +421,7 @@ class GeographyDetailView(TemplateView):
             s3_key = None
 
         if s3_key and s3_key.exists():
-            memfile = cStringIO.StringIO()
+            memfile = io.StringIO()
             s3_key.get_file(memfile)
             memfile.seek(0)
             compressed = gzip.GzipFile(fileobj=memfile)

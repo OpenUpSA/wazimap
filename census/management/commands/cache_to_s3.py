@@ -6,7 +6,7 @@ from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
 import json
-import cStringIO
+import io
 import gzip
 
 from ...profile import geo_profile, enhance_api_data
@@ -33,7 +33,7 @@ def write_profile_json(s3_key, data):
     s3_key.storage_class = 'REDUCED_REDUNDANCY'
 
     # create gzipped version of json in memory
-    memfile = cStringIO.StringIO()
+    memfile = io.StringIO()
     #memfile.write(data)
     with gzip.GzipFile(filename=s3_key.key, mode='wb', fileobj=memfile) as gzip_data:
         gzip_data.write(data)
