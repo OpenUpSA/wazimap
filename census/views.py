@@ -226,8 +226,8 @@ class TableDetailView(TemplateView):
             'preview': {},
         }
 
-        for group, group_values in tables.iteritems():
-            preview_table = next(group_values.iteritems())[0]
+        for group, group_values in tables.items():
+            preview_table = next(group_values.items())[0]
             tabulation_data['related_tables']['preview'][preview_table] = self.get_table_data(preview_table)
             tabulation_data['related_tables']['preview'][preview_table]['table_type'] = self.TABLE_TYPE_TRANSLATE_DICT[preview_table.upper()[0]]
 
@@ -235,7 +235,7 @@ class TableDetailView(TemplateView):
 
     def get_topic_pages(self, table_topics):
         related_topic_pages = []
-        for key, values in TOPICS_MAP.iteritems():
+        for key, values in TOPICS_MAP.items():
             topics = values.get('topics', [])
             matches = set(topics).intersection(table_topics)
             if matches:

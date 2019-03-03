@@ -144,7 +144,7 @@ def build_item(name, data, parents, rpn_string):
         label = parent['relation']
         geoid = parent['geoid']
         data_for_geoid = dict(estimate={}, error={})
-        for table_id, table_data in data['data'][geoid].iteritems():
+        for table_id, table_data in data['data'][geoid].items():
             data_for_geoid['estimate'].update(table_data['estimate'])
             data_for_geoid['error'].update(table_data['error'])
 
@@ -927,7 +927,7 @@ def find_dicts_with_key(dictionary, searchkey):
         d = stack.pop()
         if searchkey in d:
             dict_list.append(d)
-        for key, value in d.iteritems():
+        for key, value in d.items():
             if isinstance(value, dict) or isinstance(value, OrderedDict):
                 stack.append(value)
 

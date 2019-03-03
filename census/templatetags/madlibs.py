@@ -50,7 +50,7 @@ def comparison_index_phrase(value):
     index = round(float(value))
     
     # get lower boundaries for each phrase in the map
-    thresholds = sorted([k for k,v in COMPARISON_PHRASE_MAP.iteritems()])
+    thresholds = sorted([k for k,v in COMPARISON_PHRASE_MAP.items()])
 
     # get highest boundary that's less than the index value we've been passed
     phrase_key = max(k for k in thresholds if k <= index)

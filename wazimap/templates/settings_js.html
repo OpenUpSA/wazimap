@@ -11,9 +11,9 @@ var GOOGLE_GEOCODE_API_KEY = '{{ WAZIMAP.google_geocode_api_key }}';
 var GEOMETRY_DEFAULT_GEO_VERSION = {{ geo_data.default_version|jsonify|safe }};
 
 var GEOMETRY_URLS = {
-  {% for geo_version, data in WAZIMAP.geometry_data.iteritems %}
+  {% for geo_version, data in WAZIMAP.geometry_data.items %}
     '{{ geo_version }}': {
-      {% for level, path in data.iteritems %}
+      {% for level, path in data.items %}
       '{{ level }}': '{% static path %}' {% if not forloop.last %},{% endif %}
       {% endfor %}
     } {% if not forloop.last %},{% endif %}
