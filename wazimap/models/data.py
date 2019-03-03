@@ -22,7 +22,11 @@ means that the census controller doesn't care about table names, only
 about what fields it requires. If more than one FieldTable could serve
 for a set of fields, the one with the fewest extraneous fields is chosen.
 '''
+from __future__ import division
 
+from past.builtins import basestring
+from past.utils import old_div
+from builtins import object
 from collections import OrderedDict
 import re
 
@@ -55,7 +59,7 @@ class Dataset(models.Model):
     def __str__(self):
         return self.name
 
-    class Meta:
+    class Meta(object):
         ordering = ['name']
 
 
@@ -65,7 +69,7 @@ class Release(models.Model):
     citation = models.TextField(max_length=None, null=True, blank=True, help_text="What the user should use when citing this data.")
     dataset = models.ForeignKey(Dataset, related_name='releases', null=False, on_delete=models.CASCADE)
 
-    class Meta:
+    class Meta(object):
         unique_together = (('year', 'dataset'))
         ordering = ['name', 'year']
 
@@ -88,7 +92,7 @@ class DBTable(models.Model):
     # Cache of SQLALchemy models for each db table
     MODELS = {}
 
-    class Meta:
+    class Meta(object):
         ordering = ['name']
 
     def __init__(self, *args, **kwargs):
@@ -127,7 +131,7 @@ class DataTable(models.Model):
 
     release_class = None
 
-    class Meta:
+    class Meta(object):
         abstract = True
         ordering = ('name',)
 
@@ -288,9 +292,9 @@ class SimpleTable(DataTable):
                 for f in fields:
                     if f not in columns:
                         raise ValueError("Invalid field/column '%s' for table '%s'. Valid columns are: %s" % (
-                            f, self.id, ', '.join(columns.keys())))
+                            f, self.id, ', '.join(list(columns.keys()))))
             else:
-                fields = columns.keys()
+                fields = list(columns.keys())
                 if self.total_column:
                     fields.remove(self.total_column)
 
@@ -303,7 +307,7 @@ class SimpleTable(DataTable):
             # is the total column valid?
             if isinstance(total, basestring) and total not in columns:
                 raise ValueError("Total column '%s' isn't one of the columns for table '%s'. Valid columns are: %s" % (
-                    total, self.id, ', '.join(columns.keys())))
+                    total, self.id, ', '.join(list(columns.keys()))))
 
             # table columns to fetch
             cols = [model.__table__.columns[c] for c in fields]
@@ -386,7 +390,7 @@ class SimpleTable(DataTable):
             for row in rows:
                 geo_values = data['%s-%s' % (row.geo_level, row.geo_code)]
 
-                for col in columns.keys():
+                for col in list(columns.keys()):
                     geo_values['estimate'][col] = getattr(row, col)
                     geo_values['error'][col] = 0
 
@@ -725,7 +729,7 @@ class FieldTable(DataTable):
                     key = capitalize(key)
 
                 # enforce key ordering the first time we see this field
-                if (not data or data.keys() == ['metadata']) and field in key_order:
+                if (not data or list(data.keys()) == ['metadata']) and field in key_order:
                     for fld in key_order[field]:
                         data[fld] = OrderedDict()
 
@@ -788,7 +792,7 @@ class FieldTable(DataTable):
 
         # add in percentages
         def calc_percent(data):
-            for key, data in data.items():
+            for key, data in list(data.items()):
                 if not key == 'metadata':
                     if 'numerators' in data:
                         if percent:
@@ -798,7 +802,7 @@ class FieldTable(DataTable):
                                 total = grand_total
 
                             if total is not None and data['numerators']['this'] is not None:
-                                perc = 0 if total == 0 else (data['numerators']['this'] / total * 100)
+                                perc = 0 if total == 0 else (old_div(data['numerators']['this'], total * 100))
                                 data['values'] = {'this': round(perc, 2)}
                             else:
                                 data['values'] = {'this': None}
@@ -839,11 +843,11 @@ class FieldTable(DataTable):
             .filter(db_model.geo_version == geo.version)
 
         if only:
-            for k, v in only.items():
+            for k, v in list(only.items()):
                 objects = objects.filter(getattr(db_model, k).in_(v))
 
         if exclude:
-            for k, v in exclude.items():
+            for k, v in list(exclude.items()):
                 objects = objects.filter(getattr(db_model, k).notin_(v))
 
         if order_by is not None:

@@ -1,3 +1,4 @@
+from builtins import object
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from wazimap.data.utils import _metadata
 

@@ -9,10 +9,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         from wazimap.data.tables import FIELD_TABLES, DATA_TABLES
 
-        for table in FIELD_TABLES.itervalues():
+        for table in FIELD_TABLES.values():
             self.upgrade_field_table(table)
 
-        for table in DATA_TABLES.itervalues():
+        for table in DATA_TABLES.values():
             if not hasattr(table, 'fields'):
                 self.upgrade_simple_table(table)
 

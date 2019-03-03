@@ -1,3 +1,4 @@
+from builtins import zip
 from collections import OrderedDict
 from itertools import repeat
 
@@ -19,7 +20,7 @@ def enhance_api_data(api_data):
         # create our containers for transformation
         for obj in ['values', 'error', 'numerators', 'numerator_errors']:
             if obj not in d:
-                raw[obj] = dict(zip(geo_data.comparative_levels, repeat(0)))
+                raw[obj] = dict(list(zip(geo_data.comparative_levels, repeat(0))))
             else:
                 raw[obj] = d[obj]
             enhanced[obj] = OrderedDict()

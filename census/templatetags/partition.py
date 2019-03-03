@@ -14,7 +14,10 @@ A common use-case is for splitting a list into a table with columns::
     {% endfor %}
     </table>
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 from django.template import Library
 
 register = Library()
@@ -168,7 +171,7 @@ def columns(thelist, n):
         return [thelist]
     newlists = [list() for i in range(int(ceil(len(thelist) / float(n))))]
     for i, val in enumerate(thelist):
-        newlists[i/n].append(val)
+        newlists[old_div(i,n)].append(val)
     return newlists
 
 register.filter(rows)

@@ -1,3 +1,4 @@
+from builtins import object
 from django.db import models
 
 class Table(models.Model):
@@ -9,7 +10,7 @@ class Table(models.Model):
     topics = models.CharField(max_length=255, blank=True)
     release = models.CharField(max_length=16)
     
-    class Meta:
+    class Meta(object):
         ordering = ('release','table_id')
 
     def __unicode__(self):
@@ -25,7 +26,7 @@ class Column(models.Model):
     parent_column_id = models.CharField(max_length=255)
     has_children = models.BooleanField()
 
-    class Meta:
+    class Meta(object):
         ordering = ('table__table_id','table__release','column_id')
 
     def __unicode__(self):
@@ -49,7 +50,7 @@ class SummaryLevel(models.Model):
     parent = models.ForeignKey('self', related_name='children', blank=True, null=True)
     ancestors = models.ManyToManyField('self', related_name='descendants', symmetrical=False, blank=True)
     
-    class Meta:
+    class Meta(object):
         ordering = ('summary_level',)
 
     def __unicode__(self):
@@ -84,7 +85,7 @@ class SubjectConcept(models.Model):
     description = models.TextField(blank=True)
     source = models.CharField(max_length=64, blank=True, default="American Community Survey Subject Definitions")
     
-    class Meta:
+    class Meta(object):
         ordering = ('name',)
         
     def __unicode__(self):
@@ -125,7 +126,7 @@ class Geography(models.Model):
     intptlat = models.CharField(max_length=16, blank=True)
     intptlon = models.CharField(max_length=16, blank=True)
     
-    class Meta:
+    class Meta(object):
         ordering = ('full_geoid',)
         verbose_name_plural = "Geographies"
 

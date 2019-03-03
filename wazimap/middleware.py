@@ -1,3 +1,4 @@
+from builtins import object
 from django.conf import settings
 from django.http.response import HttpResponsePermanentRedirect
 
