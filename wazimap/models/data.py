@@ -386,7 +386,7 @@ class SimpleTable(DataTable):
             for row in rows:
                 geo_values = data['%s-%s' % (row.geo_level, row.geo_code)]
 
-                for col in columns.iterkeys():
+                for col in columns.keys():
                     geo_values['estimate'][col] = getattr(row, col)
                     geo_values['error'][col] = 0
 

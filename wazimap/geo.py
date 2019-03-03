@@ -126,7 +126,7 @@ class GeoData(object):
         self.geometry = {}
         self.geometry_files = settings.WAZIMAP.get('geometry_data', {})
 
-        for level in self.geo_levels.iterkeys():
+        for level in self.geo_levels.keys():
             # sanity check for geo version
             if level in self.geometry_files or self.geometry_files.keys() == [''] and isinstance(self.geometry_files[''], basestring):
                 # The geometry_data must include a version key. For example:
@@ -155,7 +155,7 @@ class GeoData(object):
                 raise ValueError("The geometry_data setting is missing a geometry version key. You probably aren't using geometry versions just need to " +
                                  "change WAZIMAP['geometry_data'] to be: %s" % suggestion)
 
-            for version in self.geometry_files.iterkeys():
+            for version in self.geometry_files.keys():
                 fname, js = self.load_geojson_for_level(level, version)
                 if not js:
                     continue

@@ -166,7 +166,7 @@ def calculate_median_stat(stats):
     Note: this function assumes the objects are sorted.
     '''
     total = 0
-    keys = [k for k in stats.iterkeys() if k != 'metadata']
+    keys = [k for k in stats.keys() if k != 'metadata']
     total = sum(stats[k]['numerators']['this'] for k in keys)
     half = total / 2.0
 
