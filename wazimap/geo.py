@@ -330,4 +330,4 @@ def gdal_missing(critical=False):
              "is a problem in production. For more information on installing GDAL, see http://wazimap.readthedocs.io/en/latest/")
 
     if critical:
-        raise StandardError("GDAL must be installed for this functionality to work.")
+        raise Exception("GDAL must be installed for this functionality to work.")

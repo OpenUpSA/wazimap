@@ -1,3 +1,4 @@
+from __future__ import print_function
 from django.core.management.base import BaseCommand
 from multiprocessing import Pool
 from traceback import format_exc
@@ -50,7 +51,7 @@ def seed(geoid):
         s3key = key(geoid)
         write_profile_json(s3key, json.dumps(api_data))
         logger.info("Wrote to key {}".format(s3key))
-    except Exception, e:
+    except Exception as e:
         logger.error("Problem caching {}".format(geoid))
         logger.exception(e)
     logger.info("Done working on {}".format(geoid))
@@ -61,7 +62,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if not args:
-            print "Please include the name of a file containing the seed geo_ids."
+            print("Please include the name of a file containing the seed geo_ids.")
             return False
 
         parallelism = 4

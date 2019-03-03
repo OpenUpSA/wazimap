@@ -1,3 +1,4 @@
+from __future__ import print_function
 import json
 import math
 import operator
@@ -55,7 +56,7 @@ def moe_proportion(numerator, denominator, numerator_moe, denominator_moe):
     proportion = float(numerator) / denominator
     try:
         return math.sqrt(numerator_moe**2 - (proportion**2 * denominator_moe**2)) / float(denominator)
-    except ValueError, e:
+    except ValueError as e:
         return moe_ratio(numerator, denominator, numerator_moe, denominator_moe)
 
 def moe_ratio(numerator, denominator, numerator_moe, denominator_moe):
@@ -1014,4 +1015,4 @@ def enhance_api_data(api_data):
     return api_data
 
 if __name__ == '__main__':
-    print json.dumps(geo_profile('04000US55'), indent=2)
+    print(json.dumps(geo_profile('04000US55'), indent=2))
