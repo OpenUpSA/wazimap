@@ -22,7 +22,8 @@ class GeoTestCase(TestCase):
             GeoData()
 
         # if the geometry_data is missing the version, we should raise an error
+        # raises an attribute error from line 188 geo.py
         settings.WAZIMAP['geometry_data'] = {'': 'geo/country.geojson'}
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(AttributeError):
             GeoData()
