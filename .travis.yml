@@ -5,6 +5,8 @@ services:
   - postgresql
 env:
   - DATABASE_URL=postgres://postgres:@localhost:5432/wazimap
+before_install:
+  - sudo rm -f /etc/boto.cfg  # workaround for https://github.com/travis-ci/travis-ci/issues/7940
 install:
   - python setup.py -q install
 script: python manage.py test

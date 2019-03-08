@@ -4,6 +4,10 @@ import sys
 import dj_database_url
 
 
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true') == 'true'
 TESTING = 'test' in sys.argv[1:3]
 
@@ -65,27 +69,25 @@ STATICFILES_FINDERS = (
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
-                'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.debug',
-                'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
-                'django.template.context_processors.static',
                 'django.template.context_processors.request',
-                'django.template.context_processors.tz',
-                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static',
+                'django.contrib.auth.context_processors.auth',
                 'census.context_processors.api_url',
                 'wazimap.context_processors.wazimap_settings',
-            ],
-            'debug': DEBUG,
-        },
-    },
+            ]
+        }
+    }
 ]
 
 
 MIDDLEWARE_CLASSES = (
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',

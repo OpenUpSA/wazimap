@@ -22,7 +22,7 @@ EMBED_CACHE_TIME = settings.WAZIMAP.get('embed_cache_secs', STANDARD_CACHE_TIME)
 GEOGRAPHY_LEVELS = '|'.join(settings.WAZIMAP['levels'].keys())
 PROFILES_GEOGRAPHY_REGEX = r'profiles/(?P<geography_id>[{}]+-\w+)(-(?P<slug>[\w-]+))?'.format(GEOGRAPHY_LEVELS)
 
-urlpatterns = [
+urlpatterns = (
     url(r'^admin/', include(admin.site.urls)),
 
     url(
@@ -240,4 +240,4 @@ urlpatterns = [
     #     name    = 'elasticsearch',
     # ),
     # END LOCAL DEV VERSION OF API ##
-]
+)
