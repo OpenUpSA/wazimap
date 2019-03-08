@@ -22,7 +22,7 @@ EMBED_CACHE_TIME = settings.WAZIMAP.get('embed_cache_secs', STANDARD_CACHE_TIME)
 GEOGRAPHY_LEVELS = '|'.join(settings.WAZIMAP['levels'].keys())
 PROFILES_GEOGRAPHY_REGEX = r'profiles/(?P<geography_id>[{}]+-\w+)(-(?P<slug>[\w-]+))?'.format(GEOGRAPHY_LEVELS)
 
-urlpatterns = (
+urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
     url(
@@ -108,6 +108,13 @@ urlpatterns = (
         view    = cache_page(STANDARD_CACHE_TIME)(GeoAPIView.as_view()),
         kwargs  = {},
         name    = 'api_geo_parents',
+    ),
+    
+    url(
+        regex   = '^api/1.0/geo/(?P<geo_id>\w+-\w+)/children$',
+        view    = cache_page(STANDARD_CACHE_TIME)(GeoAPIView.as_view()),
+        kwargs  = {'action': 'children'},
+        name    = 'api_geo_children',
     ),
 
     # TODO enable this see: https://github.com/Code4SA/censusreporter/issues/31
@@ -240,4 +247,4 @@ urlpatterns = (
     #     name    = 'elasticsearch',
     # ),
     # END LOCAL DEV VERSION OF API ##
-)
+]

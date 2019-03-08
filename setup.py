@@ -28,7 +28,6 @@ install_requires = [
     'requests>=1.2.0',
     'unicodecsv>=0.9.4',
     'whitenoise>=1.0.6',
-    'wsgiref>=0.1.2',
 ]
 
 setup(
