@@ -24,13 +24,16 @@ DATABASES = {
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
     'django.contrib.humanize',
-    'django.contrib.sites',
     'django.contrib.staticfiles',
     'sass_processor',
     'wazimap.apps.WazimapConfig',
-    'census',
+    'census'
 ]
 
 ALLOWED_HOSTS = ['*']
