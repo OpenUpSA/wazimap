@@ -36,7 +36,7 @@ naming_convention = {
     "pk": "pk_%(table_name)s"
 }
 
-_metadata = MetaData(bind=_engine, naming_convention=naming_convention, reflect=True)
+_metadata = MetaData(bind=_engine, naming_convention=naming_convention)
 _Session = sessionmaker(bind=_engine)
 
 
