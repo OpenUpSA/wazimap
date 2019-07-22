@@ -12,6 +12,7 @@ with open(path.join(here, 'VERSION')) as f:
     version = f.read().strip()
 
 install_requires = [
+    'numpy>=1.16.4',
     'Django>=1.11.15,<1.12.0',
     'SQLAlchemy>=0.9.4',
     'boto>=2.27.0',
@@ -19,7 +20,7 @@ install_requires = [
     'django-cors-headers>=1.1.0',
     'django-compressor>=2.1.1',
     'django-pipeline>=1.6.4',
-    'django-sass-processor>=0.5.4',
+    'django-sass-processor==0.5.5',
     'ecdsa>=0.11',
     'futures>=3.0.4',
     'libsass>=0.13.1',
@@ -28,7 +29,6 @@ install_requires = [
     'requests>=1.2.0',
     'unicodecsv>=0.9.4',
     'whitenoise>=1.0.6',
-    'wsgiref>=0.1.2',
 ]
 
 setup(
