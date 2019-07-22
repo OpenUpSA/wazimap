@@ -1,0 +1,43 @@
+version: "3.7"
+services: 
+  backend:
+    container_name: wazimap-plus
+    build: .
+    command: python3 manage.py runserver
+    restart: unless-stopped
+    depends_on: 
+      - database
+    environment: 
+      DATABASE_URL: postgresql://wazimap:wazimap@wazimap-plus-database/wazimapplus
+      DATABASE_USER: wazimap
+      DATABASE_NAME: wazimapplus
+      DATABASE_IP: wazimap-plus-database
+      PGPASSWORD: wazimap
+      WAZI_PROFILE: ecd
+      DEFAULT_GEO_VERSION: 2016
+    links:
+      - database
+    networks: 
+      - wazi-net
+  database:
+    container_name: wazimap-plus-database
+    image: "postgres:latest"
+    environment: 
+      POSTGRES_USER: wazimap 
+      POSTGRES_PASSWORD: wazimap 
+      POSTGRES_DB: wazimap
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wazimap"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes: 
+      - "./postgres-data:/var/lib/postgresql/data"
+    networks: 
+      wazi-net:
+        aliases: 
+          - wazimap-plus-database
+
+networks: 
+  wazi-net:
+    driver: bridge
