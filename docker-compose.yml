@@ -19,6 +19,10 @@ services:
       - database
     networks: 
       - wazi-net
+    ports:
+      - 8000:80
+    volumes: 
+      - .:/app
   database:
     container_name: wazimap-plus-database
     image: "postgres:latest"
