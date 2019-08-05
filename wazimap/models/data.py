@@ -35,7 +35,7 @@ from django.dispatch import receiver
 from itertools import groupby
 from wazimap.data.base import Base
 from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata, current_context
-from sqlalchemy import Column, String, Table, or_, and_, func
+from sqlalchemy import Column, String, Table, or_, and_, func, text
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.orm import class_mapper
 import sqlalchemy.types
@@ -855,7 +855,7 @@ class FieldTable(DataTable):
 
             if attr == 'total':
                 if is_desc:
-                    attr = attr + ' DESC'
+                    attr = text(attr + ' DESC')
             else:
                 attr = getattr(db_model, attr)
                 if is_desc:
