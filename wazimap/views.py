@@ -1,6 +1,7 @@
 from itertools import chain
 import json
-import urllib
+
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
@@ -45,10 +46,10 @@ class GeographyDetailView(BaseGeographyDetailView):
     def dispatch(self, *args, **kwargs):
         request = args[0]
         version = request.GET.get('geo_version', self.default_geo_version)
-        self.geo_id = self.kwargs.get('geography_id', None)
+        self.geo_level = self.kwargs.get('geo_level', None)
+        self.geo_code = self.kwargs.get('geo_code', None)
 
         try:
-            self.geo_level, self.geo_code = self.geo_id.split('-', 1)
             self.geo = geo_data.get_geography(self.geo_code, self.geo_level, version)
         except (ValueError, LocationNotFound):
             raise Http404
@@ -57,7 +58,7 @@ class GeographyDetailView(BaseGeographyDetailView):
         if self.adjust_slugs and (kwargs.get('slug') or self.geo.slug):
             if kwargs['slug'] != self.geo.slug:
                 kwargs['slug'] = self.geo.slug
-                url = '/profiles/%s-%s-%s?%s' % (self.geo_level, self.geo_code, self.geo.slug, urllib.urlencode(request.GET))
+                url = '/profiles/%s/%s/%s?%s' % (self.geo_level, self.geo_code, self.geo.slug, urlencode(request.GET))
                 return redirect(url, permanent=True)
 
         # Skip the parent class's logic completely and go back to basics
