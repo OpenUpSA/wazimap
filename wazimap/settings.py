@@ -80,6 +80,7 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.request',
                 'django.template.context_processors.static',
+                'django.contrib.messages.context_processors.messages',
                 'django.contrib.auth.context_processors.auth',
                 'census.context_processors.api_url',
                 'wazimap.context_processors.wazimap_settings',
@@ -89,7 +90,7 @@ TEMPLATES = [
 ]
 
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',

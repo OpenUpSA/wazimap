@@ -16,7 +16,7 @@ class Table(models.Model):
         return '%s' % self.table_name
 
 class Column(models.Model):
-    table = models.ForeignKey(Table)
+    table = models.ForeignKey(Table, on_delete=models.CASCADE)
     parent_table_id = models.CharField(max_length=8)
     column_id = models.CharField(max_length=16)
     column_order = models.DecimalField(max_digits=4, decimal_places=1)
@@ -46,7 +46,7 @@ class SummaryLevel(models.Model):
     source = models.CharField(max_length=64, blank=True)
     
     # Relationships
-    parent = models.ForeignKey('self', related_name='children', blank=True, null=True)
+    parent = models.ForeignKey('self', related_name='children', blank=True, null=True, on_delete=models.CASCADE)
     ancestors = models.ManyToManyField('self', related_name='descendants', symmetrical=False, blank=True)
     
     class Meta:
