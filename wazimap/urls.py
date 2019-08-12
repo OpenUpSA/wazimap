@@ -38,14 +38,19 @@ urlpatterns = [
     path("help", cache_page(STANDARD_CACHE_TIME)(HelpView.as_view()), name="help"),
     # e.g. /profiles/province/GT/slug
     path(
-        "profiles/<geo_level>/<geo_code/<slug>",
+        "profiles/<geo_level>/<geo_code>/<slug>",
+        cache_page(STANDARD_CACHE_TIME)(GeographyDetailView.as_view()),
+        name="geography_detail",
+    ),
+    path(
+        "profiles/<geo_level>/<geo_code>/<slug>/", # FIXME: Trying to look how to put wildcards in normal path for '/'
         cache_page(STANDARD_CACHE_TIME)(GeographyDetailView.as_view()),
         name="geography_detail",
     ),
     # embeds - handles the legacy static/iframe.html URL to generate the page on the fly
     #          so that settings can be injected
-    re_path(
-        "^embed/iframe.html$",
+    path(
+        "embed/iframe.html",
         cache_page(EMBED_CACHE_TIME)(
             TemplateView.as_view(template_name="embed/iframe.html")
         ),
