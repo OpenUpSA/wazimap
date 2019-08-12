@@ -19,7 +19,7 @@ def forwards(apps, schema_editor):
     inspector = inspect(session.bind)
 
     try:
-        for data_table in DATA_TABLES.itervalues():
+        for data_table in DATA_TABLES.values():
             db_model = data_table.model
             table = db_model.__table__
 
@@ -47,7 +47,7 @@ def reverse(apps, schema_editor):
     inspector = inspect(session.bind)
 
     try:
-        for data_table in DATA_TABLES.itervalues():
+        for data_table in DATA_TABLES.values():
             db_model = data_table.model
             table = db_model.__table__
 

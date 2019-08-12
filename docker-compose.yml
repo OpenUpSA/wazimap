@@ -26,6 +26,7 @@ services:
   database:
     container_name: wazimap-plus-database
     image: "postgres:latest"
+    restart: unless-stopped
     environment: 
       POSTGRES_USER: wazimap 
       POSTGRES_PASSWORD: wazimap 

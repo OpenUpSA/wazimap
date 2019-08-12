@@ -113,14 +113,14 @@ def collapse_categories(data, categories, key_order=None):
         new_fields = collapsed[new_category_name]
 
         # level 2: iterate over measurement objects in category
-        for measurement_key, measurement_objects in fields.iteritems():
+        for measurement_key, measurement_objects in fields.items():
             if measurement_key == 'name':
                 continue
             new_fields.setdefault(measurement_key, {})
             new_measurement_objects = new_fields[measurement_key]
 
             # level 3: iterate over data points in measurement objects
-            for datapoint_key, datapoint_value in measurement_objects.iteritems():
+            for datapoint_key, datapoint_value in measurement_objects.items():
                 try:
                     new_measurement_objects.setdefault(datapoint_key, 0)
                     new_measurement_objects[datapoint_key] += float(datapoint_value)
@@ -166,7 +166,7 @@ def calculate_median_stat(stats):
     Note: this function assumes the objects are sorted.
     '''
     total = 0
-    keys = [k for k in stats.iterkeys() if k != 'metadata']
+    keys = [k for k in stats.keys() if k != 'metadata']
     total = sum(stats[k]['numerators']['this'] for k in keys)
     half = total / 2.0
 
@@ -182,7 +182,7 @@ def merge_dicts(this, other, other_key):
     Recursively merges 'other' dict into 'this' dict. In particular
     it merges the leaf nodes specified in MERGE_KEYS.
     '''
-    for key, values in this.iteritems():
+    for key, values in this.items():
         if key in MERGE_KEYS:
             if key in other:
                 values[other_key] = other[key]['this']
@@ -214,20 +214,20 @@ def group_remainder(data, num_items=4, make_percentage=True,
         if key == 'metadata':
             continue
 
-        for k, v in values[num_key].iteritems():
+        for k, v in values[num_key].items():
             total_all[k] += v
 
         if i > cutoff:
             del data[key]
             data.setdefault(remainder_name, other_dict)
-            for k, v in values[num_key].iteritems():
+            for k, v in values[num_key].items():
                 total_other[k] += v
 
     if make_percentage:
-        for key, values in data.iteritems():
+        for key, values in data.items():
             if key != 'metadata':
                 values['values'] = dict((k, percent(v, total_all[k]))
-                                        for k, v in values['numerators'].iteritems())
+                                        for k, v in values['numerators'].items())
 
 
 def get_stat_data(fields, geo, session, table_dataset=None, table_universe=None,

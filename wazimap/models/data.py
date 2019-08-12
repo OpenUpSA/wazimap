@@ -386,7 +386,7 @@ class SimpleTable(DataTable):
             for row in rows:
                 geo_values = data['%s-%s' % (row.geo_level, row.geo_code)]
 
-                for col in columns.iterkeys():
+                for col in columns.keys():
                     geo_values['estimate'][col] = getattr(row, col)
                     geo_values['error'][col] = 0
 
@@ -788,7 +788,7 @@ class FieldTable(DataTable):
 
         # add in percentages
         def calc_percent(data):
-            for key, data in data.iteritems():
+            for key, data in data.items():
                 if not key == 'metadata':
                     if 'numerators' in data:
                         if percent:
@@ -839,11 +839,11 @@ class FieldTable(DataTable):
             .filter(db_model.geo_version == geo.version)
 
         if only:
-            for k, v in only.iteritems():
+            for k, v in only.items():
                 objects = objects.filter(getattr(db_model, k).in_(v))
 
         if exclude:
-            for k, v in exclude.iteritems():
+            for k, v in exclude.items():
                 objects = objects.filter(getattr(db_model, k).notin_(v))
 
         if order_by is not None:
