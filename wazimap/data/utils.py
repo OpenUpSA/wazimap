@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from django.conf import settings
 from django.db.backends.base.creation import TEST_DATABASE_PREFIX
 from django.db import connection
+from django.shortcuts import get_object_or_404
 
 if settings.TESTING:
     # Hack to ensure the sqlalchemy database name matches the Django one
@@ -353,7 +354,7 @@ def get_page_releases(dataset_name, geo, year, filter_releases=True):
     releases = {}
     releases.setdefault('other', [])
 
-    query = Dataset.objects.get(name=dataset_name).releases.order_by('-year')
+    query = get_object_or_404(Dataset, name=dataset_name).releases.order_by('-year')
 
     # Some releases don't have data for all geo_levels
     available_years = settings.WAZIMAP['available_release_years'].get(geo.geo_level, None)
