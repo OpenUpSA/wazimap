@@ -200,7 +200,7 @@ def group_remainder(data, num_items=4, make_percentage=True,
     'values' contains the totals.
     '''
     num_key = 'numerators' if make_percentage else 'values'
-    total_all = dict((k, 0.0) for k in data.values()[0][num_key].keys())
+    total_all = dict((k, 0.0) for k in list(data.values()[0][num_key].keys()))
     total_other = total_all.copy()
     other_dict = {
         "name": remainder_name,
