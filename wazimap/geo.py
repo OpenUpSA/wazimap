@@ -128,7 +128,7 @@ class GeoData(object):
 
         for level in self.geo_levels.keys():
             # sanity check for geo version
-            if level in self.geometry_files or self.geometry_files.keys() == [''] and isinstance(self.geometry_files[''], basestring):
+            if level in self.geometry_files or self.geometry_files.keys() == [''] and isinstance(self.geometry_files[''], str):
                 # The geometry_data must include a version key. For example:
                 #
                 # geometry_data = {
