@@ -63,8 +63,8 @@ urlpatterns = [
         name="geography_json",
     ),
     # e.g. /compare/province-GT/vs/province-WC/
-    re_path(
-        "^compare/(?P<geo_id1>\w+-\w+)/vs/(?P<geo_id2>\w+-\w+)/$",
+    path(
+        "compare/<geo_id1>/vs/<geo_id2>/$",
         cache_page(STANDARD_CACHE_TIME)(GeographyCompareView.as_view()),
         name="geography_compare",
     ),
