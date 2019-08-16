@@ -64,7 +64,7 @@ urlpatterns = [
     ),
     # e.g. /compare/province-GT/vs/province-WC/
     path(
-        "compare/<geo_id1>/vs/<geo_id2>/$",
+        "compare/<geo_id1>/vs/<geo_id2>/",
         cache_page(STANDARD_CACHE_TIME)(GeographyCompareView.as_view()),
         name="geography_compare",
     ),
