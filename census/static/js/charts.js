@@ -886,7 +886,7 @@ function Chart(options) {
         var place = (!!geoStr) ? geoStr : 'this',
             decimals = (!!precision) ? precision : 0,
             valueText = data.context.values[place],
-            valueMOEFlag = data.context.error_ratio[place] >= 10 ? "<sup>&dagger;</sup>" : "";
+            valueMOEFlag = "";
         return chart.valFmt(valueText, decimals) + valueMOEFlag;
     }
 

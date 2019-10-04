@@ -1,4 +1,4 @@
-'''
+"""
 Models for handling census and other data tables.
 
 `SimpleTable` and `FieldTable` instances describe an underlying Postgres table
@@ -21,7 +21,7 @@ A `FieldTable` can be looked up based on a required set of fields. This
 means that the census controller doesn't care about table names, only
 about what fields it requires. If more than one FieldTable could serve
 for a set of fields, the one with the fewest extraneous fields is chosen.
-'''
+"""
 
 from collections import OrderedDict
 import re
@@ -50,46 +50,73 @@ class Dataset(models.Model):
     Such as a census that happens every decade. Two data tables from the
     same dataset and using the same universe, are comparable over time.
     """
-    name = models.CharField(max_length=100, null=False, blank=False, unique=True, help_text="Friendly name of this dataset.")
+
+    name = models.CharField(
+        max_length=100,
+        null=False,
+        blank=False,
+        unique=True,
+        help_text="Friendly name of this dataset.",
+    )
 
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
 
 class Release(models.Model):
-    name = models.CharField(max_length=100, null=False, blank=False, help_text="Name of this release, excluding the year.")
-    year = models.CharField(max_length=50, null=False, blank=False, help_text="Primary year of this release. Will be used for sorting.")
-    citation = models.TextField(max_length=None, null=True, blank=True, help_text="What the user should use when citing this data.")
-    dataset = models.ForeignKey(Dataset, related_name='releases', null=False, on_delete=models.CASCADE)
+    name = models.CharField(
+        max_length=100,
+        null=False,
+        blank=False,
+        help_text="Name of this release, excluding the year.",
+    )
+    year = models.CharField(
+        max_length=50,
+        null=False,
+        blank=False,
+        help_text="Primary year of this release. Will be used for sorting.",
+    )
+    citation = models.TextField(
+        max_length=None,
+        null=True,
+        blank=True,
+        help_text="What the user should use when citing this data.",
+    )
+    dataset = models.ForeignKey(
+        Dataset, related_name="releases", null=False, on_delete=models.CASCADE
+    )
 
     class Meta:
-        unique_together = (('year', 'dataset'))
-        ordering = ['name', 'year']
+        unique_together = ("year", "dataset")
+        ordering = ["name", "year"]
 
     def __str__(self):
-        return '%s - %s' % (self.name, self.year)
+        return "%s - %s" % (self.name, self.year)
 
     def as_dict(self):
-        return {
-            'name': self.name,
-            'year': self.year,
-            'citation': self.citation
-        }
+        return {"name": self.name, "year": self.year, "citation": self.citation}
 
 
 class DBTable(models.Model):
     """ Pointer to a table in the database that contains actual data.
     """
+
     # TODO: validator on name
-    name = models.CharField(max_length=100, null=False, unique=True, blank=False, help_text="Name of the physical database table containing data for this DB table.")
+    name = models.CharField(
+        max_length=100,
+        null=False,
+        unique=True,
+        blank=False,
+        help_text="Name of the physical database table containing data for this DB table.",
+    )
     # Cache of SQLALchemy models for each db table
     MODELS = {}
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __init__(self, *args, **kwargs):
         super(DBTable, self).__init__(*args, **kwargs)
@@ -108,28 +135,43 @@ class DBTable(models.Model):
         self._model = model
 
     def __str__(self):
-        return 'DBTable<%s>' % self.name
+        return "DBTable<%s>" % self.name
 
 
 class DataTable(models.Model):
-    NUMBER = 'number'
-    PERC = 'percentage'
-    CHOICES = (
-        (NUMBER, NUMBER),
-        (PERC, PERC)
-    )
+    NUMBER = "number"
+    PERC = "percentage"
+    CHOICES = ((NUMBER, NUMBER), (PERC, PERC))
 
-    name = models.SlugField(max_length=1024, null=False, blank=False, unique=True, help_text="Name for this table. No spaces.")
-    universe = models.CharField(max_length=1024, null=False, blank=False, help_text="Universe this table describes, such as 'Population', 'Households', or 'Youth aged 15-24'.")
+    name = models.SlugField(
+        max_length=1024,
+        null=False,
+        blank=False,
+        unique=True,
+        help_text="Name for this table. No spaces.",
+    )
+    universe = models.CharField(
+        max_length=1024,
+        null=False,
+        blank=False,
+        help_text="Universe this table describes, such as 'Population', 'Households', or 'Youth aged 15-24'.",
+    )
     dataset = models.ForeignKey(Dataset, null=False, on_delete=models.CASCADE)
-    stat_type = models.CharField(max_length=10, null=False, default=NUMBER, choices=CHOICES)
-    description = models.CharField(max_length=1024, null=True, blank=True, help_text="Helpful description of this table (optional). Generated automatically for FieldTables if left blank.")
+    stat_type = models.CharField(
+        max_length=10, null=False, default=NUMBER, choices=CHOICES
+    )
+    description = models.CharField(
+        max_length=1024,
+        null=True,
+        blank=True,
+        help_text="Helpful description of this table (optional). Generated automatically for FieldTables if left blank.",
+    )
 
     release_class = None
 
     class Meta:
         abstract = True
-        ordering = ('name',)
+        ordering = ("name",)
 
     def clean(self):
         if not self.description:
@@ -142,8 +184,8 @@ class DataTable(models.Model):
         """
         query = self.release_class.objects.filter(data_table=self)
 
-        if year == 'latest':
-            query = query.order_by('-release__year')
+        if year == "latest":
+            query = query.order_by("-release__year")
         else:
             query = query.filter(release__year=year)
 
@@ -157,17 +199,20 @@ class DataTable(models.Model):
         """
         if year is None and release is None:
             from wazimap.data.utils import current_context
+
             # use the current context
-            year = current_context().get('year')
+            year = current_context().get("year")
 
         if year:
             release = self.get_release(year)
 
         if not release:
-            raise ValueError("Unclear which release year to use. Specify a release or a year, or use dataset_context(year=...)")
+            raise ValueError(
+                "Unclear which release year to use. Specify a release or a year, or use dataset_context(year=...)"
+            )
 
         # get the db_table
-        fieldname = self.release_class.__name__.lower() + '__release'
+        fieldname = self.release_class.__name__.lower() + "__release"
         query = self.db_table_releases.filter(**{fieldname: release})
 
         db_table = query.first()
@@ -195,27 +240,41 @@ class DataTable(models.Model):
         columns = []
 
         # will form a compound primary key on the fields, and the geo id
-        columns.append(Column('geo_level', String(15), nullable=False, primary_key=True))
-        columns.append(Column('geo_code', String(10), nullable=False, primary_key=True))
-        columns.append(Column('geo_version', String(100), nullable=False, primary_key=True, server_default=''))
+        columns.append(
+            Column("geo_level", String(15), nullable=False, primary_key=True)
+        )
+        columns.append(Column("geo_code", String(10), nullable=False, primary_key=True))
+        columns.append(
+            Column(
+                "geo_version",
+                String(100),
+                nullable=False,
+                primary_key=True,
+                server_default="",
+            )
+        )
 
         return columns
 
     def as_dict(self):
         return {
-            'title': self.description or self.name,
-            'universe': self.universe,
-            'denominator_column_id': self.total_column,
-            'table_id': self.name.upper(),
-            'stat_type': self.stat_type,
-            'releases': [r.as_dict() for r in self.releases()],
+            "title": self.description or self.name,
+            "universe": self.universe,
+            "denominator_column_id": self.total_column,
+            "table_id": self.name.upper(),
+            "stat_type": self.stat_type,
+            "releases": [r.as_dict() for r in self.releases()],
         }
 
     def releases(self):
-        return list(set(r.release for r in self.release_class.objects
-                        .filter(data_table=self)
-                        .prefetch_related('release')
-                        .all()))
+        return list(
+            set(
+                r.release
+                for r in self.release_class.objects.filter(data_table=self)
+                .prefetch_related("release")
+                .all()
+            )
+        )
 
     def ensure_db_tables_exist(self):
         for release in self.release_class.objects.all():
@@ -247,14 +306,30 @@ class SimpleTable(DataTable):
     use a `FieldTable` below.
     """
 
-    total_column = models.CharField(max_length=50, null=True, blank=True, help_text="Name of the column that contains the total value of all the columns in the row. Wazimap usse this to express column values as a percentage. If this is not set, the table doesn't have the concept of a total and only absolute values (not percentages) will be displayed.")
-    db_table_releases = models.ManyToManyField(DBTable, through='SimpleTableRelease', through_fields=('data_table', 'db_table'))
+    total_column = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        help_text="Name of the column that contains the total value of all the columns in the row. Wazimap usse this to express column values as a percentage. If this is not set, the table doesn't have the concept of a total and only absolute values (not percentages) will be displayed.",
+    )
+    db_table_releases = models.ManyToManyField(
+        DBTable, through="SimpleTableRelease", through_fields=("data_table", "db_table")
+    )
 
     def __init__(self, *args, **kwargs):
         super(SimpleTable, self).__init__(*args, **kwargs)
         self.release_class = SimpleTableRelease
 
-    def get_stat_data(self, geo, fields=None, key_order=None, percent=True, total=None, recode=None, year=None):
+    def get_stat_data(
+        self,
+        geo,
+        fields=None,
+        key_order=None,
+        percent=True,
+        total=None,
+        recode=None,
+        year=None,
+    ):
         """ Get a data dictionary for a place from this table.
 
         This fetches the values for each column in this table and returns a data
@@ -276,7 +351,7 @@ class SimpleTable(DataTable):
 
         :return: (data-dictionary, total)
         """
-        db_table = self.get_db_table(year=year or current_context().get('year'))
+        db_table = self.get_db_table(year=year or current_context().get("year"))
         model = db_table.model
         columns = self.columns(db_table)
 
@@ -287,8 +362,10 @@ class SimpleTable(DataTable):
             if fields:
                 for f in fields:
                     if f not in columns:
-                        raise ValueError("Invalid field/column '%s' for table '%s'. Valid columns are: %s" % (
-                            f, self.id, ', '.join(columns.keys())))
+                        raise ValueError(
+                            "Invalid field/column '%s' for table '%s'. Valid columns are: %s"
+                            % (f, self.id, ", ".join(columns.keys()))
+                        )
             else:
                 fields = columns.keys()
                 if self.total_column:
@@ -302,22 +379,31 @@ class SimpleTable(DataTable):
 
             # is the total column valid?
             if isinstance(total, basestring) and total not in columns:
-                raise ValueError("Total column '%s' isn't one of the columns for table '%s'. Valid columns are: %s" % (
-                    total, self.id, ', '.join(columns.keys())))
+                raise ValueError(
+                    "Total column '%s' isn't one of the columns for table '%s'. Valid columns are: %s"
+                    % (total, self.id, ", ".join(columns.keys()))
+                )
 
             # table columns to fetch
             cols = [model.__table__.columns[c] for c in fields]
 
-            if total is not None and isinstance(total, basestring) and total not in cols:
+            if (
+                total is not None
+                and isinstance(total, basestring)
+                and total not in cols
+            ):
                 cols.append(total)
 
             # do the query. If this returns no data, row is None
-            row = session\
-                .query(*cols)\
-                .filter(model.geo_level == geo.geo_level,
-                        model.geo_code == geo.geo_code,
-                        model.geo_version == geo.version)\
+            row = (
+                session.query(*cols)
+                .filter(
+                    model.geo_level == geo.geo_level,
+                    model.geo_code == geo.geo_code,
+                    model.geo_version == geo.version,
+                )
                 .first()
+            )
 
             if row is None:
                 row = ZeroRow()
@@ -334,7 +420,9 @@ class SimpleTable(DataTable):
             # accumulate values as we go.
             results = OrderedDict()
 
-            key_order = key_order or fields  # default key order is just the list of fields
+            key_order = (
+                key_order or fields
+            )  # default key order is just the list of fields
 
             for field in key_order:
                 val = getattr(row, field) or 0
@@ -344,17 +432,19 @@ class SimpleTable(DataTable):
 
                 # set the recoded field name, noting that the key may already
                 # exist if another column recoded to it
-                field_info = results.setdefault(key, {'name': recode.get(field, columns[field]['name'])})
+                field_info = results.setdefault(
+                    key, {"name": recode.get(field, columns[field]["name"])}
+                )
 
                 if percent:
                     # sum up existing values, if any
-                    val = val + field_info.get('numerators', {}).get('this', 0)
-                    field_info['values'] = {'this': p(val, total)}
-                    field_info['numerators'] = {'this': val}
+                    val = val + field_info.get("numerators", {}).get("this", 0)
+                    field_info["values"] = {"this": p(val, total)}
+                    field_info["numerators"] = {"this": val}
                 else:
                     # sum up existing values, if any
-                    val = val + field_info.get('values', {}).get('this', 0)
-                    field_info['values'] = {'this': val}
+                    val = val + field_info.get("values", {}).get("this", 0)
+                    field_info["values"] = {"this": val}
 
             add_metadata(results, self, db_table.active_release)
             return results, total
@@ -363,10 +453,10 @@ class SimpleTable(DataTable):
 
     def raw_data_for_geos(self, geos, release=None, year=None):
         # initial values
-        data = {('%s-%s' % (geo.geo_level, geo.geo_code)): {
-                'estimate': {},
-                'error': {}}
-                for geo in geos}
+        data = {
+            ("%s-%s" % (geo.geo_level, geo.geo_code)): {"estimate": {}, "error": {}}
+            for geo in geos
+        }
 
         db_table = self.get_db_table(release=release, year=year)
         columns = self.columns(db_table)
@@ -374,17 +464,23 @@ class SimpleTable(DataTable):
         session = get_session()
         try:
             geo_values = None
-            rows = session\
-                .query(db_table.model)\
-                .filter(or_(and_(
-                    db_table.model.geo_level == g.geo_level,
-                    db_table.model.geo_code == g.geo_code,
-                    db_table.model.geo_version == g.version)
-                    for g in geos))\
+            rows = (
+                session.query(db_table.model)
+                .filter(
+                    or_(
+                        and_(
+                            db_table.model.geo_level == g.geo_level,
+                            db_table.model.geo_code == g.geo_code,
+                            db_table.model.geo_version == g.version,
+                        )
+                        for g in geos
+                    )
+                )
                 .all()
+            )
 
             for row in rows:
-                geo_values = data['%s-%s' % (row.geo_level, row.geo_code)]
+                geo_values = data["%s-%s" % (row.geo_level, row.geo_code)]
 
                 for col in columns.keys():
                     geo_values['estimate'][col] = getattr(row, col)
@@ -405,10 +501,14 @@ class SimpleTable(DataTable):
         if self.total_column:
             indent = 1
 
-        for col in (c.name for c in db_table.model.__table__.columns if c.name not in ['geo_code', 'geo_level', 'geo_version']):
+        for col in (
+            c.name
+            for c in db_table.model.__table__.columns
+            if c.name not in ["geo_code", "geo_level", "geo_version"]
+        ):
             columns[col] = {
-                'name': capitalize(col.replace('_', ' ')),
-                'indent': 0 if col == self.total_column else indent
+                "name": capitalize(col.replace("_", " ")),
+                "indent": 0 if col == self.total_column else indent,
             }
 
         # TODO: cache it?
@@ -423,10 +523,22 @@ class SimpleTable(DataTable):
             try:
                 # We have to find out the other columns from the table itself.
                 # First, assume it exists. If not, we'll create it with our default columns.
-                table = Table(db_table.name, Base.metadata, *columns, autoload=True, extend_existing=True)
+                table = Table(
+                    db_table.name,
+                    Base.metadata,
+                    *columns,
+                    autoload=True,
+                    extend_existing=True
+                )
             except NoSuchTableError:
                 # Create it
-                table = Table(db_table.name, Base.metadata, *columns, autoload=False, extend_existing=True)
+                table = Table(
+                    db_table.name,
+                    Base.metadata,
+                    *columns,
+                    autoload=False,
+                    extend_existing=True
+                )
 
             class Model(Base):
                 __table__ = table
@@ -441,8 +553,8 @@ class SimpleTable(DataTable):
 class FieldTable(DataTable):
     INT_RE = re.compile("^[0-9]+$")
 
-    INTEGER = 'Integer'
-    FLOAT = 'Float'
+    INTEGER = "Integer"
+    FLOAT = "Float"
     CHOICES = ((INTEGER, INTEGER), (FLOAT, FLOAT))
 
     fields = ArrayField(models.CharField(max_length=150, null=False, unique=True), help_text="Comma-separated ordered list of fields this table describes.")
@@ -462,13 +574,13 @@ class FieldTable(DataTable):
         self.release_class = FieldTableRelease
         self._field_set = None
         if self.has_total:
-            self.total_column = self.column_id([self.denominator_key or 'total'])
+            self.total_column = self.column_id([self.denominator_key or "total"])
         else:
             self.total_column = None
 
     def clean(self):
         if not self.name:
-            self.name = slugify(''.join(self.fields))
+            self.name = slugify("".join(self.fields))
 
         super(FieldTable, self).clean()
         self._field_set = None
@@ -488,7 +600,9 @@ class FieldTable(DataTable):
 
             # create the table model
             class Model(Base):
-                __table__ = Table(db_table.name, Base.metadata, *columns, extend_existing=True)
+                __table__ = Table(
+                    db_table.name, Base.metadata, *columns, extend_existing=True
+                )
 
             db_table.model = Model
 
@@ -497,9 +611,11 @@ class FieldTable(DataTable):
         value_type = getattr(sqlalchemy.types, self.value_type)
 
         # field columns
-        columns.extend(Column(field, String(128), primary_key=True) for field in self.fields)
+        columns.extend(
+            Column(field, String(128), primary_key=True) for field in self.fields
+        )
         # total column
-        columns.append(Column('total', value_type, nullable=True))
+        columns.append(Column("total", value_type, nullable=True))
 
         return columns
 
@@ -538,18 +654,14 @@ class FieldTable(DataTable):
         # TODO: cache this
 
         if self.has_total:
-            columns[self.total_column] = {'name': 'Total', 'indent': 0}
+            columns[self.total_column] = {"name": "Total", "indent": 0}
 
         session = get_session()
         try:
             fields = [getattr(db_table.model, f) for f in self.fields]
 
             # get distinct permutations for all fields
-            rows = session\
-                .query(*fields)\
-                .order_by(*fields)\
-                .distinct()\
-                .all()
+            rows = session.query(*fields).order_by(*fields).distinct().all()
 
             def permute(indent, field_values, rows):
                 field = self.fields[indent - 1]
@@ -561,8 +673,8 @@ class FieldTable(DataTable):
                     col_id = self.column_id(new_values)
 
                     columns[col_id] = {
-                        'name': capitalize(val) + ('' if last else ':'),
-                        'indent': 0 if col_id == self.total_column else indent,
+                        "name": capitalize(val) + ("" if last else ":"),
+                        "indent": 0 if col_id == self.total_column else indent,
                     }
 
                     if not last:
@@ -579,12 +691,26 @@ class FieldTable(DataTable):
             # javascript re-orders keys that are pure integers, so force it to be a string
             return field_values[0] + "_"
         else:
-            return '-'.join(field_values)
+            return "-".join(field_values)
 
-    def get_stat_data(self, fields, geo, session, order_by=None,
-                      percent=True, total=None, only=None, exclude=None, exclude_zero=False,
-                      recode=None, key_order=None, percent_grouping=None, slices=None, year=None,
-                      db_table=None):
+    def get_stat_data(
+        self,
+        fields,
+        geo,
+        session,
+        order_by=None,
+        percent=True,
+        total=None,
+        only=None,
+        exclude=None,
+        exclude_zero=False,
+        recode=None,
+        key_order=None,
+        percent_grouping=None,
+        slices=None,
+        year=None,
+        db_table=None,
+    ):
         """
         This is our primary helper routine for building a dictionary suitable for
         a place's profile page, based on a statistic.
@@ -648,21 +774,30 @@ class FieldTable(DataTable):
         if only is not None:
             if not isinstance(only, dict):
                 if many_fields:
-                    raise ValueError("If many fields are given, then only must be a dict. I got %s instead" % only)
+                    raise ValueError(
+                        "If many fields are given, then only must be a dict. I got %s instead"
+                        % only
+                    )
                 else:
                     only = {fields[0]: set(only)}
 
         if exclude is not None:
             if not isinstance(exclude, dict):
                 if many_fields:
-                    raise ValueError("If many fields are given, then exclude must be a dict. I got %s instead" % exclude)
+                    raise ValueError(
+                        "If many fields are given, then exclude must be a dict. I got %s instead"
+                        % exclude
+                    )
                 else:
                     exclude = {fields[0]: set(exclude)}
 
         if key_order:
             if not isinstance(key_order, dict):
                 if many_fields:
-                    raise ValueError("If many fields are given, then key_order must be a dict. I got %s instead" % key_order)
+                    raise ValueError(
+                        "If many fields are given, then key_order must be a dict. I got %s instead"
+                        % key_order
+                    )
                 else:
                     key_order = {fields[0]: key_order}
         else:
@@ -674,7 +809,15 @@ class FieldTable(DataTable):
 
         # get the release and underlying database table
         db_table = db_table or self.get_db_table(year=year)
-        objects = self.get_rows_for_geo(geo, session, fields=fields, order_by=order_by, only=only, exclude=exclude, db_table=db_table)
+        objects = self.get_rows_for_geo(
+            geo,
+            session,
+            fields=fields,
+            order_by=order_by,
+            only=only,
+            exclude=exclude,
+            db_table=db_table,
+        )
 
         if total is not None and many_fields:
             raise ValueError("Cannot specify a total if many fields are given")
@@ -686,14 +829,20 @@ class FieldTable(DataTable):
             # The table doesn't support calculating percentages, but the caller
             # has asked for a percentage without providing a total value to use.
             # Either specify a total, or specify percent=False
-            raise ValueError("Asking for a percent on table %s that doesn't support totals and no total parameter specified." % self.name)
+            raise ValueError(
+                "Asking for a percent on table %s that doesn't support totals and no total parameter specified."
+                % self.name
+            )
 
         # sanity check the percent grouping
         if percent:
             if percent_grouping:
                 for field in percent_grouping:
                     if field not in fields:
-                        raise ValueError("Field '%s' specified in percent_grouping must be in the fields list." % field)
+                        raise ValueError(
+                            "Field '%s' specified in percent_grouping must be in the fields list."
+                            % field
+                        )
                 # re-order percent grouping to be same order as in the field list
                 percent_grouping = [f for f in fields if f in percent_grouping]
         else:
@@ -725,7 +874,7 @@ class FieldTable(DataTable):
                     key = capitalize(key)
 
                 # enforce key ordering the first time we see this field
-                if (not data or data.keys() == ['metadata']) and field in key_order:
+                if (not data or data.keys() == ["metadata"]) and field in key_order:
                     for fld in key_order[field]:
                         data[fld] = OrderedDict()
 
@@ -737,12 +886,12 @@ class FieldTable(DataTable):
 
                 # default values for intermediate fields
                 if data is not None and i < n_fields - 1:
-                    data['metadata'] = {'name': key}
+                    data["metadata"] = {"name": key}
 
             # data is now the dict where the end value is going to go
             if not data:
-                data['name'] = key
-                data['numerators'] = {'this': 0.0}
+                data["name"] = key
+                data["numerators"] = {"this": 0.0}
 
             return data
 
@@ -751,7 +900,10 @@ class FieldTable(DataTable):
             if not obj.total and exclude_zero:
                 continue
 
-            if self.denominator_key and getattr(obj, self.fields[-1]) == self.denominator_key:
+            if (
+                self.denominator_key
+                and getattr(obj, self.fields[-1]) == self.denominator_key
+            ):
                 grand_total = obj.total
                 # don't include the denominator key in the output
                 continue
@@ -762,13 +914,13 @@ class FieldTable(DataTable):
                 continue
 
             if obj.total is not None:
-                data['numerators']['this'] += obj.total
+                data["numerators"]["this"] += obj.total
                 running_total += obj.total
             else:
                 # TODO: sanity check this is the right thing to do for multiple fields with
                 # nested nulls -- does aggregating over nulls treat them as zero, or should we
                 # treat them as null?
-                data['numerators']['this'] = None
+                data["numerators"]["this"] = None
 
             if percent_grouping:
                 if obj.total is not None:
@@ -780,7 +932,7 @@ class FieldTable(DataTable):
                             key = get_recoded_key(recode, field, key)
                         group_key = group_key + (key,)
 
-                    data['_group_key'] = group_key
+                    data["_group_key"] = group_key
                     group_totals[group_key] = group_totals.get(group_key, 0) + obj.total
 
         if grand_total == -1:
@@ -792,19 +944,26 @@ class FieldTable(DataTable):
                 if not key == 'metadata':
                     if 'numerators' in data:
                         if percent:
-                            if '_group_key' in data:
-                                total = group_totals[data.pop('_group_key')]
+                            if "_group_key" in data:
+                                total = group_totals[data.pop("_group_key")]
                             else:
                                 total = grand_total
 
-                            if total is not None and data['numerators']['this'] is not None:
-                                perc = 0 if total == 0 else (data['numerators']['this'] / total * 100)
-                                data['values'] = {'this': round(perc, 2)}
+                            if (
+                                total is not None
+                                and data["numerators"]["this"] is not None
+                            ):
+                                perc = (
+                                    0
+                                    if total == 0
+                                    else (data["numerators"]["this"] / total * 100)
+                                )
+                                data["values"] = {"this": round(perc, 2)}
                             else:
-                                data['values'] = {'this': None}
+                                data["values"] = {"this": None}
                         else:
-                            data['values'] = dict(data['numerators'])
-                            data['numerators']['this'] = None
+                            data["values"] = dict(data["numerators"])
+                            data["numerators"]["this"] = None
                     else:
                         calc_percent(data)
 
@@ -818,7 +977,16 @@ class FieldTable(DataTable):
 
         return root_data, grand_total
 
-    def get_rows_for_geo(self, geo, session, fields=None, order_by=None, only=None, exclude=None, db_table=None):
+    def get_rows_for_geo(
+        self,
+        geo,
+        session,
+        fields=None,
+        order_by=None,
+        only=None,
+        exclude=None,
+        db_table=None,
+    ):
         """ Get rows of statistics from the stats model +db_model+ for a particular
         geography, summing over the 'total' field and grouping by +fields+. Filters
         to include +only+ and ignore +exclude+, if given.
@@ -827,16 +995,21 @@ class FieldTable(DataTable):
         db_model = db_table.model
 
         if fields is None:
-            fields = [c.key for c in class_mapper(db_model).attrs if c.key not in ['geo_code', 'geo_level', 'geo_version', 'total']]
+            fields = [
+                c.key
+                for c in class_mapper(db_model).attrs
+                if c.key not in ["geo_code", "geo_level", "geo_version", "total"]
+            ]
 
         fields = [getattr(db_model, f) for f in fields]
 
-        objects = session\
-            .query(func.sum(db_model.total).label('total'), *fields)\
-            .group_by(*fields)\
-            .filter(db_model.geo_code == geo.geo_code)\
-            .filter(db_model.geo_level == geo.geo_level)\
+        objects = (
+            session.query(func.sum(db_model.total).label("total"), *fields)
+            .group_by(*fields)
+            .filter(db_model.geo_code == geo.geo_code)
+            .filter(db_model.geo_level == geo.geo_level)
             .filter(db_model.geo_version == geo.version)
+        )
 
         if only:
             for k, v in only.items():
@@ -849,11 +1022,11 @@ class FieldTable(DataTable):
         if order_by is not None:
             attr = order_by
             is_desc = False
-            if order_by[0] == '-':
+            if order_by[0] == "-":
                 is_desc = True
                 attr = attr[1:]
 
-            if attr == 'total':
+            if attr == "total":
                 if is_desc:
                     attr = text(attr + ' DESC')
             else:
@@ -865,8 +1038,10 @@ class FieldTable(DataTable):
 
         objects = objects.all()
         if len(objects) == 0:
-            raise DataNotFound("Entry in %s for geography %s version '%s' not found"
-                               % (db_table.name, geo.geoid, geo.version))
+            raise DataNotFound(
+                "Entry in %s for geography %s version '%s' not found"
+                % (db_table.name, geo.geoid, geo.version)
+            )
         return objects
 
     def raw_data_for_geos(self, geos, db_table=None):
@@ -875,10 +1050,10 @@ class FieldTable(DataTable):
         Returns a dict mapping the geo ids to table data.
         """
         # initial values
-        data = {('%s-%s' % (geo.geo_level, geo.geo_code)): {
-                'estimate': {},
-                'error': {}}
-                for geo in geos}
+        data = {
+            ("%s-%s" % (geo.geo_level, geo.geo_code)): {"estimate": {}, "error": {}}
+            for geo in geos
+        }
 
         db_table = db_table or self.get_db_table()
 
@@ -886,19 +1061,27 @@ class FieldTable(DataTable):
         try:
             geo_values = None
             fields = [getattr(db_table.model, f) for f in self.fields]
-            rows = session\
-                .query(db_table.model.geo_level,
-                       db_table.model.geo_code,
-                       func.sum(db_table.model.total).label('total'),
-                       *fields)\
-                .group_by(db_table.model.geo_level, db_table.model.geo_code, *fields)\
-                .order_by(db_table.model.geo_level, db_table.model.geo_code, *fields)\
-                .filter(or_(and_(
-                    db_table.model.geo_level == geo.geo_level,
-                    db_table.model.geo_code == geo.geo_code,
-                    db_table.model.geo_version == geo.version)
-                    for geo in geos))\
+            rows = (
+                session.query(
+                    db_table.model.geo_level,
+                    db_table.model.geo_code,
+                    func.sum(db_table.model.total).label("total"),
+                    *fields
+                )
+                .group_by(db_table.model.geo_level, db_table.model.geo_code, *fields)
+                .order_by(db_table.model.geo_level, db_table.model.geo_code, *fields)
+                .filter(
+                    or_(
+                        and_(
+                            db_table.model.geo_level == geo.geo_level,
+                            db_table.model.geo_code == geo.geo_code,
+                            db_table.model.geo_version == geo.version,
+                        )
+                        for geo in geos
+                    )
+                )
                 .all()
+            )
 
             def permute(level, field_keys, rows):
                 field = self.fields[level]
@@ -928,8 +1111,8 @@ class FieldTable(DataTable):
 
                     if value is not None:
                         total = (total or 0) + value
-                    geo_values['estimate'][col_id] = value
-                    geo_values['error'][col_id] = 0
+                    geo_values["estimate"][col_id] = value
+                    geo_values["error"][col_id] = 0
 
                 if self.denominator_key:
                     total = denominator
@@ -938,13 +1121,13 @@ class FieldTable(DataTable):
 
             # rows for each geo
             for geo_id, geo_rows in groupby(rows, lambda r: (r.geo_level, r.geo_code)):
-                geo_values = data['%s-%s' % geo_id]
+                geo_values = data["%s-%s" % geo_id]
                 total = permute(0, [], geo_rows)
 
                 # total
                 if self.total_column:
-                    geo_values['estimate'][self.total_column] = total
-                    geo_values['error'][self.total_column] = 0
+                    geo_values["estimate"][self.total_column] = total
+                    geo_values["error"][self.total_column] = 0
 
         finally:
             session.close()
@@ -952,10 +1135,10 @@ class FieldTable(DataTable):
         return data
 
     def _build_description(self):
-        return self.universe + ' by ' + ', '.join(self.fields)
+        return self.universe + " by " + ", ".join(self.fields)
 
     def __str__(self):
-        return ', '.join(self.fields)
+        return self.name
 
     @classmethod
     def for_fields(cls, fields, universe=None, dataset=None, name=None):
@@ -977,7 +1160,9 @@ class FieldTable(DataTable):
 
         possibilities = [
             (t, len(t.field_set - field_set))
-            for t in candidates if len(t.field_set) >= len(field_set) and len(field_set - t.field_set) == 0]
+            for t in candidates
+            if len(t.field_set) >= len(field_set) and len(field_set - t.field_set) == 0
+        ]
         table, _ = min(possibilities, key=lambda p: p[1])
 
         return table
@@ -1007,7 +1192,7 @@ class SimpleTableRelease(models.Model, BaseRelease):
     release = models.ForeignKey(Release, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '%s for %s in %s' % (self.db_table, self.data_table, self.release)
+        return "%s for %s in %s" % (self.db_table, self.data_table, self.release)
 
 
 class FieldTableRelease(models.Model, BaseRelease):
@@ -1016,17 +1201,17 @@ class FieldTableRelease(models.Model, BaseRelease):
     release = models.ForeignKey(Release, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '%s for %s in %s' % (self.db_table, self.data_table, self.release)
+        return "%s for %s in %s" % (self.db_table, self.data_table, self.release)
 
 
 @receiver(post_save, sender=SimpleTable)
 def ensure_simple_table_db_tables_exist(sender, **kwargs):
-    kwargs['instance'].ensure_db_tables_exist()
+    kwargs["instance"].ensure_db_tables_exist()
 
 
 @receiver(post_save, sender=FieldTable)
 def ensure_field_table_db_tables_exist(sender, **kwargs):
-    kwargs['instance'].ensure_db_tables_exist()
+    kwargs["instance"].ensure_db_tables_exist()
 
 
 class ZeroRow(object):
