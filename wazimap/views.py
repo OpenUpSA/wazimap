@@ -57,7 +57,7 @@ class GeographyDetailView(BaseGeographyDetailView):
         if self.adjust_slugs and (kwargs.get('slug') or self.geo.slug):
             if kwargs['slug'] != self.geo.slug:
                 kwargs['slug'] = self.geo.slug
-                url = '/profiles/%s-%s-%s?%s' % (self.geo_level, self.geo_code, self.geo.slug, urllib.urlencode(request.GET))
+                url = '/profiles/%s-%s-%s?%s' % (self.geo_level, self.geo_code, self.geo.slug, urllib.parse.urlencode(request.GET))
                 return redirect(url, permanent=True)
 
         # Skip the parent class's logic completely and go back to basics
@@ -298,7 +298,7 @@ class DataAPIView(View):
         data = {}
 
         for table in tables:
-            for geo_id, table_data in table.raw_data_for_geos(geos).iteritems():
+            for geo_id, table_data in table.raw_data_for_geos(geos).items():
                 data.setdefault(geo_id, {})[table.name.upper()] = table_data
 
         return data

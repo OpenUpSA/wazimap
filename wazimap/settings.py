@@ -31,9 +31,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.humanize',
     'django.contrib.staticfiles',
+    'corsheaders',
     'sass_processor',
     'wazimap.apps.WazimapConfig',
-    'census',
+    'census'
 ]
 
 ALLOWED_HOSTS = ['*']
@@ -89,24 +90,25 @@ TEMPLATES = [
 ]
 
 
-MIDDLEWARE_CLASSES = (
+# CorsMiddleware should be placed as high as possible: https://github.com/adamchainz/django-cors-headers#setup
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'wazimap.middleware.RedirectMiddleware',
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_METHODS = (
+CORS_ALLOW_METHODS = [
     'GET',
     'OPTIONS'
-)
+]
 
 
 # Databases and caches

@@ -1,4 +1,5 @@
 build/
+env/
 /dist/
 _build/
 *.egg-info/
