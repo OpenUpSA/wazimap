@@ -34,14 +34,8 @@ from django.dispatch import receiver
 
 from itertools import groupby
 from wazimap.data.base import Base
-from wazimap.data.utils import (
-    get_session,
-    capitalize,
-    percent as p,
-    add_metadata,
-    current_context,
-)
-from sqlalchemy import Column, String, Table, or_, and_, func
+from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata, current_context
+from sqlalchemy import Column, String, Table, or_, and_, func, text
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.orm import class_mapper
 import sqlalchemy.types
@@ -488,9 +482,9 @@ class SimpleTable(DataTable):
             for row in rows:
                 geo_values = data["%s-%s" % (row.geo_level, row.geo_code)]
 
-                for col in columns.iterkeys():
-                    geo_values["estimate"][col] = getattr(row, col)
-                    geo_values["error"][col] = 0
+                for col in columns.keys():
+                    geo_values['estimate'][col] = getattr(row, col)
+                    geo_values['error'][col] = 0
 
         finally:
             session.close()
@@ -563,31 +557,17 @@ class FieldTable(DataTable):
     FLOAT = "Float"
     CHOICES = ((INTEGER, INTEGER), (FLOAT, FLOAT))
 
-    fields = ArrayField(
-        models.CharField(max_length=50, null=False, unique=True),
-        help_text="Comma-separated ordered list of fields this table describes.",
-    )
-    db_table_releases = models.ManyToManyField(
-        DBTable, through="FieldTableRelease", through_fields=("data_table", "db_table")
-    )
-    denominator_key = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True,
-        help_text='The key value of the rightmost field that should be used as the "total" column, '
-        + "instead of summing over the values for each row. This is necessary when the "
-        + "table doesn't describe a true partitioning of the dataset (ie. the row values "
-        + "sum to more than the total population).  This will be used as the total column once "
-        + "the id of the column has been calculated.",
-    )
-    has_total = models.BooleanField(
-        default=True,
-        null=False,
-        help_text="Does it make sense to calculate a total column and express percentages for values in this table?",
-    )
-    value_type = models.CharField(
-        max_length=20, null=False, blank=False, default=INTEGER, choices=CHOICES
-    )
+    fields = ArrayField(models.CharField(max_length=150, null=False, unique=True), help_text="Comma-separated ordered list of fields this table describes.")
+    db_table_releases = models.ManyToManyField(DBTable, through='FieldTableRelease', through_fields=('data_table', 'db_table'))
+    denominator_key = models.CharField(max_length=150, null=True, blank=True,
+                                       help_text='The key value of the rightmost field that should be used as the "total" column, ' +
+                                                 'instead of summing over the values for each row. This is necessary when the ' +
+                                                 'table doesn\'t describe a true partitioning of the dataset (ie. the row values ' +
+                                                 'sum to more than the total population).  This will be used as the total column once ' +
+                                                 'the id of the column has been calculated.')
+    has_total = models.BooleanField(default=True, null=False,
+                                    help_text="Does it make sense to calculate a total column and express percentages for values in this table?")
+    value_type = models.CharField(max_length=20, null=False, blank=False, default=INTEGER, choices=CHOICES)
 
     def __init__(self, *args, **kwargs):
         super(FieldTable, self).__init__(*args, **kwargs)
@@ -960,9 +940,9 @@ class FieldTable(DataTable):
 
         # add in percentages
         def calc_percent(data):
-            for key, data in data.iteritems():
-                if not key == "metadata":
-                    if "numerators" in data:
+            for key, data in data.items():
+                if not key == 'metadata':
+                    if 'numerators' in data:
                         if percent:
                             if "_group_key" in data:
                                 total = group_totals[data.pop("_group_key")]
@@ -1032,11 +1012,11 @@ class FieldTable(DataTable):
         )
 
         if only:
-            for k, v in only.iteritems():
+            for k, v in only.items():
                 objects = objects.filter(getattr(db_model, k).in_(v))
 
         if exclude:
-            for k, v in exclude.iteritems():
+            for k, v in exclude.items():
                 objects = objects.filter(getattr(db_model, k).notin_(v))
 
         if order_by is not None:
@@ -1048,7 +1028,7 @@ class FieldTable(DataTable):
 
             if attr == "total":
                 if is_desc:
-                    attr = attr + " DESC"
+                    attr = text(attr + ' DESC')
             else:
                 attr = getattr(db_model, attr)
                 if is_desc:

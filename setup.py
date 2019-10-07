@@ -16,19 +16,17 @@ install_requires = [
     'SQLAlchemy>=0.9.4',
     'boto>=2.27.0',
     'dj-database-url>=0.4.0',
-    'django-cors-headers>=1.1.0',
+    'django-cors-headers>=3.1.0',
     'django-compressor>=2.1.1',
     'django-pipeline>=1.6.4',
     'django-sass-processor>=0.5.4',
     'ecdsa>=0.11',
-    'futures>=3.0.4',
     'libsass>=0.13.1',
     'paramiko>=1.12.3,<2',
     'psycopg2>=2.5.2',
     'requests>=1.2.0',
     'unicodecsv>=0.9.4',
     'whitenoise>=1.0.6',
-    'wsgiref>=0.1.2',
 ]
 
 setup(
@@ -69,8 +67,8 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
     ],
 
     # You can just specify the packages manually here if your project is
