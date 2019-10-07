@@ -34,7 +34,13 @@ from django.dispatch import receiver
 
 from itertools import groupby
 from wazimap.data.base import Base
-from wazimap.data.utils import get_session, capitalize, percent as p, add_metadata, current_context
+from wazimap.data.utils import (
+    get_session,
+    capitalize,
+    percent as p,
+    add_metadata,
+    current_context,
+)
 from sqlalchemy import Column, String, Table, or_, and_, func, text
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.orm import class_mapper
@@ -378,7 +384,7 @@ class SimpleTable(DataTable):
                     recode = {f: recode(f) for f in fields}
 
             # is the total column valid?
-            if isinstance(total, basestring) and total not in columns:
+            if isinstance(total, str) and total not in columns:
                 raise ValueError(
                     "Total column '%s' isn't one of the columns for table '%s'. Valid columns are: %s"
                     % (total, self.id, ", ".join(columns.keys()))
@@ -387,11 +393,7 @@ class SimpleTable(DataTable):
             # table columns to fetch
             cols = [model.__table__.columns[c] for c in fields]
 
-            if (
-                total is not None
-                and isinstance(total, basestring)
-                and total not in cols
-            ):
+            if total is not None and isinstance(total, str) and total not in cols:
                 cols.append(total)
 
             # do the query. If this returns no data, row is None
@@ -412,7 +414,7 @@ class SimpleTable(DataTable):
             if total is None:
                 # sum of all columns
                 total = sum(getattr(row, f) or 0 for f in fields)
-            elif isinstance(total, basestring):
+            elif isinstance(total, str):
                 total = getattr(row, total)
 
             # Now build a data dictionary based on the columns in +row+.
@@ -483,8 +485,8 @@ class SimpleTable(DataTable):
                 geo_values = data["%s-%s" % (row.geo_level, row.geo_code)]
 
                 for col in columns.keys():
-                    geo_values['estimate'][col] = getattr(row, col)
-                    geo_values['error'][col] = 0
+                    geo_values["estimate"][col] = getattr(row, col)
+                    geo_values["error"][col] = 0
 
         finally:
             session.close()
@@ -557,17 +559,31 @@ class FieldTable(DataTable):
     FLOAT = "Float"
     CHOICES = ((INTEGER, INTEGER), (FLOAT, FLOAT))
 
-    fields = ArrayField(models.CharField(max_length=150, null=False, unique=True), help_text="Comma-separated ordered list of fields this table describes.")
-    db_table_releases = models.ManyToManyField(DBTable, through='FieldTableRelease', through_fields=('data_table', 'db_table'))
-    denominator_key = models.CharField(max_length=150, null=True, blank=True,
-                                       help_text='The key value of the rightmost field that should be used as the "total" column, ' +
-                                                 'instead of summing over the values for each row. This is necessary when the ' +
-                                                 'table doesn\'t describe a true partitioning of the dataset (ie. the row values ' +
-                                                 'sum to more than the total population).  This will be used as the total column once ' +
-                                                 'the id of the column has been calculated.')
-    has_total = models.BooleanField(default=True, null=False,
-                                    help_text="Does it make sense to calculate a total column and express percentages for values in this table?")
-    value_type = models.CharField(max_length=20, null=False, blank=False, default=INTEGER, choices=CHOICES)
+    fields = ArrayField(
+        models.CharField(max_length=150, null=False, unique=True),
+        help_text="Comma-separated ordered list of fields this table describes.",
+    )
+    db_table_releases = models.ManyToManyField(
+        DBTable, through="FieldTableRelease", through_fields=("data_table", "db_table")
+    )
+    denominator_key = models.CharField(
+        max_length=150,
+        null=True,
+        blank=True,
+        help_text='The key value of the rightmost field that should be used as the "total" column, '
+        + "instead of summing over the values for each row. This is necessary when the "
+        + "table doesn't describe a true partitioning of the dataset (ie. the row values "
+        + "sum to more than the total population).  This will be used as the total column once "
+        + "the id of the column has been calculated.",
+    )
+    has_total = models.BooleanField(
+        default=True,
+        null=False,
+        help_text="Does it make sense to calculate a total column and express percentages for values in this table?",
+    )
+    value_type = models.CharField(
+        max_length=20, null=False, blank=False, default=INTEGER, choices=CHOICES
+    )
 
     def __init__(self, *args, **kwargs):
         super(FieldTable, self).__init__(*args, **kwargs)
@@ -941,8 +957,8 @@ class FieldTable(DataTable):
         # add in percentages
         def calc_percent(data):
             for key, data in data.items():
-                if not key == 'metadata':
-                    if 'numerators' in data:
+                if not key == "metadata":
+                    if "numerators" in data:
                         if percent:
                             if "_group_key" in data:
                                 total = group_totals[data.pop("_group_key")]
@@ -1028,7 +1044,7 @@ class FieldTable(DataTable):
 
             if attr == "total":
                 if is_desc:
-                    attr = text(attr + ' DESC')
+                    attr = text(attr + " DESC")
             else:
                 attr = getattr(db_model, attr)
                 if is_desc:
