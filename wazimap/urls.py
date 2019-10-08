@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib import admin
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.views.decorators.cache import cache_page
 from django.views.generic.base import RedirectView, TemplateView
@@ -23,8 +23,7 @@ GEOGRAPHY_LEVELS = '|'.join(settings.WAZIMAP['levels'].keys())
 PROFILES_GEOGRAPHY_REGEX = r'profiles/(?P<geography_id>[{}]+-\w+)(-(?P<slug>[\w-]+))?'.format(GEOGRAPHY_LEVELS)
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-
+    url(r"^admin/", admin.site.urls),
     url(
         regex   = '^$',
         view    = cache_page(STANDARD_CACHE_TIME)(HomepageView.as_view()),
