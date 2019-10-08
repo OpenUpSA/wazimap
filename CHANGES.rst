@@ -1,6 +1,12 @@
 Wazimap Version History
 =======================
 
+2.1.0 (09 October 2019)
+------------------------
+* Upgrade to python 3
+* Upgrade to django 2
+
+
 2.0.0 (?)
 
 This release of Wazimap introduces some backwards incompatible changes. You WILL need to follow the upgrade steps.
