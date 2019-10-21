@@ -9,32 +9,32 @@ from django.contrib.postgres.fields import ArrayField
 class GeoMixin(object):
     def as_dict(self):
         return {
-            'full_geoid': self.geoid,
-            'full_name': self.full_name,  # profile views use this as a name
-            'name': self.full_name,  # API views use this as a name
-            'short_name': self.name,
-            'geo_level': self.geo_level,
-            'geo_code': self.geo_code,
-            'child_level': self.child_level,
-            'parent_geoid': self.parent_geoid,
-            'square_kms': self.square_kms,
-            'version': self.version,
+            "full_geoid": self.geoid,
+            "full_name": self.full_name,  # profile views use this as a name
+            "name": self.full_name,  # API views use this as a name
+            "short_name": self.name,
+            "geo_level": self.geo_level,
+            "geo_code": self.geo_code,
+            "child_level": self.child_level,
+            "parent_geoid": self.parent_geoid,
+            "square_kms": self.square_kms,
+            "version": self.version,
         }
 
     def as_dict_deep(self):
         return {
-            'this': self.as_dict(),
-            'parents': OrderedDict((p.geo_level, p.as_dict()) for p in self.ancestors()),
+            "this": self.as_dict(),
+            "parents": OrderedDict(
+                (p.geo_level, p.as_dict()) for p in self.ancestors()
+            ),
         }
 
     def children(self):
         """ Get all objects that are direct children of this object.
         """
-        return self.__class__.objects\
-            .filter(parent_level=self.geo_level,
-                    parent_code=self.geo_code,
-                    version=self.version)\
-            .all()
+        return self.__class__.objects.filter(
+            parent_level=self.geo_level, parent_code=self.geo_code, version=self.version
+        ).all()
 
     def split_into(self, level):
         """ Walk down the level hierarchy from here and return
@@ -42,13 +42,18 @@ class GeoMixin(object):
         of this geography.
         """
         from wazimap.geo import geo_data
-        levels = [level] + geo_data.geo_levels[level]['ancestors']
+
+        levels = [level] + geo_data.geo_levels[level]["ancestors"]
 
         candidates = self.children()
         kids = set()
         while candidates:
             kids.update(c for c in candidates if c.geo_level == level)
-            candidates = list(itertools.chain(*[c.children() for c in candidates if c.geo_level in levels]))
+            candidates = list(
+                itertools.chain(
+                    *[c.children() for c in candidates if c.geo_level in levels]
+                )
+            )
         return list(kids)
 
     @property
@@ -59,17 +64,19 @@ class GeoMixin(object):
         from wazimap.geo import geo_data
 
         names = [self.name]
-        names += [a.name for a in self.ancestors() if a.geo_level != geo_data.root_level]
-        return ', '.join(names)
+        names += [
+            a.name for a in self.ancestors() if a.geo_level != geo_data.root_level
+        ]
+        return ", ".join(names)
 
     @property
     def geoid(self):
-        return '-'.join([self.geo_level, self.geo_code])
+        return "-".join([self.geo_level, self.geo_code])
 
     @property
     def parent_geoid(self):
         if self.parent_level and self.parent_code:
-            return '%s-%s' % (self.parent_level, self.parent_code)
+            return "%s-%s" % (self.parent_level, self.parent_code)
         return None
 
     @property
@@ -80,7 +87,8 @@ class GeoMixin(object):
     def child_level(self):
         # official child level
         from wazimap.geo import geo_data
-        kids = geo_data.geo_levels[self.geo_level]['children']
+
+        kids = geo_data.geo_levels[self.geo_level]["children"]
         return kids[0] if kids else None
 
     def __unicode__(self):
@@ -90,12 +98,12 @@ class GeoMixin(object):
 class GeographyBase(models.Model, GeoMixin):
     #: The level for this geography (eg. `country`) which, together with
     #: `geo_code`, makes up the unique geo id.
-    geo_level = models.CharField(max_length=15, null=False)
+    geo_level = models.CharField(max_length=25, null=False)
     #: The code for this geography which must be unique for this level.
     #: Together with `geo_level`, this makes up the unique geo id.
     geo_code = models.CharField(max_length=10, null=False)
     #: Demarcation version of this geography. (advanced).
-    version = models.CharField(max_length=100, db_index=True, null=False, default='')
+    version = models.CharField(max_length=100, db_index=True, null=False, default="")
 
     #: Name of this geography.
     name = models.CharField(max_length=100, null=False, db_index=True)
@@ -116,16 +124,20 @@ class GeographyBase(models.Model, GeoMixin):
 
     class Meta:
         abstract = True
-        unique_together = ('geo_level', 'geo_code', 'version')
+        unique_together = ("geo_level", "geo_code", "version")
 
     @property
     def parent(self):
         """ The parent of this geograhy, or `None` if this is the root of
         the hierarchy.
         """
-        if not hasattr(self, '_parent'):
+        if not hasattr(self, "_parent"):
             if self.parent_level and self.parent_code:
-                self._parent = self.__class__.objects.filter(geo_level=self.parent_level, geo_code=self.parent_code, version=self.version).first()
+                self._parent = self.__class__.objects.filter(
+                    geo_level=self.parent_level,
+                    geo_code=self.parent_code,
+                    version=self.version,
+                ).first()
             else:
                 self._parent = None
 
