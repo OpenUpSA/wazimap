@@ -4,6 +4,10 @@ import sys
 import dj_database_url
 
 
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 DEBUG = os.environ.get('DJANGO_DEBUG', 'true') == 'true'
 TESTING = 'test' in sys.argv[1:3]
 
@@ -20,9 +24,12 @@ DATABASES = {
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
     'django.contrib.humanize',
-    'django.contrib.sites',
     'django.contrib.staticfiles',
     'sass_processor',
     'wazimap.apps.WazimapConfig',
@@ -32,7 +39,6 @@ INSTALLED_APPS = [
 ALLOWED_HOSTS = ['*']
 TIME_ZONE = 'Africa/Johannesburg'
 LANGUAGE_CODE = 'en-za'
-SITE_ID = 1
 USE_I18N = False
 USE_L10N = True
 USE_THOUSAND_SEPARATOR = True
@@ -61,37 +67,37 @@ STATICFILES_FINDERS = (
     'sass_processor.finders.CssFinder',
 )
 
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
-#STATICFILES_STORAGE = 'wazimap.pipeline.GzipManifestPipelineStorage'
-
 
 # Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
-                'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.debug',
-                'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
+                'django.template.context_processors.request',
                 'django.template.context_processors.static',
-                'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
+                'django.contrib.auth.context_processors.auth',
                 'census.context_processors.api_url',
                 'wazimap.context_processors.wazimap_settings',
-            ],
-            'debug': DEBUG,
-        },
-    },
+            ]
+        }
+    }
 ]
 
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'wazimap.middleware.RedirectMiddleware',
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -257,4 +263,10 @@ WAZIMAP = {
     # geographies, you probably want to set this to your earliest version, so
     # that embeds continue to show the original data.
     'legacy_embed_geo_version': None,
+
+    # The primary release year to use for each geo level. The default is to use
+    # the `latest` release. Set this if you have newer releases at some geo
+    # levels, such as a 2010 national census down to the city level, and a 2015
+    # partial census to the provincial level.
+    'primary_release_year': {},
 }

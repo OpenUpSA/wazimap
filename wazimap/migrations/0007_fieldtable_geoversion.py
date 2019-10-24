@@ -19,7 +19,7 @@ def forwards(apps, schema_editor):
     inspector = inspect(session.bind)
 
     try:
-        for data_table in DATA_TABLES.itervalues():
+        for data_table in DATA_TABLES.values():
             db_model = data_table.model
             table = db_model.__table__
 
@@ -51,7 +51,7 @@ def reverse(apps, schema_editor):
     inspector = inspect(session.bind)
 
     try:
-        for data_table in DATA_TABLES.itervalues():
+        for data_table in DATA_TABLES.values():
             db_model = data_table.model
             table = db_model.__table__
 
@@ -80,5 +80,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(forwards, reverse)
+        # We no longer need this migration in 2.x
+        # Be sure to upgrade to 1.x before 2.x if you run into issues.
     ]

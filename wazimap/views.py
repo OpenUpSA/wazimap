@@ -1,6 +1,8 @@
 from itertools import chain
 import json
 
+from urllib.parse import urlencode
+
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.safestring import SafeString
@@ -11,11 +13,12 @@ from django.shortcuts import redirect
 
 from census.views import GeographyDetailView as BaseGeographyDetailView, LocateView as BaseLocateView, render_json_to_response
 
-from wazimap.geo import geo_data
+from wazimap.geo import geo_data, LocationNotFound
 from wazimap.profiles import enhance_api_data
-from wazimap.data.tables import get_datatable, DATA_TABLES
-from wazimap.data.utils import LocationNotFound
+from wazimap.data.tables import get_datatable
+from wazimap.data.utils import dataset_context, get_page_releases
 from wazimap.data.download import DownloadManager
+from wazimap.models import FieldTable, SimpleTable
 
 
 def render_json_error(message, status_code=400):
@@ -43,10 +46,10 @@ class GeographyDetailView(BaseGeographyDetailView):
     def dispatch(self, *args, **kwargs):
         request = args[0]
         version = request.GET.get('geo_version', self.default_geo_version)
-        self.geo_id = self.kwargs.get('geography_id', None)
+        self.geo_level = self.kwargs.get('geo_level', None)
+        self.geo_code = self.kwargs.get('geo_code', None)
 
         try:
-            self.geo_level, self.geo_code = self.geo_id.split('-', 1)
             self.geo = geo_data.get_geography(self.geo_code, self.geo_level, version)
         except (ValueError, LocationNotFound):
             raise Http404
@@ -55,7 +58,7 @@ class GeographyDetailView(BaseGeographyDetailView):
         if self.adjust_slugs and (kwargs.get('slug') or self.geo.slug):
             if kwargs['slug'] != self.geo.slug:
                 kwargs['slug'] = self.geo.slug
-                url = '/profiles/%s-%s-%s' % (self.geo_level, self.geo_code, self.geo.slug)
+                url = '/profiles/%s/%s/%s?%s' % (self.geo_level, self.geo_code, self.geo.slug, urlencode(request.GET))
                 return redirect(url, permanent=True)
 
         # Skip the parent class's logic completely and go back to basics
@@ -71,9 +74,17 @@ class GeographyDetailView(BaseGeographyDetailView):
         if not profile_method:
             raise ValueError("You must define WAZIMAP.profile_builder in settings.py")
         profile_method = import_string(profile_method)
-        profile_data = profile_method(self.geo, self.profile_name, self.request)
+
+        year = self.request.GET.get('release', geo_data.primary_release_year(self.geo))
+        if settings.WAZIMAP['latest_release_year'] == year:
+            year = 'latest'
+
+        with dataset_context(year=year):
+            profile_data = profile_method(self.geo, self.profile_name, self.request)
 
         profile_data['geography'] = self.geo.as_dict_deep()
+        profile_data['primary_releases'] = get_page_releases(
+            settings.WAZIMAP['primary_dataset_name'], self.geo, year)
 
         profile_data = enhance_api_data(profile_data)
         page_context.update(profile_data)
@@ -184,23 +195,50 @@ class DataAPIView(View):
         except KeyError as e:
             return render_json_error('Unknown table: %s' % e.message, 404)
 
-        if kwargs.get('action') == 'show':
-            return self.show(request)
-        if kwargs.get('action') == 'download':
-            return self.download(request)
+        # tables should all be from the same dataset
+        datasets = set(t.dataset for t in self.tables)
+        if len(datasets) > 1:
+            return render_json_error("All tables must belong to the same dataset.", 400)
+        self.dataset = list(datasets)[0]
+
+        self.year = kwargs['release']
+        if settings.WAZIMAP['latest_release_year'] == self.year:
+            self.year = 'latest'
+
+        self.available_releases = get_page_releases(
+            self.dataset.name, self.data_geos[0], self.year, filter_releases=False)
+
+        self.release = None
+        for table in self.tables:
+            release = table.get_release(year=self.year)
+            if not release:
+                return render_json_error("No release %s for table %s." % (kwargs['release'], table.name.upper()), 400)
+
+            # different?
+            if self.release and self.release != release:
+                return render_json_error("All tables must have the same release.", 400)
+
+            self.release = release
+
+        with dataset_context(year=self.release.year):
+            if kwargs.get('action') == 'show':
+                return self.show(request)
+            if kwargs.get('action') == 'download':
+                return self.download(request)
 
     def show(self, request):
-        dataset = ', '.join(sorted(list(set(t.dataset_name for t in self.tables))))
-        years = ', '.join(sorted(list(set(t.year for t in self.tables))))
-
         data = self.get_data(self.data_geos, self.tables)
 
+        tables = {}
+        for table in self.tables:
+            d = table.as_dict()
+            d['columns'] = table.columns()
+            tables[table.name.upper()] = d
+
         return render_json_to_response({
-            'release': {
-                'name': dataset,
-                'years': years,
-            },
-            'tables': dict((t.id.upper(), t.as_dict()) for t in self.tables),
+            'release': self.release.as_dict(),
+            'other_releases': self.available_releases['other'],
+            'tables': tables,
             'data': data,
             'geography': dict((g.geoid, g.as_dict()) for g in chain(self.data_geos, self.info_geos)),
         })
@@ -215,8 +253,9 @@ class DataAPIView(View):
             return response
 
         data = self.get_data(self.data_geos, self.tables)
+        columns = {table.name: table.columns(release=self.release) for table in self.tables}
 
-        content, fname, mime_type = mgr.generate_download_bundle(self.tables, self.data_geos, self.geo_ids, data, fmt)
+        content, fname, mime_type = mgr.generate_download_bundle(self.tables, self.data_geos, self.geo_ids, self.release, columns, data, fmt)
 
         response = HttpResponse(content, content_type=mime_type)
         response['Content-Disposition'] = 'attachment; filename="%s"' % fname
@@ -260,8 +299,8 @@ class DataAPIView(View):
         data = {}
 
         for table in tables:
-            for geo_id, table_data in table.raw_data_for_geos(geos).iteritems():
-                data.setdefault(geo_id, {})[table.id.upper()] = table_data
+            for geo_id, table_data in table.raw_data_for_geos(geos).items():
+                data.setdefault(geo_id, {})[table.name.upper()] = table_data
 
         return data
 
@@ -271,7 +310,9 @@ class TableAPIView(View):
     View that lists data tables.
     """
     def get(self, request, *args, **kwargs):
-        return render_json_to_response([t.as_dict(columns=False) for t in DATA_TABLES.itervalues()])
+        return render_json_to_response([
+            t.as_dict() for t in chain(SimpleTable.objects.all(), FieldTable.objects.all())
+        ])
 
 
 class AboutView(TemplateView):
@@ -291,12 +332,16 @@ class GeographyCompareView(TemplateView):
             'geo_id2': geo_id2,
         }
 
+        release = self.request.GET.get('release')
         try:
             level, code = geo_id1.split('-', 1)
             page_context['geo1'] = geo_data.get_geography(code, level)
+            page_context['geo1_release_year'] = str(settings.WAZIMAP['primary_release_year'].get(level, release)) if release == settings.WAZIMAP['latest_release_year'] else release
 
             level, code = geo_id2.split('-', 1)
             page_context['geo2'] = geo_data.get_geography(code, level)
+            page_context['geo2_release_year'] = str(settings.WAZIMAP['primary_release_year'].get(level, release)) if release == settings.WAZIMAP['latest_release_year'] else release
+
         except (ValueError, LocationNotFound):
             raise Http404
 
@@ -305,7 +350,7 @@ class GeographyCompareView(TemplateView):
 
 class GeoAPIView(View):
     """
-    View that lists things about geos. Currently just parents.
+    View that lists things about geos. Currently parents and children.
     """
     def get(self, request, geo_id, *args, **kwargs):
         try:
@@ -317,6 +362,16 @@ class GeoAPIView(View):
         parents = [g.as_dict() for g in geo.ancestors()]
         return render_json_to_response(parents)
 
+    def children(self, request, geo_id, *args, **kwargs):
+        try:
+            level, code = geo_id.split('-', 1)
+            geo = geo_data.get_geography(code, level)
+        except (ValueError, LocationNotFound):
+            raise Http404
+
+        children = [g.as_dict() for g in geo.children()]
+        return render_json_to_response(children)
+
 
 class TableDetailView(TemplateView):
     template_name = 'table/table_detail.html'
@@ -324,12 +379,19 @@ class TableDetailView(TemplateView):
     def dispatch(self, *args, **kwargs):
         try:
             self.table = get_datatable(kwargs['table'])
+            # There's no dataset context set here, so we use the latest year
+            self.release = self.table.get_release(year='latest')
         except KeyError:
             raise Http404
 
         return super(TableDetailView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
+        latest_release_year = self.release.year
+        with dataset_context(year=latest_release_year):
+            table_columns = self.table.columns()
         return {
             'table': self.table,
+            'latest_release_year': latest_release_year,
+            'table_columns': table_columns
         }

@@ -1,8 +1,8 @@
 from __future__ import division
 from collections import OrderedDict, defaultdict
-from urllib import urlencode
-from urllib2 import unquote
-import cStringIO
+from urllib.parse import urlencode
+from urllib.parse import unquote
+from io import StringIO
 import gzip
 import re
 import requests
@@ -11,7 +11,7 @@ import json
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q
 from django.http import HttpResponse, Http404, HttpResponseRedirect
@@ -226,8 +226,8 @@ class TableDetailView(TemplateView):
             'preview': {},
         }
 
-        for group, group_values in tables.iteritems():
-            preview_table = next(group_values.iteritems())[0]
+        for group, group_values in tables.items():
+            preview_table = next(group_values.items())[0]
             tabulation_data['related_tables']['preview'][preview_table] = self.get_table_data(preview_table)
             tabulation_data['related_tables']['preview'][preview_table]['table_type'] = self.TABLE_TYPE_TRANSLATE_DICT[preview_table.upper()[0]]
 
@@ -235,7 +235,7 @@ class TableDetailView(TemplateView):
 
     def get_topic_pages(self, table_topics):
         related_topic_pages = []
-        for key, values in TOPICS_MAP.iteritems():
+        for key, values in TOPICS_MAP.items():
             topics = values.get('topics', [])
             matches = set(topics).intersection(table_topics)
             if matches:
@@ -350,7 +350,7 @@ class GeographyDetailView(TemplateView):
                     return HttpResponseRedirect(
                         reverse('geography_detail', args=(fragment,)
                     ))
-                except Exception, e:
+                except Exception as e:
                     # if we have a strange situation where there's no
                     # display name attached to the geography, we should
                     # go ahead and display the profile page
@@ -403,7 +403,7 @@ class GeographyDetailView(TemplateView):
         s3_key.storage_class = 'REDUCED_REDUNDANCY'
 
         # create gzipped version of json in memory
-        memfile = cStringIO.StringIO()
+        memfile = StringIO()
         #memfile.write(data)
         with gzip.GzipFile(filename=s3_key.key, mode='wb', fileobj=memfile) as gzip_data:
             gzip_data.write(data)
@@ -421,7 +421,7 @@ class GeographyDetailView(TemplateView):
             s3_key = None
 
         if s3_key and s3_key.exists():
-            memfile = cStringIO.StringIO()
+            memfile = StringIO()
             s3_key.get_file(memfile)
             memfile.seek(0)
             compressed = gzip.GzipFile(fileobj=memfile)
@@ -508,7 +508,7 @@ class DataView(TemplateView):
         self.primary_geo_id = self.request.GET.get('primary_geo_id', None)
         self.geo_ids = self.request.GET.get('geo_ids', 'country-SA')
         self.release_slug = self.request.GET.get('release', None)
-        self.release = ACS_RELEASES.get(self.release_slug, None)
+        self.release = self.request.GET.get('release', None)
 
         if not self.table or not self.geo_ids:
             errors = {
@@ -525,7 +525,7 @@ class DataView(TemplateView):
         return super(DataView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
-        download_link_prefix = '/api/1.0/data/download/latest?table_ids=%s&geo_ids=%s' % (self.table, self.geo_ids)
+        download_link_prefix = '/api/1.0/data/download/%s?table_ids=%s&geo_ids=%s' % (self.release, self.table, self.geo_ids)
 
         page_context = {
             'table': self.table or '',

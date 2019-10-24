@@ -1,12 +1,12 @@
 {% extends 'table/_base_table.html' %}
 {% load tabletags static %}
-{% block head_title %}Table {{ table.id }}: {{ table.description }} - {{ block.super }}{% endblock %}
+{% block head_title %}Table {{ table.name }}: {{ table.description }} - {{ block.super }}{% endblock %}
 
 {% block head_facebook_tags %}
-        <meta property="og:title" content="{{ WAZIMAP.name }} table detail: {{ table.id }}" />
+        <meta property="og:title" content="{{ WAZIMAP.name }} table detail: {{ table.name }}" />
         <meta property="og:site_name" content="{{ WAZIMAP.name }}" />
-        <meta property="og:url" content="{{ WAZIMAP.url }}{% url 'table_detail' table.id %}" />
-        <meta property="og:description" content="Description and table metadata for {{ WAZIMAP.name }} table {{ table.id }}: {{ table.description }}." />
+        <meta property="og:url" content="{{ WAZIMAP.url }}{% url 'table_detail' table.name %}" />
+        <meta property="og:description" content="Description and table metadata for {{ WAZIMAP.name }} table {{ table.name }}: {{ table.description }}." />
         <meta property="og:type" content="article" />
         {#}<meta property="og:image" content="" />{#}
 {% endblock %}
@@ -17,7 +17,7 @@
 {% block header_content %}
 <div id="explore" class="wrapper clearfix header-container">
     <section id="explore-topic-place-picker" class="clearfix big-action">
-        <h1 class="article-header">Table {{ table.id }}: {{ table.description }}</h1>
+        <h1 class="article-header">Table {{ table.name }}: {{ table.description }}</h1>
         <h2 class="help-text">Show data from this table: Choose a place or area</h2>
         <div id="topic-place-select-wrapper" class="input-wrapper">
             <input name="topic_place_select" id="topic-place-select" type="text" placeholder="Start typing to pick a place..." autocomplete="off">
@@ -43,7 +43,7 @@
     </header>
     <div class="section-container">
         <section class="clearfix">
-            <h2>Table {{ table.id }}</h2>
+            <h2>Table {{ table.name }}</h2>
             <h2 class="header-for-columns">Table universe: <span class="normal">{{ table.universe }}</span></h2>
             <aside>
                 {% if tabulation.table_versions|length > 1 %}
@@ -56,7 +56,7 @@
 
             <div class="column-golden-wide expanded-table">
                 <h4>Columns in this table</h4>
-                <ul>{% for column_id, column_data in table.columns.items %}
+                <ul>{% for column_id, column_data in table_columns.items %}
                     <li class="indent-{{ column_data.indent }}">{{ column_data.name }}</li>
                 {% endfor %}</ul>
             </div>
@@ -69,11 +69,12 @@
 <script src="{% static 'js/table.detail.js' %}"></script>
 <script type="text/javascript">
 var table = new Table({
-    tableID: '{{ table.id }}',
+    tableID: '{{ table.name }}',
     topicSelect: '#topic-select',
     topicSelectContainer: '#query-topic-picker',
     displayHeader: '#header-container',
     displayWrapper: '#table-display',
+    releaseYear: '{{ latest_release_year }}',
 });
 </script>
 {% endblock %}

@@ -3,7 +3,7 @@ from collections import OrderedDict
 import json
 
 from django.utils.functional import lazy, Promise
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 
 def get_object_or_none(klass, *args, **kwargs):
@@ -15,7 +15,7 @@ def get_object_or_none(klass, *args, **kwargs):
 class LazyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Promise):
-            return force_unicode(obj)
+            return force_text(obj)
         return obj
 
 ## A little generator to pluck out max values ##

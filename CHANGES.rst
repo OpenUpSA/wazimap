@@ -1,20 +1,21 @@
 Wazimap Version History
 =======================
 
-1.2.1 (14 September 2018)
------------------------
+2.0.0 (?)
 
-* FIX warning for template parameters
+This release of Wazimap introduces some backwards incompatible changes. You WILL need to follow the upgrade steps.
+Be sure to upgrade to 1.x before upgrading to 2.x.
 
-1.2 (13 September 2018)
------------------------
-
-* Update to Django version 1.11 which has long-term support
+* Wazimap now supports multiple releases of a dataset. This means that you can, for example, have two releases of a national census in Wazimap at the same time. You will need to make some changes to how you build profile pages.
+* BREAKING: SimpleTable and FieldTable are now Django models.
+* BREAKING: Table management is now done through the Django admin interface. You must upgrade your existing tables.
+* BREAKING: ``get_objects_by_geo`` has been replaced by ``FieldTable.get_rows_for_geo``.
 
 1.1.1 (21 November 2017)
 -----------------------
 
 * FIX another bug for versioned geos for static maps
+
 
 1.1.0 (23 October 2017)
 -----------------------
@@ -24,13 +25,13 @@ Wazimap Version History
 1.0.1 (21 September 2017)
 -------------------------
 
-This release of Wazimap introduces some backwards compatible changes.
+This release of Wazimap introduces some backwards incompatible changes.
 
 * Support versioned geographies.
 * BREAKING: The Geography model has changed. You must run ``python manage.py migrate`` when updating.
 * BREAKING: The method signature of the ``profile_builder`` function has changed. It is now called as ``get_profile(geo, profile_name, request)``. You will need to update your profile methods to work with a ``geo`` object rather than a ``level`` and a ``code``. Use ``geo.geo_level`` and ``geo.geo_code`` instead.
 * BREAKING: Some methods on the ``GeoData`` object now take a ``Geography`` object rather than a ``geo_level`` and a ``geo_code``.
-* BREAKING: The ``geometry_data`` setting must include a geography version at the top of the dict. Use ``''`` by default. eg: ``{'': {'country': 'geo/country.geojson'}}``
+* BREAKING: The ``geography_data`` setting must include a geography version at the top of the dict. Use ``''`` by default. eg: ``{'': {'country': 'geo/country.geojson'}}``
 * Some methods on the ``GeoData`` object now take an optional ``version`` parameter.
 * A new method ``GeoData.get_comparative_geos`` makes it easier to build the profile page for comparative geographies.
 * FIX: load streetmap tiles over https if necessary

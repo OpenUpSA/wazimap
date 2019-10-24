@@ -88,6 +88,10 @@ from the Wazimap application, rather than your Django application like normal.
 
     python manage.py migrate
 
-9. You now have a Wazimap application and matching database ready to load
-   geographies and data into. Those steps are covered in the rest of this
-   guide.
+9. Create a superuser to manage your site: ::
+
+    python manage.py createsuperuser
+
+10. You now have a Wazimap application and matching database ready to load
+    geographies and data into. Those steps are covered in the rest of this
+    guide.
