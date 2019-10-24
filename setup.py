@@ -27,8 +27,7 @@ install_requires = [
     'psycopg2-binary>=2.5.2',
     'requests>=2.18.4',
     'unicodecsv>=0.14.1',
-    'whitenoise>=3.3.1',
-    'wsgiref>=0.1.2',
+    'whitenoise>=3.3.1'
 ]
 
 setup(
@@ -43,7 +42,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/Code4SA/wazimap',
+    url='https://github.com/OpenUpSA/wazimap',
 
     # Author details
     author='OpenUp',
