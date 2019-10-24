@@ -12,23 +12,23 @@ with open(path.join(here, 'VERSION')) as f:
     version = f.read().strip()
 
 install_requires = [
-    'numpy>=1.16.4',
-    'Django>=1.11.15,<1.12.0',
-    'SQLAlchemy>=0.9.4',
-    'boto>=2.27.0',
+    'Django>=2.2.3',
+    'SQLAlchemy==1.2',
+    'boto==2.48.0',
     'dj-database-url>=0.4.0',
-    'django-cors-headers>=1.1.0',
-    'django-compressor>=2.1.1',
-    'django-pipeline>=1.6.4',
-    'django-sass-processor==0.5.5',
-    'ecdsa>=0.11',
-    'futures>=3.0.4',
-    'libsass>=0.13.1',
+    'django-cors-headers>=3.0.2',
+    'django-compressor>=2.3',
+    'django-pipeline>=1.6.14',
+    'django-sass-processor>=0.7.1',
+    'ecdsa>=0.13',
+    'futures>=3.1.1',
+    'libsass>=0.13.3',
     'paramiko>=1.12.3,<2',
-    'psycopg2>=2.5.2',
-    'requests>=1.2.0',
-    'unicodecsv>=0.9.4',
-    'whitenoise>=1.0.6',
+    'psycopg2-binary>=2.5.2',
+    'requests>=2.18.4',
+    'unicodecsv>=0.14.1',
+    'whitenoise>=3.3.1',
+    'wsgiref>=0.1.2',
 ]
 
 setup(
@@ -43,7 +43,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/OpenUpSA/wazimap',
+    url='https://github.com/Code4SA/wazimap',
 
     # Author details
     author='OpenUp',
