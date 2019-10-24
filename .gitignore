@@ -12,3 +12,5 @@ censusreporter/embed_data/profiles/*
 debug
 .vagrant
 .eggs/
+postgres-data
+.vscode
