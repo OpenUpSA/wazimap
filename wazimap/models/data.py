@@ -264,6 +264,7 @@ class DataTable(models.Model):
 
     def as_dict(self):
         return {
+            "id": self.id,
             "title": self.description or self.name,
             "universe": self.universe,
             "denominator_column_id": self.total_column,
