@@ -5,7 +5,8 @@ Wazimap Version History
 ------------------------
 * Upgrade to python 3
 * Upgrade to django 2
-
+* Return fieldtable id from as_dict
+* better object representation of fieldtable object.
 
 2.0.0 (?)
 
