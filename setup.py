@@ -41,7 +41,7 @@ setup(
     url="https://github.com/OpenUpSA/wazimap",
     # Author details
     author="OpenUp",
-    author_email="greg@openup.org.za",
+    author_email="webapps@openup.org.za",
     # Choose your license
     license="MIT",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
