@@ -135,167 +135,289 @@
 
 <script type="text/javascript">
 
-// Create all the charts
-var Charts = {},
-    chartContainers = $('[id^=chart-]'),
-    defaultDataRelease = '{{ geography.census_release }}',
-    profileData = {{ profile_data_json }};
+ // Create all the charts
+ var Charts = {},
+     chartContainers = $('[id^=chart-]'),
+     defaultDataRelease = '{{ geography.census_release }}',
+     profileData = {{ profile_data_json }};
 
-var gracefulType = function(chartType) {
-    // convert certain chart types to more readable versions at narrow widths
-    if (browserWidth <= 640) {
-        if (chartType == 'column' || chartType == 'histogram') {
-            return 'bar'
-        } else if (chartType == 'grouped_column') {
-            return 'grouped_bar'
-        }
-    }
-    return chartType
-}
+ var gracefulType = function(chartType) {
+     // convert certain chart types to more readable versions at narrow widths
+     if (browserWidth <= 640) {
+         if (chartType == 'column' || chartType == 'histogram') {
+             return 'bar'
+         } else if (chartType == 'grouped_column') {
+             return 'grouped_bar'
+         }
+     }
+     return chartType
+ }
 
-var makeCharts = function() {
-    var citationList = [];
-    $.each(chartContainers, function(i, obj) {
-        $(obj).empty();
-        var chartID = $(this).prop('id'),
-            chartDataKey = chartID.replace('chart-','').replace('alt-',''),
-            chartDataID = chartDataKey.split('-'),
-            chartType = gracefulType(chartDataID[0]),
-            chartData = profileData[chartDataID[1]],
-            chartChartTitle = $(this).data('chart-title'),
-            chartChartShowYAxis = $(this).data('chart-show-y-axis'),
-            chartInitialSort = $(this).data('initial-sort'),
-            chartStatType = $(this).data('stat-type'),
-            chartDecimalPlaces = $(this).data('decimal-places'),
-            chartQualifier = $(this).data('qualifier') || null,
-            thisRelease = $(this).data('release') || null,
-            geographyData = profileData['geography'],
-            comparisonLevels = {{ WAZIMAP.comparative_levels|safe }};
+ var makeCharts = function() {
+     $('.no__print__show').remove();
+     var citationList = [];
+     $.each(chartContainers, function(i, obj) {
+         $(obj).empty();
+         var chartID = $(this).prop('id'),
+             chartDataKey = chartID.replace('chart-','').replace('alt-',''),
+             chartDataID = chartDataKey.split('-'),
+             chartType = gracefulType(chartDataID[0]),
+             chartData = profileData[chartDataID[1]],
+             chartChartTitle = $(this).data('chart-title'),
+             chartChartShowYAxis = $(this).data('chart-show-y-axis'),
+             chartInitialSort = $(this).data('initial-sort'),
+             chartStatType = $(this).data('stat-type'),
+             chartDecimalPlaces = $(this).data('decimal-places'),
+             chartQualifier = $(this).data('qualifier') || null,
+             thisRelease = $(this).data('release') || null,
+             geographyData = profileData['geography'],
+             comparisonLevels = {{ WAZIMAP.comparative_levels|safe }};
 
-        // allow arbitrary nesting in API data structure
-        var drilldown = chartDataID.length - 1;
-        if (drilldown >= 2) {
-            for (var n = 2; n <= drilldown; n++) {
-                chartData = chartData[chartDataID[n]]
-            }
-        }
+         // allow arbitrary nesting in API data structure
+         var drilldown = chartDataID.length - 1;
+         if (drilldown >= 2) {
+             for (var n = 2; n <= drilldown; n++) {
+                 chartData = chartData[chartDataID[n]]
+             }
+         }
 
-        // Display the release specified in data-release, else display the metadata release
-        var dataRelease = chartData['metadata']['release'];
-        var chartRelease = thisRelease ? thisRelease : dataRelease;
-        var chartReleaseYear = chartData['metadata']['year'];
+         // Display the release specified in data-release, else display the metadata release
+         var dataRelease = chartData['metadata']['release'];
+         var chartRelease = thisRelease ? thisRelease : dataRelease;
+         var chartReleaseYear = chartData['metadata']['year'];
 
-        citationList.push({
-          name: chartData['metadata']['release'],
-          citation: chartData['metadata']['citation']
-        });
+         citationList.push({
+             name: chartData['metadata']['release'],
+             citation: chartData['metadata']['citation']
+         });
 
-        var chartstuff = {
-            chartContainer: chartID,
-            chartDataKey: chartDataKey,
-            chartType: chartType,
-            chartHeight: 160,
-            chartData: chartData,
-            chartQualifier: chartQualifier,
-            chartRelease: chartRelease,
-            chartReleaseYear: chartReleaseYear,
-            chartChartTitle: chartChartTitle,
-            chartInitialSort: chartInitialSort,
-            chartStatType: chartStatType,
-            chartDecimalPlaces: chartDecimalPlaces,
-            geographyData: geographyData,
-            comparisonLevels: comparisonLevels
-        }
-        try {
-            Charts[i] = Chart(chartstuff);
-        } catch(e) {
-            console.log("Error making chart " + chartID)
-            console.log(chartstuff);
-        }
-    });
+         var chartstuff = {
+             chartContainer: chartID,
+             chartDataKey: chartDataKey,
+             chartType: chartType,
+             chartHeight: 160,
+             chartData: chartData,
+             chartQualifier: chartQualifier,
+             chartRelease: chartRelease,
+             chartReleaseYear: chartReleaseYear,
+             chartChartTitle: chartChartTitle,
+             chartInitialSort: chartInitialSort,
+             chartStatType: chartStatType,
+             chartDecimalPlaces: chartDecimalPlaces,
+             geographyData: geographyData,
+             comparisonLevels: comparisonLevels
+         }
+         try {
+             Charts[i] = Chart(chartstuff);
+         } catch(e) {
+             console.log("Error making chart " + chartID)
+             console.log(chartstuff);
+         }
+     });
 
-    var citations = _.uniq(citationList, function(c) {
-      return c.name + " " + c.citation;
-    });
+     var citations = _.uniq(citationList, function(c) {
+	 return c.name + " " + c.citation;
+     });
 
-    $('#citations ul').empty();
-    $.each(citations, function(i, c) {
-      $('#citations ul')
-        .append(
-          $('<li>')
-            .append($('<b>').append(c['name'] + ": "))
-            .append(c['citation'])
-            .append(_.escape(' <' + window.location.origin + window.location.pathname + '>'))
-          )
-    });
+     $('#citations ul').empty();
+     $.each(citations, function(i, c) {
+	 $('#citations ul')
+             .append(
+		 $('<li>')
+		     .append($('<b>').append(c['name'] + ": "))
+		     .append(c['citation'])
+		     .append(_.escape(' <' + window.location.origin + window.location.pathname + '>'))
+             )
+     });
 
-    {% if head2head %}
-    // we remove the source hrefs in the iframes
-    $.each($("a[href='#citations']"), function(i, a) {
-      a.removeAttribute("href");
-    });
-    {% endif %}
-}
+     {% if head2head %}
+     // we remove the source hrefs in the iframes
+     $.each($("a[href='#citations']"), function(i, a) {
+	 a.removeAttribute("href");
+     });
+     {% endif %}
+ }
 
-var maps = new ProfileMaps();
-maps.drawMapsForProfile(profileData.geography);
+ var gracefulPrintType = function(chartType){
+     return chartType
+ }
+ var getQueryParameters = function(){
+     
+ }
+ var makePrintCharts = function() {
+     $('.web__no__show').remove();
+     $.urlParam = function(name){
+	 console.log(window.location.href);
+	 var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+	 if (results==null){
+	     return null;
+	 }
+	 else{
+	     return results[1] || 0;
+	 }
 
-makeCharts();
+     }
 
-// listen for resize, redraw charts to new dimensions
-var lazyRedrawCharts = _.debounce(function() {
-    window.browserWidth = document.documentElement.clientWidth;
-    window.browserHeight = document.documentElement.clientHeight;
-    makeCharts();
-}, 50);
-$(window).resize(lazyRedrawCharts);
+     var profiles = $.urlParam('profiles').split(',');
 
-// for touch devices, still allow context toggle
-$('.stat-row').on('click', '.stat', function() {
-    $(this).find('.context').toggle();
-});
+     $('.data-print-section').each(function(){
+	 var sectionId = $(this).attr('id');
+	 if (profiles.includes(sectionId)){
+	 }
+	 else{
+	     $(this).remove();
+	 }
+     });
+     
+     var citationList = [];
+     $.each(chartContainers, function(i, obj) {
+         $(obj).empty();
+         var chartID = $(this).prop('id'),
+             chartDataKey = chartID.replace('chart-','').replace('alt-',''),
+             chartDataID = chartDataKey.split('-'),
+             chartType = gracefulPrintType(chartDataID[0]),
+             chartData = profileData[chartDataID[1]],
+             chartChartTitle = $(this).data('chart-title'),
+             chartChartShowYAxis = $(this).data('chart-show-y-axis'),
+             chartInitialSort = $(this).data('initial-sort'),
+             chartStatType = $(this).data('stat-type'),
+             chartDecimalPlaces = $(this).data('decimal-places'),
+             chartQualifier = $(this).data('qualifier') || null,
+             thisRelease = $(this).data('release') || null,
+             geographyData = profileData['geography'],
+	     chartDesign = $(this).data('chart-design'),
+             comparisonLevels = {{ WAZIMAP.comparative_levels|safe }};
+	 
 
-var parentLinkContainer = null;
-if (!!parentLinkContainer) {
-    // set up the listener for trigger to reveal hidden groups
-    $('#header-box').on('click', '.link-reveal', function() {
-        $(this).hide().next('.hidden').show();
-        return false;
-    });
+         // allow arbitrary nesting in API data structure
+         var drilldown = chartDataID.length - 1;
+	 
+	 if (drilldown >= 2) {
+	     for (var n = 2; n <= drilldown; n++) {
+		 chartData = chartData[chartDataID[n]]
+	     }
+	 }
 
-    // hit the /parents API endpoint
-    $.getJSON(parentGeoAPI)
-        .done(function(results) {
-            // filter out 'this' from the parents
-            var parents = _.reject(results['parents'], function(p) {
-                return p.relation === 'this';
-            });
-            // list of unique parent sumlev types, maintaining order
-            var parentRelations = _.uniq(_.pluck(parents, 'sumlevel'));
-            // collect parents into individual sumlev groups
-            var parentGroups = _.groupBy(parents, function(d) {
-                return d.sumlevel;
-            });
-            // for each parent sumlev type ...
-            var parentLinkSets = _.map(parentRelations, function(r) {
-                // ... compile a set of links to individual profile pages
-                var parentLinkSet = _.map(parentGroups[r], function(v, k) {
-                    return '<a href="/profiles/' + v.geoid + '-' + slugify(v.display_name) + '/">' + v.display_name + '</a>';
-                });
-                var numParents = parentLinkSet.length;
-                // if more than one of a sumlev type, group behind reveal link
-                if (numParents > 1) {
-                    return '<a href="#" class="link-reveal">'+numParents+' '+ sumlevMap[r]['plural'] +'</a><span class="hidden">'+parentLinkSet.join(', ')+'</span>';
-                } else {
-                    // just one of this sumlev type, so add it to list
-                    return parentLinkSet;
-                }
-            })
-            // push the whole thing into the header box ... thingy
-            parentLinkContainer.html(parentLinksPrefix + parentLinkSets.join(', '));
-            $('body').trigger('glossaryUpdate', parentLinkContainer);
-        });
-}
+         // Display the release specified in data-release, else display the metadata release
+         var dataRelease = chartData['metadata']['release'];
+         var chartRelease = thisRelease ? thisRelease : dataRelease;
+         var chartReleaseYear = chartData['metadata']['year'];
+
+         citationList.push({
+             name: chartData['metadata']['release'],
+             citation: chartData['metadata']['citation']
+         });
+
+         var chartstuff = {
+             chartContainer: chartID,
+             chartDataKey: chartDataKey,
+             chartType: chartType,
+             chartHeight: 200,
+             chartData: chartData,
+             chartQualifier: chartQualifier,
+             chartRelease: chartRelease,
+             chartReleaseYear: chartReleaseYear,
+             chartChartTitle: chartChartTitle,
+             chartInitialSort: chartInitialSort,
+             chartStatType: chartStatType,
+             chartDecimalPlaces: chartDecimalPlaces,
+             geographyData: geographyData,
+             comparisonLevels: comparisonLevels,
+	     chartDesign: chartDesign
+         }
+         try {
+             Charts[i] = Chart(chartstuff);
+         } catch(e) {
+             console.log("Error making chart " + chartID)
+	     console.log(e);
+             console.log(chartstuff);
+         }
+     });
+
+     var citations = _.uniq(citationList, function(c) {
+	 return c.name + " " + c.citation;
+     });
+
+     $('#citations ul').empty();
+     $.each(citations, function(i, c) {
+	 $('#citations ul')
+             .append(
+		 $('<li>')
+		     .append($('<b>').append(c['name'] + ": "))
+		     .append(c['citation'])
+		     .append(_.escape(' <' + window.location.origin + window.location.pathname + '>'))
+             )
+     });
+
+     {% if head2head %}
+     // we remove the source hrefs in the iframes
+     $.each($("a[href='#citations']"), function(i, a) {
+	 a.removeAttribute("href");
+     });
+     {% endif %}
+ }
+
+ //makePrintCharts();
+ 
+ var maps = new ProfileMaps();
+ maps.drawMapsForProfile(profileData.geography);
+ 
+ makeCharts();
+
+ // listen for resize, redraw charts to new dimensions
+ var lazyRedrawCharts = _.debounce(function() {
+     window.browserWidth = document.documentElement.clientWidth;
+     window.browserHeight = document.documentElement.clientHeight;
+     makeCharts();
+ }, 50);
+ $(window).resize(lazyRedrawCharts);
+
+ // for touch devices, still allow context toggle
+ $('.stat-row').on('click', '.stat', function() {
+     $(this).find('.context').toggle();
+ });
+
+ var parentLinkContainer = null;
+ if (!!parentLinkContainer) {
+     // set up the listener for trigger to reveal hidden groups
+     $('#header-box').on('click', '.link-reveal', function() {
+         $(this).hide().next('.hidden').show();
+         return false;
+     });
+
+     // hit the /parents API endpoint
+     $.getJSON(parentGeoAPI)
+      .done(function(results) {
+          // filter out 'this' from the parents
+          var parents = _.reject(results['parents'], function(p) {
+              return p.relation === 'this';
+          });
+          // list of unique parent sumlev types, maintaining order
+          var parentRelations = _.uniq(_.pluck(parents, 'sumlevel'));
+          // collect parents into individual sumlev groups
+          var parentGroups = _.groupBy(parents, function(d) {
+              return d.sumlevel;
+          });
+          // for each parent sumlev type ...
+          var parentLinkSets = _.map(parentRelations, function(r) {
+              // ... compile a set of links to individual profile pages
+              var parentLinkSet = _.map(parentGroups[r], function(v, k) {
+                  return '<a href="/profiles/' + v.geoid + '-' + slugify(v.display_name) + '/">' + v.display_name + '</a>';
+              });
+              var numParents = parentLinkSet.length;
+              // if more than one of a sumlev type, group behind reveal link
+              if (numParents > 1) {
+                  return '<a href="#" class="link-reveal">'+numParents+' '+ sumlevMap[r]['plural'] +'</a><span class="hidden">'+parentLinkSet.join(', ')+'</span>';
+              } else {
+                  // just one of this sumlev type, so add it to list
+                  return parentLinkSet;
+              }
+          })
+          // push the whole thing into the header box ... thingy
+          parentLinkContainer.html(parentLinksPrefix + parentLinkSets.join(', '));
+          $('body').trigger('glossaryUpdate', parentLinkContainer);
+      });
+ }
 
 </script>
 {% endblock %}

@@ -19,7 +19,6 @@ function Chart(options) {
         chart.chartContainer = d3.select('#'+options.chartContainer)
             .append("div")
                 .style("position", "relative");
-
         chart.screenPosition = chart.chartContainer.node().getBoundingClientRect();
         chart.parentHeight = chart.getParentHeight();
         chart.chartType = options.chartType;
@@ -37,6 +36,7 @@ function Chart(options) {
         chart.chartHeight = options.chartHeight || (chart.parentHeight < 180 ? 180 : chart.parentHeight);
         chart.chartColorScale = options.chartColorScale || 'Set2S';
         chart.screenPosition = document.getElementById(options.chartContainer).getBoundingClientRect();
+	chart.chartDesign = options.chartDesign || null;
 
         // add a bit of geodata for links and hovercards
         var geographyThis = options.geographyData['this'],
@@ -320,8 +320,18 @@ function Chart(options) {
         }
 
         // store width and height available for chart elements
+	//console.log(chart.chartDesign);
+	var chartDesignWidth;
+	if (chart.chartDesign == '--full-width'){
+	    chartDesignWidth = 1116;
+	}else if (chart.chartDesign == '--half-width'){
+	    chartDesignWidth = 546;
+	}else{
+	    chartDesignWidth = chart.settings.width - chart.settings.margin.left - chart.settings.margin.right;
+	}
+	
         chart.updateSettings({
-            displayWidth: chart.settings.width - chart.settings.margin.left - chart.settings.margin.right,
+            displayWidth: chartDesignWidth,
             displayHeight: chart.settings.height - chart.settings.margin.top - chart.settings.margin.bottom
         });
 
@@ -534,10 +544,18 @@ function Chart(options) {
             .classed("pie-chart", true);
 
         // give the chart display dimensions
+	var chartDesignWidth;
+	if (chart.chartDesign == '--full-width'){
+	    chartDesignWidth = 1116;
+	}else if (chart.chartDesign == '--half-width'){
+	    chartDesignWidth = 546;
+	}else{
+	    chartDesignWidth = chart.settings.width - chart.settings.margin.left - chart.settings.margin.right;
+	}
         chart.updateSettings({
-            legendWidth: chart.settings.width * .38,
-            pieWidth: chart.settings.width * .58,
-            displayWidth: chart.settings.width - chart.settings.margin.left - chart.settings.margin.right,
+            legendWidth: chartDesignWidth * .38,
+            pieWidth: chartDesignWidth * .58,
+            displayWidth: chartDesignWidth,
             displayHeight: chart.settings.height - chart.settings.margin.top - chart.settings.margin.bottom
         });
 
