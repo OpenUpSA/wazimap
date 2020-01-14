@@ -158,6 +158,7 @@
      var chartContainers = $('.chart-webpage');
      $('.no__print__show').remove();
      $.each(chartContainers, function(i, obj) {
+	 console.log($(this));
          $(obj).empty();
          var chartID = $(this).prop('id'),
              chartDataKey = chartID.replace('chart-','').replace('alt-',''),
@@ -245,29 +246,29 @@
 
  var makePrintCharts = function() {
      $('.web__no__show').remove();
-     $.urlParam = function(name){
-	 var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-	 if (results==null){
-	     return null;
-	 }
-	 else{
-	     return results[1] || 0;
-	 }
+     /* $.urlParam = function(name){
+	var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+	if (results==null){
+	return null;
+	}
+	else{
+	return results[1] || 0;
+	}
 
-     }
+      * }
 
-     var profiles = $.urlParam('profiles').split(',');
+      * var profiles = $.urlParam('profiles').split(',');
 
-     $('.data-print-section').each(function(){
-	 var sectionId = $(this).attr('id');
-	 if (!profiles.includes(sectionId)){
-	     $(this).remove();
-	 }
-     });
+      * $('.data-print-section').each(function(){
+	var sectionId = $(this).attr('id');
+	if (profiles.includes(sectionId)){
+	}else{
+	$(this).remove();
+	}
+      * }); */
      
      var citationList = [];
      var chartContainers = $('.chart-printpage');
-     console.log(chartContainers);
      $.each(chartContainers, function(i, obj) {
          $(obj).empty();
          var chartID = $(this).prop('id'),
@@ -359,6 +360,7 @@
  maps.drawMapsForProfile(profileData.geography);
  
  makeCharts();
+ //makePrintCharts();
 
  // listen for resize, redraw charts to new dimensions
  var lazyRedrawCharts = _.debounce(function() {
