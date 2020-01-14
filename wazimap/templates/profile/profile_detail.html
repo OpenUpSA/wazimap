@@ -152,10 +152,11 @@
      }
      return chartType
  }
-
+ 
  var makeCharts = function() {
-     $('.no__print__show').remove();
      var citationList = [];
+     var chartContainers = $('.chart-webpage');
+     $('.no__print__show').remove();
      $.each(chartContainers, function(i, obj) {
          $(obj).empty();
          var chartID = $(this).prop('id'),
@@ -241,13 +242,10 @@
  var gracefulPrintType = function(chartType){
      return chartType
  }
- var getQueryParameters = function(){
-     
- }
+
  var makePrintCharts = function() {
      $('.web__no__show').remove();
      $.urlParam = function(name){
-	 console.log(window.location.href);
 	 var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
 	 if (results==null){
 	     return null;
@@ -262,14 +260,14 @@
 
      $('.data-print-section').each(function(){
 	 var sectionId = $(this).attr('id');
-	 if (profiles.includes(sectionId)){
-	 }
-	 else{
+	 if (!profiles.includes(sectionId)){
 	     $(this).remove();
 	 }
      });
      
      var citationList = [];
+     var chartContainers = $('.chart-printpage');
+     console.log(chartContainers);
      $.each(chartContainers, function(i, obj) {
          $(obj).empty();
          var chartID = $(this).prop('id'),
@@ -356,8 +354,6 @@
      });
      {% endif %}
  }
-
- //makePrintCharts();
  
  var maps = new ProfileMaps();
  maps.drawMapsForProfile(profileData.geography);
