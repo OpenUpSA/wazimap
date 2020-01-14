@@ -27,7 +27,7 @@ install_requires = [
     'psycopg2>=2.5.2',
     'requests>=1.2.0',
     'unicodecsv>=0.9.4',
-    'whitenoise>=1.0.6',
+    'whitenoise==4.1.2',
     'wsgiref>=0.1.2',
 ]
 
