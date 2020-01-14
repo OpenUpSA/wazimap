@@ -244,29 +244,35 @@
      return chartType
  }
 
+ var urlParam = function(name){
+     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+     if (results==null){
+	 return null;
+     }
+     else{
+	 return results[1] || 0;
+     }
+
+ }
+ 
  var makePrintCharts = function() {
      $('.web__no__show').remove();
-     /* $.urlParam = function(name){
-	var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-	if (results==null){
-	return null;
-	}
-	else{
-	return results[1] || 0;
-	}
-
-      * }
-
-      * var profiles = $.urlParam('profiles').split(',');
-
-      * $('.data-print-section').each(function(){
-	var sectionId = $(this).attr('id');
-	if (profiles.includes(sectionId)){
-	}else{
-	$(this).remove();
-	}
-      * }); */
+     var queryString = window.location.search
+     console.log(queryString);
      
+     if (queryString){
+	 query = queryString.replace('?profiles=', '').split(',');
+	 $('.data-print-section').each(function(){
+	     var sectionId = $(this).attr('id');
+	     console.log(sectionId);
+	     if ($.inArray(sectionId, query) > -1 ){
+		 
+	     }else{
+		 $(this).hide();
+	     }
+	     
+	 });
+     } 
      var citationList = [];
      var chartContainers = $('.chart-printpage');
      $.each(chartContainers, function(i, obj) {
