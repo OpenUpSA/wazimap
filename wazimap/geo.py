@@ -283,8 +283,8 @@ class GeoData(object):
         if version is None:
             version = self.global_latest_version
 
-        for features in self.geometry.itervalues():
-            for feature in features.itervalues():
+        for features in self.geometry.values():
+            for feature in features.values():
                 if feature['shape'] and feature['shape'].contains(p):
                     geo = self.get_geography(feature['properties']['code'],
                                              feature['properties']['level'],
