@@ -12,12 +12,12 @@ with open(path.join(here, "VERSION")) as f:
     version = f.read().strip()
 
 install_requires = [
-    "django==2.2.6",
     "SQLAlchemy==1.2.17",
+    "django==2.2.6,<3",
     "boto==2.49.0",
     "dj-database-url==0.5.0",
     "django-cors-headers==3.1.0",
-    "django-compressor==2.2",
+    "django-compressor==2.4",
     "django-pipeline==1.6.14",
     "django-sass-processor==0.7.3",
     "ecdsa==0.11",
