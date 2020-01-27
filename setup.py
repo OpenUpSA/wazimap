@@ -13,7 +13,7 @@ with open(path.join(here, "VERSION")) as f:
 
 install_requires = [
     "SQLAlchemy==1.2.17",
-    "django==2.2.6,<3",
+    "django>=2.2.6,<3",
     "boto==2.49.0",
     "dj-database-url==0.5.0",
     "django-cors-headers==3.1.0",
