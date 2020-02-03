@@ -25,6 +25,7 @@ install_requires = [
     "paramiko>=1.18.5,<2",
     "psycopg2>=2.7.7",
     "requests>=2.21",
+    "six>=1.12.0",
     "unicodecsv>=0.14.1",
     "whitenoise>=4.1.2",
 ]
