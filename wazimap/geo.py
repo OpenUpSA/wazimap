@@ -285,9 +285,10 @@ class GeoData(object):
 
         for features in self.geometry.values():
             for feature in features.values():
-                if feature['shape'] and feature['shape'].contains(p):
-                    geo = self.get_geography(feature['properties']['code'],
-                                             feature['properties']['level'],
+                feature_key = list(feature.keys())[0]
+                if feature[feature_key]['shape'] and feature[feature_key]['shape'].contains(p):
+                    geo = self.get_geography(feature[feature_key]['properties']['code'],
+                                             feature[feature_key]['properties']['level'],
                                              version)
                     if not levels or geo.geo_level in levels:
                         geos.append(geo)
