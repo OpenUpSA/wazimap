@@ -1,6 +1,10 @@
 Wazimap Version History
 =======================
 
+2.1.2 (19 Feburary 2020)
+-------------------------
+
+* Fix key error in Geometry features Github Issue #159
 
 2.1.1 (03 Feburary 2020)
 -------------------------
