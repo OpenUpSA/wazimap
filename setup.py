@@ -15,7 +15,7 @@ install_requires = [
     "Django==2.2.6",
     "SQLAlchemy>=1.2.17",
     "boto>=2.49.0",
-    "dj-database-url~=0.5.0",
+    "dj-database-url>=0.5.0",
     "django-cors-headers>=3.1.0",
     "django-compressor>=2.2",
     "django-pipeline>=1.6.14",
