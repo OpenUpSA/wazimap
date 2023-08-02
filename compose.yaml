@@ -1,0 +1,32 @@
+services:
+  server:
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    environment:
+      - DATABASE_URL=postgresql://wazimap:wazimap@db/wazimap
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["./manage.py", "runserver"]
+  db:
+    image: postgres:11.6
+    environment:
+      - POSTGRES_USER=wazimap
+      - POSTGRES_PASSWORD=wazimap
+      - POSTGRES_DB=wazimap
+      - PGUSER=wazimap
+    ports:
+      - "5433:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "log_statement=all"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:

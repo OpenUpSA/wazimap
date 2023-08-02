@@ -12,23 +12,23 @@ with open(path.join(here, 'VERSION')) as f:
     version = f.read().strip()
 
 install_requires = [
-    'Django>=1.11.15,<1.12.0',
-    'SQLAlchemy==1.2.17',
-    'boto==2.49',
-    'dj-database-url==0.5.0',
-    'django-cors-headers==3.0.2',
-    'django-compressor==2.2',
-    'django-pipeline==1.6.14',
-    'django-sass-processor==0.7.',
-    'ecdsa==0.11',
-    'futures>=3.0.4',
-    'libsass==0.17.0',
-    'paramiko>=1.12.3,<2',
-    'psycopg2==2.7.7',
-    'requests==2.21',
-    'unicodecsv==0.14.1',
-    'whitenoise==4.1.2',
-    'wsgiref>=0.1.2',
+    'Django~=2.2.6',
+    'SQLAlchemy~=1.2.17',
+    'boto~=2.49.0',
+    'dj-database-url~=0.5.0',
+    'django-cors-headers~=3.0.2',
+    'django-compressor~=2.2',
+    'django-pipeline~=1.6.14',
+    'django-sass-processor~=0.7.3',
+    'ecdsa~=0.11',
+    #'futures>=3.0.4',
+    'libsass~=0.17.0',
+    'paramiko~=1.18.5',
+    'psycopg2~=2.8.5',
+    'requests~=2.21',
+    'unicodecsv~=0.14.1',
+    'whitenoise!=4.1.2',
+    'wsgiref~=0.1.2',
 ]
 
 setup(
@@ -96,6 +96,6 @@ setup(
     extras_require={
         'dev': ['nose', 'flake8'],
         'test': ['nose', 'flake8'],
-        'gdal': ['GDAL', 'Shapely>=1.5.13'],
+        'gdal': ['GDAL', 'Shapely~=1.5.13'],
     },
 )
