@@ -1,9 +1,9 @@
-from __future__ import division
+
 from collections import OrderedDict
 import json
 
 from django.utils.functional import lazy, Promise
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 
 def get_object_or_none(klass, *args, **kwargs):
@@ -27,7 +27,7 @@ def drill(item):
             for result in drill(i):
                 yield result
     elif isinstance(item, dict):
-        for k,v in item.items():
+        for k,v in list(item.items()):
             for result in drill(v):
                 yield result
 

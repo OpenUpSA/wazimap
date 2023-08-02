@@ -370,10 +370,10 @@ class SimpleTable(DataTable):
                     if f not in columns:
                         raise ValueError(
                             "Invalid field/column '%s' for table '%s'. Valid columns are: %s"
-                            % (f, self.id, ", ".join(columns.keys()))
+                            % (f, self.id, ", ".join(list(columns.keys())))
                         )
             else:
-                fields = columns.keys()
+                fields = list(columns.keys())
                 if self.total_column:
                     fields.remove(self.total_column)
 
@@ -384,10 +384,10 @@ class SimpleTable(DataTable):
                     recode = {f: recode(f) for f in fields}
 
             # is the total column valid?
-            if isinstance(total, basestring) and total not in columns:
+            if isinstance(total, str) and total not in columns:
                 raise ValueError(
                     "Total column '%s' isn't one of the columns for table '%s'. Valid columns are: %s"
-                    % (total, self.id, ", ".join(columns.keys()))
+                    % (total, self.id, ", ".join(list(columns.keys())))
                 )
 
             # table columns to fetch
@@ -395,7 +395,7 @@ class SimpleTable(DataTable):
 
             if (
                 total is not None
-                and isinstance(total, basestring)
+                and isinstance(total, str)
                 and total not in cols
             ):
                 cols.append(total)
@@ -418,7 +418,7 @@ class SimpleTable(DataTable):
             if total is None:
                 # sum of all columns
                 total = sum(getattr(row, f) or 0 for f in fields)
-            elif isinstance(total, basestring):
+            elif isinstance(total, str):
                 total = getattr(row, total)
 
             # Now build a data dictionary based on the columns in +row+.
@@ -488,7 +488,7 @@ class SimpleTable(DataTable):
             for row in rows:
                 geo_values = data["%s-%s" % (row.geo_level, row.geo_code)]
 
-                for col in columns.iterkeys():
+                for col in list(columns.keys()):
                     geo_values["estimate"][col] = getattr(row, col)
                     geo_values["error"][col] = 0
 
@@ -894,7 +894,7 @@ class FieldTable(DataTable):
                     key = capitalize(key)
 
                 # enforce key ordering the first time we see this field
-                if (not data or data.keys() == ["metadata"]) and field in key_order:
+                if (not data or list(data.keys()) == ["metadata"]) and field in key_order:
                     for fld in key_order[field]:
                         data[fld] = OrderedDict()
 
@@ -960,7 +960,7 @@ class FieldTable(DataTable):
 
         # add in percentages
         def calc_percent(data):
-            for key, data in data.items():
+            for key, data in list(data.items()):
                 if not key == "metadata":
                     if "numerators" in data:
                         if percent:
@@ -1032,11 +1032,11 @@ class FieldTable(DataTable):
         )
 
         if only:
-            for k, v in only.items():
+            for k, v in list(only.items()):
                 objects = objects.filter(getattr(db_model, k).in_(v))
 
         if exclude:
-            for k, v in exclude.items():
+            for k, v in list(exclude.items()):
                 objects = objects.filter(getattr(db_model, k).notin_(v))
 
         if order_by is not None:

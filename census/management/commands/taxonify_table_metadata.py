@@ -96,7 +96,7 @@ class Command(BaseCommand):
             table_name = table.table_name
             subject_area = table.subject_area
             topics = []
-            print table_name
+            print(table_name)
 
             if subject_area in SUBJECT_AREA_TO_TOPICS:
                 # only keep the rows in the subject areas we want

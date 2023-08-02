@@ -5,7 +5,7 @@ from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
 import json
-import cStringIO
+import io
 import gzip
 
 from ...profile import geo_profile, enhance_api_data
@@ -32,7 +32,7 @@ def write_profile_json(s3_key, data):
     s3_key.storage_class = 'REDUCED_REDUNDANCY'
 
     # create gzipped version of json in memory
-    memfile = cStringIO.StringIO()
+    memfile = io.StringIO()
     #memfile.write(data)
     with gzip.GzipFile(filename=s3_key.key, mode='wb', fileobj=memfile) as gzip_data:
         gzip_data.write(data)
@@ -50,7 +50,7 @@ def seed(geoid):
         s3key = key(geoid)
         write_profile_json(s3key, json.dumps(api_data))
         logger.info("Wrote to key {}".format(s3key))
-    except Exception, e:
+    except Exception as e:
         logger.error("Problem caching {}".format(geoid))
         logger.exception(e)
     logger.info("Done working on {}".format(geoid))
@@ -61,7 +61,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if not args:
-            print "Please include the name of a file containing the seed geo_ids."
+            print("Please include the name of a file containing the seed geo_ids.")
             return False
 
         parallelism = 4
