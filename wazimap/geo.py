@@ -84,7 +84,7 @@ class GeoData(object):
         self.geo_levels = settings.WAZIMAP['levels']
 
         parents = {}
-        for code, level in self.geo_levels.iteritems():
+        for code, level in self.geo_levels.items():
             level.setdefault('name', code)
             level.setdefault('plural', code + 's')
             level.setdefault('children', [])
@@ -97,11 +97,11 @@ class GeoData(object):
         def climb(code):
             return chain(parents.get(code, []), *[climb(p) for p in parents.get(code, [])])
 
-        for code, items in parents.iteritems():
+        for code, items in parents.items():
             self.geo_levels[code]['ancestors'] = list(set(climb(code)))
 
         # root level
-        roots = [key for key, lev in self.geo_levels.iteritems() if not lev.get('ancestors')]
+        roots = [key for key, lev in self.geo_levels.items() if not lev.get('ancestors')]
         if not roots or len(roots) > 1:
             raise ValueError("geo_levels must have a single root item, but we found: %s" % roots)
         self.root_level = roots[0]
