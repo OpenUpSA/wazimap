@@ -21,14 +21,12 @@ install_requires = [
     'django-pipeline~=1.6.14',
     'django-sass-processor~=0.7.3',
     'ecdsa~=0.11',
-    #'futures>=3.0.4',
     'libsass~=0.17.0',
     'paramiko~=1.18.5',
     'psycopg2~=2.8.5',
     'requests~=2.21',
     'unicodecsv~=0.14.1',
     'whitenoise!=4.1.2',
-    'wsgiref~=0.1.2',
 ]
 
 setup(
