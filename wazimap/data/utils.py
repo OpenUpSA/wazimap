@@ -210,7 +210,8 @@ def group_remainder(data, num_items=4, make_percentage=True,
     }
     cutoff = num_items - 2
 
-    for i, (key, values) in enumerate(data.items()):
+    newdata = data.copy()
+    for i, (key, values) in enumerate(newdata.items()):
         if key == 'metadata':
             continue
 
