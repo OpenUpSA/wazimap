@@ -1325,8 +1325,8 @@ function Chart(options) {
 
     chart.trackEvent = function(category, action, label) {
         // make sure we have Google Analytics function available
-        if (typeof(ga) == 'function') {
-            ga('send', 'event', category, action, label);
+        if (typeof(gtag) == 'function') {
+            gtag('event', category, { 'action': action, 'label': label });
         }
     }
 
