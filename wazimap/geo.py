@@ -84,7 +84,7 @@ class GeoData(object):
         self.geo_levels = settings.WAZIMAP['levels']
 
         parents = {}
-        for code, level in self.geo_levels.items():
+        for code, level in list(self.geo_levels.items()):
             level.setdefault('name', code)
             level.setdefault('plural', code + 's')
             level.setdefault('children', [])
@@ -97,11 +97,11 @@ class GeoData(object):
         def climb(code):
             return chain(parents.get(code, []), *[climb(p) for p in parents.get(code, [])])
 
-        for code, items in parents.items():
+        for code, items in list(parents.items()):
             self.geo_levels[code]['ancestors'] = list(set(climb(code)))
 
         # root level
-        roots = [key for key, lev in self.geo_levels.items() if not lev.get('ancestors')]
+        roots = [key for key, lev in list(self.geo_levels.items()) if not lev.get('ancestors')]
         if not roots or len(roots) > 1:
             raise ValueError("geo_levels must have a single root item, but we found: %s" % roots)
         self.root_level = roots[0]
@@ -126,9 +126,9 @@ class GeoData(object):
         self.geometry = {}
         self.geometry_files = settings.WAZIMAP.get('geometry_data', {})
 
-        for level in self.geo_levels.keys():
+        for level in list(self.geo_levels.keys()):
             # sanity check for geo version
-            if level in self.geometry_files or self.geometry_files.keys() == [''] and isinstance(self.geometry_files[''], basestring):
+            if level in self.geometry_files or list(self.geometry_files.keys()) == [''] and isinstance(self.geometry_files[''], str):
                 # The geometry_data must include a version key. For example:
                 #
                 # geometry_data = {
@@ -155,7 +155,7 @@ class GeoData(object):
                 raise ValueError("The geometry_data setting is missing a geometry version key. You probably aren't using geometry versions just need to " +
                                  "change WAZIMAP['geometry_data'] to be: %s" % suggestion)
 
-            for version in self.geometry_files.keys():
+            for version in list(self.geometry_files.keys()):
                 fname, js = self.load_geojson_for_level(level, version)
                 if not js:
                     continue
@@ -283,12 +283,11 @@ class GeoData(object):
         if version is None:
             version = self.global_latest_version
 
-        for features in self.geometry.values():
-            for feature in features.values():
-                feature_key = list(feature.keys())[0]
-                if feature[feature_key]['shape'] and feature[feature_key]['shape'].contains(p):
-                    geo = self.get_geography(feature[feature_key]['properties']['code'],
-                                             feature[feature_key]['properties']['level'],
+        for features in list(self.geometry.values()):
+            for feature in list(features.values()):
+                if feature['shape'] and feature['shape'].contains(p):
+                    geo = self.get_geography(feature['properties']['code'],
+                                             feature['properties']['level'],
                                              version)
                     if not levels or geo.geo_level in levels:
                         geos.append(geo)

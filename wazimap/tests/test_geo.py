@@ -10,9 +10,9 @@ class GeoTestCase(TestCase):
         cpt11 = geo_data.geo_model.objects.create(geo_level='municipality', geo_code='cpt', long_name='City of Cape Town', version='2011')
         cpt16 = geo_data.geo_model.objects.create(geo_level='municipality', geo_code='cpt', long_name='City of Cape Town', version='2016')
 
-        self.assertEquals(cpt16, geo_data.get_geography('cpt', 'municipality'))
-        self.assertEquals(cpt11, geo_data.get_geography('cpt', 'municipality', '2011'))
-        self.assertEquals(cpt16, geo_data.get_geography('cpt', 'municipality', '2016'))
+        self.assertEqual(cpt16, geo_data.get_geography('cpt', 'municipality'))
+        self.assertEqual(cpt11, geo_data.get_geography('cpt', 'municipality', '2011'))
+        self.assertEqual(cpt16, geo_data.get_geography('cpt', 'municipality', '2016'))
 
     def test_geometry(self):
         # if the geometry_data is missing the version, we should raise an error

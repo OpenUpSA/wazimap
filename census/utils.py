@@ -1,4 +1,4 @@
-from __future__ import division
+
 from collections import OrderedDict
 import json
 
@@ -27,7 +27,7 @@ def drill(item):
             for result in drill(i):
                 yield result
     elif isinstance(item, dict):
-        for k,v in item.items():
+        for k,v in list(item.items()):
             for result in drill(v):
                 yield result
 
