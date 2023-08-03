@@ -1704,8 +1704,8 @@ function Comparison(options) {
     comparison.trackEvent = function(category, action, label) {
         // e.g. comparison.trackEvent('Comparisons', 'Add geographies', sumlev);
         // make sure we have Google Analytics function available
-        if (typeof(ga) == 'function') {
-            ga('send', 'event', category, action, label);
+        if (typeof(gtag) == 'function') {
+            gtag('event', category, { 'action': action, 'label': label });
         }
     }
     

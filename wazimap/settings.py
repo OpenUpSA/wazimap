@@ -178,7 +178,7 @@ WAZIMAP = {
     # Twitter handle
     'twitter': '@Wazimap',
 
-    # Google Analytics tracking id (ua-xxxxx-x)
+    # Google Analytics tracking id (G-XXXXXXXXX)
     'ga_tracking_id': '',
 
     # Two-letter country code for the country this site relates to
