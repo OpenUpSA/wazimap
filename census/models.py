@@ -48,13 +48,9 @@ class SummaryLevel(models.Model):
     source = models.CharField(max_length=64, blank=True)
 
     # Relationships
-    parent = models.ForeignKey(
-        "self", related_name="children", blank=True, null=True, on_delete=models.CASCADE
-    )
-    ancestors = models.ManyToManyField(
-        "self", related_name="descendants", symmetrical=False, blank=True
-    )
-
+    parent = models.ForeignKey('self', related_name='children', blank=True, null=True, on_delete=models.CASCADE)
+    ancestors = models.ManyToManyField('self', related_name='descendants', symmetrical=False, blank=True)
+    
     class Meta:
         ordering = ("summary_level",)
 
