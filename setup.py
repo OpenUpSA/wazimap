@@ -12,7 +12,6 @@ with open(path.join(here, 'VERSION')) as f:
     version = f.read().strip()
 setup(
     name='wazimap',
-    packages=['wazimap'],
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -55,7 +54,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    #packages=find_packages(),
+    packages=find_packages(),
 
     include_package_data=True,
 
