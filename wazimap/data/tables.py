@@ -85,7 +85,6 @@ class SimpleTable(object):
 
         DATA_TABLES[self.id] = self
 
-
 FIELD_TABLE_FIELDS = set()
 FIELD_TABLES = {}
 
@@ -163,7 +162,6 @@ class FieldTable(SimpleTable):
 
         FIELD_TABLE_FIELDS.update(self.fields)
         FIELD_TABLES[self.id] = self
-
 
 def get_table_id(fields):
     sorted_fields = sorted(fields)

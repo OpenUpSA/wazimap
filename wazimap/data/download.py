@@ -56,7 +56,7 @@ class DownloadManager(object):
 
             # See http://gis.stackexchange.com/questions/53920/ogr-createlayer-returns-typeerror
             # excel limits worksheet names to 31 chars
-            out_layer = out_data.CreateLayer(file_ident.encode('utf-8')[0:31], srs=out_srs, geom_type=ogr.wkbMultiPolygon)
+            out_layer = out_data.CreateLayer(file_ident[0:31], srs=out_srs, geom_type=ogr.wkbMultiPolygon)
             out_layer.CreateField(ogr.FieldDefn('geo_level', ogr.OFTString))
             out_layer.CreateField(ogr.FieldDefn('geo_code', ogr.OFTString))
             out_layer.CreateField(ogr.FieldDefn('geoid', ogr.OFTString))
@@ -116,7 +116,7 @@ class DownloadManager(object):
 
             log.info("Zipped. Reading and streaming.")
 
-            with open(zfile_filepath) as f:
+            with open(zfile_filepath, "rb") as f:
                 content = f.read()
                 return content, zfile_filename, 'application/zip'
 

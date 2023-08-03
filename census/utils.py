@@ -15,7 +15,7 @@ def get_object_or_none(klass, *args, **kwargs):
 class LazyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Promise):
-            return force_unicode(obj)
+            return force_text(obj)
         return obj
 
 ## A little generator to pluck out max values ##

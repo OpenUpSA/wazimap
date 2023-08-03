@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Table(models.Model):
     table_id = models.CharField(max_length=8)
     table_name = models.CharField(max_length=255)
@@ -8,12 +9,13 @@ class Table(models.Model):
     subject_area = models.CharField(max_length=32)
     topics = models.CharField(max_length=255, blank=True)
     release = models.CharField(max_length=16)
-    
+
     class Meta:
-        ordering = ('release','table_id')
+        ordering = ("release", "table_id")
 
     def __unicode__(self):
-        return '%s' % self.table_name
+        return "%s" % self.table_name
+
 
 class Column(models.Model):
     table = models.ForeignKey(Table, on_delete=models.CASCADE)
@@ -26,10 +28,10 @@ class Column(models.Model):
     has_children = models.BooleanField()
 
     class Meta:
-        ordering = ('table__table_id','table__release','column_id')
+        ordering = ("table__table_id", "table__release", "column_id")
 
     def __unicode__(self):
-        return '%s' % self.column_name
+        return "%s" % self.column_name
 
 
 class SummaryLevel(models.Model):
@@ -38,36 +40,36 @@ class SummaryLevel(models.Model):
     slug = models.SlugField()
     short_name = models.CharField(max_length=128, blank=True)
     plural_name = models.CharField(max_length=128, blank=True)
-    
+
     description = models.TextField(blank=True)
     census_description = models.TextField(blank=True)
     census_code_description = models.TextField(blank=True)
     census_notes = models.TextField(blank=True)
     source = models.CharField(max_length=64, blank=True)
-    
+
     # Relationships
     parent = models.ForeignKey('self', related_name='children', blank=True, null=True, on_delete=models.CASCADE)
     ancestors = models.ManyToManyField('self', related_name='descendants', symmetrical=False, blank=True)
     
     class Meta:
-        ordering = ('summary_level',)
+        ordering = ("summary_level",)
 
     def __unicode__(self):
-        return '%s' % self.name
-        
+        return "%s" % self.name
+
     @property
     def display_name(self):
         return self.short_name or self.name
-        
+
     def pretty_ancestor_list(self):
-        return ', '.join([ancestor.name for ancestor in self.ancestors.all()])
+        return ", ".join([ancestor.name for ancestor in self.ancestors.all()])
 
     def pretty_ancestor_options(self):
         _list = self.pretty_ancestor_list()
-        return ' or '.join(_list.rsplit(',',1))
+        return " or ".join(_list.rsplit(",", 1))
 
     def pretty_ancestor_sumlev_list(self):
-        return ','.join([ancestor.summary_level for ancestor in self.ancestors.all()])
+        return ",".join([ancestor.summary_level for ancestor in self.ancestors.all()])
 
     def ancestor_sumlev_list(self):
         return [ancestor.summary_level for ancestor in self.ancestors.all()]
@@ -82,15 +84,19 @@ class SubjectConcept(models.Model):
     census_comparability = models.TextField(blank=True)
     census_notes = models.TextField(blank=True)
     description = models.TextField(blank=True)
-    source = models.CharField(max_length=64, blank=True, default="American Community Survey Subject Definitions")
-    
+    source = models.CharField(
+        max_length=64,
+        blank=True,
+        default="American Community Survey Subject Definitions",
+    )
+
     class Meta:
-        ordering = ('name',)
-        
+        ordering = ("name",)
+
     def __unicode__(self):
-        return '%s' % self.name
-        
-        
+        return "%s" % self.name
+
+
 class Geography(models.Model):
     full_geoid = models.CharField(max_length=16)
     full_name = models.CharField(max_length=128)
@@ -124,11 +130,10 @@ class Geography(models.Model):
     aland = models.CharField(max_length=24, blank=True, null=True)
     intptlat = models.CharField(max_length=16, blank=True)
     intptlon = models.CharField(max_length=16, blank=True)
-    
+
     class Meta:
-        ordering = ('full_geoid',)
+        ordering = ("full_geoid",)
         verbose_name_plural = "Geographies"
 
     def __unicode__(self):
-        return '%s' % self.full_name
-    
+        return "%s" % self.full_name

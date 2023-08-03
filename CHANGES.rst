@@ -1,6 +1,23 @@
 Wazimap Version History
 =======================
 
+2.1.2 (19 Feburary 2020)
+-------------------------
+
+* Fix key error in Geometry features Github Issue #159
+
+2.1.1 (03 Feburary 2020)
+-------------------------
+
+* Replace calls to .itervalues with calls to .values()
+
+2.1.0 (09 October 2019)
+------------------------
+* Upgrade to python 3
+* Upgrade to django 2
+* Return fieldtable id from as_dict
+* better object representation of fieldtable object.
+
 2.0.0 (?)
 
 This release of Wazimap introduces some backwards incompatible changes. You WILL need to follow the upgrade steps.
@@ -31,7 +48,7 @@ This release of Wazimap introduces some backwards incompatible changes.
 * BREAKING: The Geography model has changed. You must run ``python manage.py migrate`` when updating.
 * BREAKING: The method signature of the ``profile_builder`` function has changed. It is now called as ``get_profile(geo, profile_name, request)``. You will need to update your profile methods to work with a ``geo`` object rather than a ``level`` and a ``code``. Use ``geo.geo_level`` and ``geo.geo_code`` instead.
 * BREAKING: Some methods on the ``GeoData`` object now take a ``Geography`` object rather than a ``geo_level`` and a ``geo_code``.
-* BREAKING: The ``geography_data`` setting must include a geography version at the top of the dict. Use ``''`` by default. eg: ``{'': {'country': 'geo/country.geojson'}}``
+* BREAKING: The ``geometry_data`` setting must include a geography version at the top of the dict. Use ``''`` by default. eg: ``{'': {'country': 'geo/country.geojson'}}``
 * Some methods on the ``GeoData`` object now take an optional ``version`` parameter.
 * A new method ``GeoData.get_comparative_geos`` makes it easier to build the profile page for comparative geographies.
 * FIX: load streetmap tiles over https if necessary

@@ -41,7 +41,7 @@ from wazimap.data.utils import (
     add_metadata,
     current_context,
 )
-from sqlalchemy import Column, String, Table, or_, and_, func
+from sqlalchemy import Column, String, Table, or_, and_, func, text
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.orm import class_mapper
 import sqlalchemy.types
@@ -264,6 +264,7 @@ class DataTable(models.Model):
 
     def as_dict(self):
         return {
+            "id": self.id,
             "title": self.description or self.name,
             "universe": self.universe,
             "denominator_column_id": self.total_column,
@@ -564,14 +565,14 @@ class FieldTable(DataTable):
     CHOICES = ((INTEGER, INTEGER), (FLOAT, FLOAT))
 
     fields = ArrayField(
-        models.CharField(max_length=50, null=False, unique=True),
+        models.CharField(max_length=150, null=False, unique=True),
         help_text="Comma-separated ordered list of fields this table describes.",
     )
     db_table_releases = models.ManyToManyField(
         DBTable, through="FieldTableRelease", through_fields=("data_table", "db_table")
     )
     denominator_key = models.CharField(
-        max_length=50,
+        max_length=150,
         null=True,
         blank=True,
         help_text='The key value of the rightmost field that should be used as the "total" column, '
@@ -1048,7 +1049,7 @@ class FieldTable(DataTable):
 
             if attr == "total":
                 if is_desc:
-                    attr = attr + " DESC"
+                    attr = text(attr + " DESC")
             else:
                 attr = getattr(db_model, attr)
                 if is_desc:

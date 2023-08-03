@@ -251,9 +251,9 @@ class GeoData(object):
         """
         search_term = search_term.strip()
 
-        query = self.geo_model.objects\
-            .filter(Q(name__icontains=search_term) |
-                    Q(geo_code=search_term.upper()))
+        query = self.geo_model.objects.filter(
+            Q(name__icontains=search_term) | Q(geo_code=search_term.upper())
+        ).distinct("name")
 
         if version is None:
             version = self.default_version

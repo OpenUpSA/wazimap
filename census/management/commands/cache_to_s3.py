@@ -1,3 +1,4 @@
+from __future__ import print_function
 from django.core.management.base import BaseCommand
 from multiprocessing import Pool
 from traceback import format_exc

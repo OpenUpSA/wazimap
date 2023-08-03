@@ -19,6 +19,8 @@ handler500 = 'census.views.server_error'
 STANDARD_CACHE_TIME = settings.WAZIMAP['cache_secs']
 EMBED_CACHE_TIME = settings.WAZIMAP.get('embed_cache_secs', STANDARD_CACHE_TIME)
 
+GEOGRAPHY_LEVELS = '|'.join(settings.WAZIMAP['levels'].keys())
+PROFILES_GEOGRAPHY_REGEX = r'profiles/(?P<geography_id>[{}]+-\w+)(-(?P<slug>[\w-]+))?'.format(GEOGRAPHY_LEVELS)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -45,7 +47,7 @@ urlpatterns = [
 
     # e.g. /profiles/province-GT/
     url(
-        regex   = '^profiles/(?P<geography_id>\w+-\w+)(-(?P<slug>[\w-]+))?/$',
+        regex   = '^{}/$'.format(PROFILES_GEOGRAPHY_REGEX),
         view    = cache_page(STANDARD_CACHE_TIME)(GeographyDetailView.as_view()),
         kwargs  = {},
         name    = 'geography_detail',
@@ -62,7 +64,7 @@ urlpatterns = [
 
     # e.g. /profiles/province-GT.json
     url(
-        regex   = '^(embed_data/)?profiles/(?P<geography_id>\w+-\w+)(-(?P<slug>[\w-]+))?\.json$',
+        regex   = '^(embed_data/)?{}\.json/$'.format(PROFILES_GEOGRAPHY_REGEX),
         view    = cache_page(STANDARD_CACHE_TIME)(GeographyJsonView.as_view()),
         kwargs  = {},
         name    = 'geography_json',

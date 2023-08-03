@@ -31,9 +31,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.humanize',
     'django.contrib.staticfiles',
+    'corsheaders',
     'sass_processor',
     'wazimap.apps.WazimapConfig',
-    'census',
+    'census'
 ]
 
 ALLOWED_HOSTS = ['*']
@@ -61,11 +62,11 @@ MEDIA_URL = ''
 STATIC_ROOT = 'static'
 STATIC_URL = '/static/'
 
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'sass_processor.finders.CssFinder',
-)
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "sass_processor.finders.CssFinder",
+]
 
 
 # Templates
@@ -101,10 +102,10 @@ MIDDLEWARE = [
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_METHODS = (
+CORS_ALLOW_METHODS = [
     'GET',
     'OPTIONS'
-)
+]
 
 
 # Databases and caches
