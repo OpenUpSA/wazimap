@@ -1,4 +1,4 @@
-FROM python:3.7.17-slim
+FROM python:3.7.17-slim-bullseye
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -17,10 +17,9 @@ RUN set -ex \
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --upgrade pip \
-    pip install -r requirements.txt
-
 COPY . .
+
+RUN pip install --upgrade pip \
+    pip install .
 
 EXPOSE 5000

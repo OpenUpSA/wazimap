@@ -10,27 +10,9 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 with open(path.join(here, 'VERSION')) as f:
     version = f.read().strip()
-
-install_requires = [
-    'Django~=2.2.6',
-    'SQLAlchemy~=1.2.17',
-    'boto~=2.49.0',
-    'dj-database-url~=0.5.0',
-    'django-cors-headers~=3.0.2',
-    'django-compressor~=2.2',
-    'django-pipeline~=1.6.14',
-    'django-sass-processor~=0.7.3',
-    'ecdsa~=0.11',
-    'libsass~=0.17.0',
-    'paramiko~=1.18.5',
-    'psycopg2~=2.8.5',
-    'requests~=2.21',
-    'unicodecsv~=0.14.1',
-    'whitenoise!=4.1.2',
-]
-
 setup(
     name='wazimap',
+    packages=['wazimap'],
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -73,7 +55,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(),
+    #packages=find_packages(),
 
     include_package_data=True,
 
@@ -81,10 +63,26 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=install_requires,
+    install_requires=[
+        'Django~=2.2.6',
+        'SQLAlchemy~=1.2.17',
+        'boto~=2.49.0',
+        'dj-database-url~=0.5.0',
+        'django-cors-headers~=3.0.2',
+        'django-compressor~=2.2',
+        'django-pipeline~=1.6.14',
+        'django-sass-processor~=0.7.3',
+        'ecdsa~=0.11',
+        'libsass~=0.17.0',
+        'paramiko~=1.18.5',
+        'psycopg2~=2.8.5',
+        'requests~=2.21',
+        'unicodecsv~=0.14.1',
+        'whitenoise~=4.1.2',
+    ],
 
     setup_requires=[
-        "setuptools_git >= 1.0",
+        "setuptools_git ~= 1.0",
     ],
 
     # List additional groups of dependencies here (e.g. development
